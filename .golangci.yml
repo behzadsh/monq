@@ -1,0 +1,108 @@
+version: "2"
+run:
+  timeout: 5m
+  relative-path-mode: gomod
+  allow-parallel-runners: true
+  go: "1.24"
+linters:
+  default: none
+  enable:
+    - errcheck
+    - govet
+    - ineffassign
+    - staticcheck
+    - unused
+    - errname
+    - gocyclo
+    - godot
+    - gosec
+    - revive
+    - misspell
+    - prealloc
+    - unconvert
+    - nolintlint
+  settings:
+    errcheck:
+      check-type-assertions: true
+      check-blank: true
+    govet:
+      enable:
+        - shadow
+    gocyclo:
+      min-complexity: 10
+    godot:
+      capital: true
+    revive:
+      enable-all-rules: true
+      rules:
+        - name: add-constant
+          disabled: true
+        - name: argument-limit
+          disabled: true
+        - name: cyclomatic
+          disabled: true
+        - name: import-alias-naming
+          arguments:
+            - "^[a-z][a-zA-Z0-9]{0,}$"
+        - name: line-length-limit
+          disabled: true
+        - name: function-result-limit
+          disabled: true
+        - name: flag-parameter
+          disabled: true
+        - name: max-public-structs
+          disabled: true
+        - name: banned-characters
+          disabled: true
+        - name: cognitive-complexity
+          disabled: true
+        - name: function-length
+          disabled: true
+        - name: file-header
+          disabled: true
+        - name: nested-structs
+          disabled: true
+        - name: unhandled-error
+          arguments:
+            - "fmt.Printf"
+            - "fmt.Println"
+            - "fmt.Print"
+    misspell:
+      locale: US
+    prealloc:
+      for-loops: true
+    nolintlint:
+      allow-unused: true
+      require-explanation: true
+      require-specific: true
+  exclusions:
+    warn-unused: true
+formatters:
+  enable:
+    - gci
+    - gofmt
+    - gofumpt
+    - golines
+  settings:
+    gci:
+      sections:
+        - standard
+        - default
+        - prefix(github.com/behzadsh/monq)
+        - blank
+        - dot
+      custom-order: true
+    gofmt:
+      rewrite-rules:
+        - pattern: 'interface{}'
+          replacement: 'any'
+        - pattern: 'a[b:len(a)]'
+          replacement: 'a[b:]'
+    gofumpt:
+      module-path: github.com/behzadsh/monq
+      extra-rules: true
+    golines:
+      max-len: 160
+issues:
+  max-issues-per-linter: 0
+  max-same-issues: 0

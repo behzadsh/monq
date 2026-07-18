@@ -1,0 +1,55 @@
+# monq
+
+A composable query-building library for the [official MongoDB Go driver](https://pkg.go.dev/go.mongodb.org/mongo-driver/v2/mongo).
+
+## Why
+
+Hand-written MongoDB queries with the Go driver mean nesting `bson.D`, `bson.A`, and `bson.E` values, and remembering operator strings like `$eq`, `$gte`,
+or `$elemMatch`, usually with the MongoDB docs open in another tab. `monq` replaces that with plain functions named after the operators they build, so the
+function signature tells you what it does and your editor's autocomplete surfaces the operators you have available.
+
+`monq` is not an ODM. There are no models, no sessions, no query execution, it only builds `bson.D` values and hands them back. Every function's output
+plugs directly into `Find`, `Aggregate`, `UpdateOne`, and the rest of the driver's API with no adapter layer in between.
+
+## How it works
+
+Each function takes a field path and a value (or, for logical operators, other `monq` expressions) and returns a `bson.D`:
+
+```go
+monq.Eq("status", "active")
+// bson.D{{Key: "status", Value: bson.D{{Key: "$eq", Value: "active"}}}}
+```
+
+Filters compose by nesting function calls, no builder object, no method chaining:
+
+```go
+filter := monq.And(
+    monq.Eq("status", "active"),
+    monq.Or(
+        monq.Gte("stats.followers", 10000),
+        monq.Exists("verified_at", true),
+    ),
+)
+
+cursor, err := collection.Find(ctx, filter)
+```
+
+For anything `monq` doesn't have a function for yet, [`Raw`](raw.go) accepts a hand-written `bson.D` anywhere a monq expression is expected, so it composes
+with the rest of a query instead of forcing an all-or-nothing rewrite:
+
+```go
+monq.And(
+    monq.Eq("status", "active"),
+    monq.Raw(bson.D{{Key: "legacyField", Value: bson.D{{Key: "$type", Value: "string"}}}}),
+)
+```
+
+## Install
+
+```sh
+go get github.com/behzadsh/monq
+```
+
+## License
+
+[MIT](LICENSE)

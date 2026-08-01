@@ -64,14 +64,22 @@ filter := monq.ElemMatch("items",
 
 Query operators available today:
 
-| Category   | Functions                                        |
-| ---------- | ------------------------------------------------ |
-| Comparison | `Eq` `Ne` `Gt` `Gte` `Lt` `Lte` `In` `Nin`        |
-| Logical    | `And` `Or` `Nor` `Not`                           |
-| Element    | `Exists` `Type`                                  |
-| Array      | `All` `ElemMatch` `Size`                         |
-| Evaluation | `Regex`                                          |
-| Escape     | `Raw`                                            |
+| Category   | Functions                                                |
+| ---------- | -------------------------------------------------------- |
+| Comparison | `Eq` `Ne` `Gt` `Gte` `Lt` `Lte` `In` `Nin`                |
+| Logical    | `And` `Or` `Nor` `Not`                                    |
+| Element    | `Exists` `Type`                                           |
+| Array      | `All` `ElemMatch` `Size`                                  |
+| Evaluation | `Expr` `JSONSchema` `Mod` `Regex` `Text`                  |
+| Bitwise    | `BitsAllClear` `BitsAllSet` `BitsAnyClear` `BitsAnySet`   |
+| Escape     | `Raw`                                                     |
+
+Operators with optional parts take them as variadic options named after the MongoDB field they set:
+
+```go
+monq.Text("coffee shop", monq.Language("en"), monq.CaseSensitive())
+// {"$text": {"$search": "coffee shop", "$language": "en", "$caseSensitive": true}}
+```
 
 ## Install
 

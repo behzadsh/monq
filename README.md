@@ -195,6 +195,7 @@ different functions rather than one name; `expr.Eq("status", "active")` compares
 | Comparison  | `Cmp` `Eq` `Ne` `Gt` `Gte` `Lt` `Lte`         |
 | Boolean     | `And` `Or` `Not`                              |
 | Conditional | `Cond` `IfNull` `Switch` `Branch` `DefaultCase` |
+| Arithmetic  | `Abs` `Add` `Ceil` `Divide` `Exp` `Floor` `Ln` `Log` `Log10` `Mod` `Multiply` `Pow` `Round` `Sqrt` `Subtract` `Trunc` |
 
 ## Install
 

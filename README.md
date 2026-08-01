@@ -46,9 +46,32 @@ with the rest of a query instead of forcing an all-or-nothing rewrite:
 ```go
 monq.And(
     monq.Eq("status", "active"),
-    monq.Raw(bson.D{{Key: "legacyField", Value: bson.D{{Key: "$type", Value: "string"}}}}),
+    monq.Raw(bson.D{{Key: "$where", Value: "this.credits == this.debits"}}),
 )
 ```
+
+Array conditions read the same way. `ElemMatch` takes the criteria a single array element has to satisfy:
+
+```go
+filter := monq.ElemMatch("items",
+    monq.Eq("sku", "abc"),
+    monq.Gte("qty", 2),
+)
+// {"items": {"$elemMatch": {"sku": {"$eq": "abc"}, "qty": {"$gte": 2}}}}
+```
+
+## Operators
+
+Query operators available today:
+
+| Category   | Functions                                        |
+| ---------- | ------------------------------------------------ |
+| Comparison | `Eq` `Ne` `Gt` `Gte` `Lt` `Lte` `In` `Nin`        |
+| Logical    | `And` `Or` `Nor` `Not`                           |
+| Element    | `Exists` `Type`                                  |
+| Array      | `All` `ElemMatch` `Size`                         |
+| Evaluation | `Regex`                                          |
+| Escape     | `Raw`                                            |
 
 ## Install
 

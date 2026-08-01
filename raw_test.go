@@ -50,8 +50,8 @@ func TestRaw(t *testing.T) {
 }
 
 func ExampleRaw() {
-	filter := monq.Raw(bson.D{{Key: "legacyField", Value: bson.D{{Key: "$type", Value: "string"}}}})
+	filter := monq.Raw(bson.D{{Key: "$where", Value: "this.credits == this.debits"}})
 
 	fmt.Println(filter)
-	// Output: {"legacyField":{"$type":"string"}}
+	// Output: {"$where":"this.credits == this.debits"}
 }

@@ -29,3 +29,13 @@ func Pipeline(stages ...bson.D) []bson.D {
 
 	return pipeline
 }
+
+// toStageArray copies stages into the bson.A that a stage nesting a sub-pipeline expects as its value.
+func toStageArray(stages []bson.D) bson.A {
+	arr := make(bson.A, len(stages))
+	for i, s := range stages {
+		arr[i] = s
+	}
+
+	return arr
+}

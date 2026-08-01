@@ -9,6 +9,9 @@ import "go.mongodb.org/mongo-driver/v2/bson"
 // given, so each piece stays a bson.D like everything else in monq. The name is an output field name: it cannot
 // contain a dot, cannot start with a $, and in a [Group] it cannot be _id, which the group key already owns.
 //
+// It builds the same pair [Field] does and exists under its own name because grouping stages call these fields
+// accumulators; use whichever reads better where you are.
+//
 // Example:
 //
 //	stage.Accumulator("total", bson.D{{Key: "$sum", Value: "$amount"}})
@@ -16,7 +19,7 @@ import "go.mongodb.org/mongo-driver/v2/bson"
 //
 // MongoDB docs: https://www.mongodb.com/docs/manual/reference/operator/aggregation/group/#accumulator-operator
 func Accumulator(name string, accumulator any) bson.D {
-	return bson.D{{Key: name, Value: accumulator}}
+	return Field(name, accumulator)
 }
 
 // BucketOption configures one optional field of a [Bucket] or [BucketAuto] stage.
@@ -159,12 +162,7 @@ func Facet(facets ...bson.D) bson.D {
 //
 // MongoDB docs: https://www.mongodb.com/docs/manual/reference/operator/aggregation/facet/
 func FacetPipeline(name string, stages ...bson.D) bson.D {
-	pipeline := make(bson.A, len(stages))
-	for i, s := range stages {
-		pipeline[i] = s
-	}
-
-	return bson.D{{Key: name, Value: pipeline}}
+	return bson.D{{Key: name, Value: toStageArray(stages)}}
 }
 
 // Group returns a stage that groups documents by a key and accumulates values over each group.

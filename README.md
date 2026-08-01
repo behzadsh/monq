@@ -152,12 +152,14 @@ stage.Group("$category",
 // {"$group": {"_id": "$category", "total": {"$sum": "$amount"}}}
 ```
 
-| Category  | Functions                                                        |
-| --------- | ---------------------------------------------------------------- |
-| Filtering | `Match` `Limit` `Skip` `Sample` `Count` `Sort`                    |
-| Grouping  | `Group` `Bucket` `BucketAuto` `SortByCount` `Facet` `Unwind`      |
-| Building  | `Accumulator` `FacetPipeline`                                     |
-| Assembly  | `Pipeline`                                                        |
+| Category  | Functions                                                                        |
+| --------- | ---------------------------------------------------------------------------------- |
+| Filtering | `Match` `Limit` `Skip` `Sample` `Count` `Sort`                                    |
+| Grouping  | `Group` `Bucket` `BucketAuto` `SortByCount` `Facet` `Unwind`                       |
+| Joining   | `Lookup` `LookupPipeline` `GraphLookup` `UnionWith`                               |
+| Reshaping | `Project` `AddFields` `Set` `Unset` `ReplaceRoot` `ReplaceWith`                    |
+| Building  | `Field` `Accumulator` `FacetPipeline`                                             |
+| Assembly  | `Pipeline`                                                                         |
 
 ## Install
 

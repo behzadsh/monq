@@ -16,7 +16,10 @@
 // which one is meant, and neither name has to be bent out of shape.
 //
 // Aggregation expressions inside stages refer to fields with the "$field" string form rather than a bare field
-// name, since that is how the aggregation framework tells a field reference from a literal string.
+// name, since that is how the aggregation framework tells a field reference from a literal string. Parameter types
+// follow that split: a parameter naming a path into a document is a monq.FieldPath ([Lookup]'s localField,
+// [Unset]'s fields), while an output field name ([Count], [Accumulator]) or an expression that happens to be a
+// string ([Unwind]'s path, [Group]'s id) is a plain string. Nothing here adds or strips a "$".
 //
 // monq does not track what a pipeline does to the shape of its documents. A stage that renames or regroups fields
 // is described in its doc comment, not in the type system, which is a deliberate limit: pipelines reshape data far

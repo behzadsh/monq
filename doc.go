@@ -12,6 +12,11 @@
 //		),
 //	)
 //
+// Geospatial queries come with their geometry, so GeoJSON never has to be written by hand: [Point], [Polygon], and
+// [GeoJSON] build the shape, [Geometry] hands it to [GeoWithin], [GeoIntersects], [Near], or [NearSphere], and the
+// legacy [Box], [Center], and [CenterSphere] shapes are there for 2d data. Every position is ordered
+// [longitude, latitude], the reverse of the order coordinates are usually quoted in.
+//
 // monq is not an ODM: there are no models, no sessions, and no query execution. Every function returns a raw driver
 // value (bson.D) that plugs directly into Find, Aggregate, UpdateOne, and friends with zero adapter layer. Values monq
 // does not yet cover can be dropped in anywhere via [Raw], so adoption can be partial.

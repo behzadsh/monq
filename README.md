@@ -72,6 +72,7 @@ Query operators available today:
 | Array      | `All` `ElemMatch` `Size`                                  |
 | Evaluation | `Expr` `JSONSchema` `Mod` `Regex` `Text`                  |
 | Bitwise    | `BitsAllClear` `BitsAllSet` `BitsAnyClear` `BitsAnySet`   |
+| Geospatial | `GeoWithin` `GeoIntersects` `Near` `NearSphere`           |
 | Escape     | `Raw`                                                     |
 
 Operators with optional parts take them as variadic options named after the MongoDB field they set:
@@ -79,6 +80,14 @@ Operators with optional parts take them as variadic options named after the Mong
 ```go
 monq.Text("coffee shop", monq.Language("en"), monq.CaseSensitive())
 // {"$text": {"$search": "coffee shop", "$language": "en", "$caseSensitive": true}}
+```
+
+Geospatial queries come with geometry constructors, so there is no hand-written GeoJSON. `Point`, `Polygon`, and `GeoJSON` build the shape, `Geometry`
+hands it to an operator, and the legacy `Box`, `Center`, and `CenterSphere` shapes are there for 2d data. Positions are `[longitude, latitude]`:
+
+```go
+monq.Near("loc", monq.Geometry(monq.Point(-73.97, 40.77)), monq.MaxDistance(1000))
+// {"loc": {"$near": {"$geometry": {"type": "Point", "coordinates": [-73.97, 40.77]}, "$maxDistance": 1000.0}}}
 ```
 
 ## Install

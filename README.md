@@ -143,10 +143,21 @@ cursor, err := collection.Aggregate(ctx, pipeline)
 `Pipeline` returns a `[]bson.D`, which is what the driver's `mongo.Pipeline` is defined as, so it goes into `Aggregate` as is. A plain slice literal works
 too.
 
-| Category  | Functions                                             |
-| --------- | ----------------------------------------------------- |
-| Filtering | `Match` `Limit` `Skip` `Sample` `Count` `Sort`         |
-| Assembly  | `Pipeline`                                             |
+Grouping stages take their output fields as `Accumulator` pieces, merged into one document by the stage:
+
+```go
+stage.Group("$category",
+    stage.Accumulator("total", bson.D{{Key: "$sum", Value: "$amount"}}),
+)
+// {"$group": {"_id": "$category", "total": {"$sum": "$amount"}}}
+```
+
+| Category  | Functions                                                        |
+| --------- | ---------------------------------------------------------------- |
+| Filtering | `Match` `Limit` `Skip` `Sample` `Count` `Sort`                    |
+| Grouping  | `Group` `Bucket` `BucketAuto` `SortByCount` `Facet` `Unwind`      |
+| Building  | `Accumulator` `FacetPipeline`                                     |
+| Assembly  | `Pipeline`                                                        |
 
 ## Install
 

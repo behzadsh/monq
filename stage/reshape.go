@@ -124,14 +124,5 @@ func Set(fields ...bson.D) bson.D {
 //
 // MongoDB docs: https://www.mongodb.com/docs/manual/reference/operator/aggregation/unset/
 func Unset(fields ...monq.FieldPath) bson.D {
-	if len(fields) == 1 {
-		return bson.D{{Key: "$unset", Value: string(fields[0])}}
-	}
-
-	names := make(bson.A, len(fields))
-	for i, f := range fields {
-		names[i] = string(f)
-	}
-
-	return bson.D{{Key: "$unset", Value: names}}
+	return bson.D{{Key: "$unset", Value: fieldNames(fields)}}
 }

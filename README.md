@@ -158,8 +158,17 @@ stage.Group("$category",
 | Grouping  | `Group` `Bucket` `BucketAuto` `SortByCount` `Facet` `Unwind`                       |
 | Joining   | `Lookup` `LookupPipeline` `GraphLookup` `UnionWith`                               |
 | Reshaping | `Project` `AddFields` `Set` `Unset` `ReplaceRoot` `ReplaceWith`                    |
-| Building  | `Field` `Accumulator` `FacetPipeline`                                             |
+| Output    | `Out` `Merge` `Documents`                                                          |
+| Geospatial| `GeoNear`                                                                          |
+| Building  | `Field` `Accumulator` `FacetPipeline` `Namespace`                                  |
 | Assembly  | `Pipeline`                                                                         |
+
+`GeoNear` takes the same geometry constructors the query operators do, which is why they return bare GeoJSON:
+
+```go
+stage.GeoNear(monq.Point(-73.97, 40.77), "distance", stage.MaxDistance(1000), stage.Spherical())
+// {"$geoNear": {"near": {"type": "Point", "coordinates": [-73.97, 40.77]}, "distanceField": "distance", ...}}
+```
 
 ## Install
 

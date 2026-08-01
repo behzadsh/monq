@@ -21,6 +21,10 @@
 // [Unset]'s fields), while an output field name ([Count], [Accumulator]) or an expression that happens to be a
 // string ([Unwind]'s path, [Group]'s id) is a plain string. Nothing here adds or strips a "$".
 //
+// A few stages have to sit in a particular place, and nothing here checks that: [GeoNear] and [Documents] have to
+// come first, [Out] and [Merge] have to come last, and a [Match] carrying a $text search is only valid as the very
+// first stage. The server reports those mistakes at execution time.
+//
 // monq does not track what a pipeline does to the shape of its documents. A stage that renames or regroups fields
 // is described in its doc comment, not in the type system, which is a deliberate limit: pipelines reshape data far
 // too freely for a Go type to follow along.

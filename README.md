@@ -170,6 +170,32 @@ stage.GeoNear(monq.Point(-73.97, 40.77), "distance", stage.MaxDistance(1000), st
 // {"$geoNear": {"near": {"type": "Point", "coordinates": [-73.97, 40.77]}, "distanceField": "distance", ...}}
 ```
 
+## Aggregation expressions
+
+`monq/expr` builds the expressions stages compute with. Expression operators compare values rather than naming a field, so a field goes in as a reference:
+
+```go
+stage.Project(
+    stage.Field("name", 1),
+    stage.Field("grade", expr.Switch(
+        expr.Branch(expr.Gte(expr.Field("score"), 90), "A"),
+        expr.Branch(expr.Gte(expr.Field("score"), 80), "B"),
+        expr.DefaultCase("F"),
+    )),
+)
+```
+
+`expr.Field("score")` is the string `"$score"`, which is how the aggregation framework tells a field from a constant. The rule runs both ways: any string
+starting with `$` is read as a reference, so a literal one goes through `expr.Literal`. That is also why `expr.Eq(a, b)` and `monq.Eq(field, value)` are
+different functions rather than one name; `expr.Eq("status", "active")` compares two constants and is false everywhere.
+
+| Category    | Functions                                    |
+| ----------- | -------------------------------------------- |
+| References  | `Field` `Literal`                             |
+| Comparison  | `Cmp` `Eq` `Ne` `Gt` `Gte` `Lt` `Lte`         |
+| Boolean     | `And` `Or` `Not`                              |
+| Conditional | `Cond` `IfNull` `Switch` `Branch` `DefaultCase` |
+
 ## Install
 
 ```sh

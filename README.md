@@ -90,6 +90,32 @@ monq.Near("loc", monq.Geometry(monq.Point(-73.97, 40.77)), monq.MaxDistance(1000
 // {"loc": {"$near": {"$geometry": {"type": "Point", "coordinates": [-73.97, 40.77]}, "$maxDistance": 1000.0}}}
 ```
 
+## Updates
+
+Update operators work the same way, one field each, and a single one is already a valid update document:
+
+```go
+collection.UpdateOne(ctx, filter, monq.Set("status", "active"))
+// {"$set": {"status": "active"}}
+```
+
+Several of them go through `Update`, which merges operators sharing a key. It is to update documents what `And` is to filters, and it exists because two
+`$set` documents concatenated by hand end up as a duplicate key that MongoDB does not merge:
+
+```go
+update := monq.Update(
+    monq.Set("status", "active"),
+    monq.Inc("logins", 1),
+    monq.Set("name", "ada"),
+)
+// {"$set": {"status": "active", "name": "ada"}, "$inc": {"logins": 1}}
+```
+
+| Category     | Functions                                                                              |
+| ------------ | -------------------------------------------------------------------------------------- |
+| Field update | `Set` `SetOnInsert` `Unset` `Inc` `Mul` `Min` `Max` `Rename` `CurrentDate` `CurrentDateTimestamp` |
+| Composition  | `Update`                                                                                 |
+
 ## Install
 
 ```sh

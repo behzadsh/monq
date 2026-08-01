@@ -125,6 +125,29 @@ monq.PushEach("scores", []any{90, 80}, monq.PushSort(-1), monq.PushSlice(3))
 // {"$push": {"scores": {"$each": [90, 80], "$sort": -1, "$slice": 3}}}
 ```
 
+## Aggregation stages
+
+Pipeline stages live in `monq/stage`, one function per stage. The package split is what keeps names honest: `stage.Set` is the `$set` stage while
+`monq.Set` is the `$set` update operator, and the qualifier says which one is meant.
+
+```go
+pipeline := stage.Pipeline(
+    stage.Match(monq.Eq("status", "active")),
+    stage.Sort(bson.D{{Key: "created_at", Value: -1}}),
+    stage.Limit(20),
+)
+
+cursor, err := collection.Aggregate(ctx, pipeline)
+```
+
+`Pipeline` returns a `[]bson.D`, which is what the driver's `mongo.Pipeline` is defined as, so it goes into `Aggregate` as is. A plain slice literal works
+too.
+
+| Category  | Functions                                             |
+| --------- | ----------------------------------------------------- |
+| Filtering | `Match` `Limit` `Skip` `Sample` `Count` `Sort`         |
+| Assembly  | `Pipeline`                                             |
+
 ## Install
 
 ```sh

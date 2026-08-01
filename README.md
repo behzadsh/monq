@@ -111,10 +111,19 @@ update := monq.Update(
 // {"$set": {"status": "active", "name": "ada"}, "$inc": {"logins": 1}}
 ```
 
-| Category     | Functions                                                                              |
-| ------------ | -------------------------------------------------------------------------------------- |
-| Field update | `Set` `SetOnInsert` `Unset` `Inc` `Mul` `Min` `Max` `Rename` `CurrentDate` `CurrentDateTimestamp` |
-| Composition  | `Update`                                                                                 |
+| Category     | Functions                                                                                         |
+| ------------ | ------------------------------------------------------------------------------------------------- |
+| Field update | `Set` `SetOnInsert` `Unset` `Inc` `Mul` `Min` `Max` `Rename` `CurrentDate` `CurrentDateTimestamp`  |
+| Array update | `Push` `PushEach` `AddToSet` `AddToSetEach` `Pull` `PullAll` `PopFirst` `PopLast`                  |
+| Bitwise      | `BitAnd` `BitOr` `BitXor`                                                                          |
+| Composition  | `Update`                                                                                            |
+
+The `$each` form of `$push` is its own function, since the `$position`, `$slice`, and `$sort` modifiers only exist there:
+
+```go
+monq.PushEach("scores", []any{90, 80}, monq.PushSort(-1), monq.PushSlice(3))
+// {"$push": {"scores": {"$each": [90, 80], "$sort": -1, "$slice": 3}}}
+```
 
 ## Install
 

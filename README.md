@@ -189,6 +189,16 @@ stage.Project(
 starting with `$` is read as a reference, so a literal one goes through `expr.Literal`. That is also why `expr.Eq(a, b)` and `monq.Eq(field, value)` are
 different functions rather than one name; `expr.Eq("status", "active")` compares two constants and is false everywhere.
 
+Accumulators are the same functions, since MongoDB spells them the same way. `Sum` reads its argument count: one argument totals a field across a group,
+several add them up inside each document.
+
+```go
+stage.Group("$category",
+    stage.Accumulator("total", expr.Sum(expr.Field("amount"))),
+    stage.Accumulator("best", expr.Top(bson.D{{Key: "score", Value: -1}}, expr.Field("name"))),
+)
+```
+
 | Category    | Functions                                    |
 | ----------- | -------------------------------------------- |
 | References  | `Field` `Literal`                             |
@@ -203,6 +213,10 @@ different functions rather than one name; `expr.Eq("status", "active")` compares
 | Array shape | `Filter` `Map` `Reduce` `Range` `ReverseArray` `Slice` `SliceFrom` `SortArray` `Zip`         |
 | Object      | `ArrayToObject` `ObjectToArray` `MergeObjects` `GetField` `SetField` `UnsetField`            |
 | Set         | `AllElementsTrue` `AnyElementTrue` `SetDifference` `SetEquals` `SetIntersection` `SetIsSubset` `SetUnion` |
+| Date        | `DateAdd` `DateSubtract` `DateDiff` `DateFromParts` `DateToParts` `DateFromString` `DateToString`         |
+| Date parts  | `Year` `Month` `DayOfMonth` `DayOfWeek` `DayOfYear` `Hour` `Minute` `Second` `Millisecond` `Week` `IsoDayOfWeek` `IsoWeek` `IsoWeekYear` |
+| Conversion  | `Convert` `IsNumber` `Type` `ToBool` `ToDate` `ToDecimal` `ToDouble` `ToInt` `ToLong` `ToObjectID` `ToString` |
+| Accumulator | `Sum` `Avg` `Max` `Min` `Push` `AddToSet` `Count` `StdDevPop` `StdDevSamp` `Top` `TopN` `Bottom` `BottomN` `Median` `Percentile` |
 
 ## Install
 

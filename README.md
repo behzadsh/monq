@@ -218,6 +218,37 @@ stage.Group("$category",
 | Conversion  | `Convert` `IsNumber` `Type` `ToBool` `ToDate` `ToDecimal` `ToDouble` `ToInt` `ToLong` `ToObjectID` `ToString` |
 | Accumulator | `Sum` `Avg` `Max` `Min` `Push` `AddToSet` `Count` `StdDevPop` `StdDevSamp` `Top` `TopN` `Bottom` `BottomN` `Median` `Percentile` |
 
+## Sorting and indexes
+
+Sort documents are built the same way as everything else, and order matters, so the entries stay in the order given:
+
+```go
+sort := monq.Sort(monq.Desc("created_at"), monq.Asc("_id"))
+// {"created_at": -1, "_id": 1}
+
+cursor, err := collection.Find(ctx, filter, options.Find().SetSort(sort))
+```
+
+Index models live in `monq/index`, where keys and options are one argument list:
+
+```go
+model := index.New(
+    index.Asc("email"),
+    index.Unique(),
+    index.PartialFilter(monq.Exists("deleted_at", false)),
+)
+
+_, err := collection.Indexes().CreateOne(ctx, model)
+```
+
+That package is separate on purpose. `mongo.IndexModel` comes from the driver's `mongo` package, which carries several third-party dependencies; keeping it
+out of the root means a program that only builds queries never compiles any of them.
+
+| Package      | Functions                                                                                |
+| ------------ | ------------------------------------------------------------------------------------------ |
+| `monq`       | `Sort` `Asc` `Desc` `TextScore`                                                            |
+| `monq/index` | `New` `Asc` `Desc` `Text` `Hashed` `Geo2D` `Geo2DSphere` `Unique` `Sparse` `TTL` `PartialFilter` `Name` `Hidden` |
+
 ## Install
 
 ```sh

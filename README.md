@@ -196,6 +196,9 @@ different functions rather than one name; `expr.Eq("status", "active")` compares
 | Boolean     | `And` `Or` `Not`                              |
 | Conditional | `Cond` `IfNull` `Switch` `Branch` `DefaultCase` |
 | Arithmetic  | `Abs` `Add` `Ceil` `Divide` `Exp` `Floor` `Ln` `Log` `Log10` `Mod` `Multiply` `Pow` `Round` `Sqrt` `Subtract` `Trunc` |
+| String      | `Concat` `Split` `SubstrBytes` `SubstrCP` `StrLenBytes` `StrLenCP` `Strcasecmp` `ToLower` `ToUpper` |
+| Trimming    | `Trim` `Ltrim` `Rtrim` `TrimChars`             |
+| Searching   | `IndexOfBytes` `IndexOfCP` `RegexFind` `RegexFindAll` `RegexMatch` `ReplaceOne` `ReplaceAll` |
 
 ## Install
 

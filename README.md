@@ -199,6 +199,10 @@ different functions rather than one name; `expr.Eq("status", "active")` compares
 | String      | `Concat` `Split` `SubstrBytes` `SubstrCP` `StrLenBytes` `StrLenCP` `Strcasecmp` `ToLower` `ToUpper` |
 | Trimming    | `Trim` `Ltrim` `Rtrim` `TrimChars`             |
 | Searching   | `IndexOfBytes` `IndexOfCP` `RegexFind` `RegexFindAll` `RegexMatch` `ReplaceOne` `ReplaceAll` |
+| Array       | `ArrayElemAt` `ConcatArrays` `First` `Last` `FirstN` `LastN` `MaxN` `MinN` `In` `IndexOfArray` `IsArray` `Size` |
+| Array shape | `Filter` `Map` `Reduce` `Range` `ReverseArray` `Slice` `SliceFrom` `SortArray` `Zip`         |
+| Object      | `ArrayToObject` `ObjectToArray` `MergeObjects` `GetField` `SetField` `UnsetField`            |
+| Set         | `AllElementsTrue` `AnyElementTrue` `SetDifference` `SetEquals` `SetIntersection` `SetIsSubset` `SetUnion` |
 
 ## Install
 

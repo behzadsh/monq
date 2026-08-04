@@ -1,0 +1,115 @@
+// Command monqgen generates monq.FieldPath constants from the bson tags of a struct.
+//
+// Hand-written field paths are strings, so a renamed field or a mistyped path is found by a failing query rather
+// than by the compiler. monqgen reads the struct that a collection stores and writes the paths out as typed
+// constants, which every monq operator taking a path accepts as it is.
+//
+// Run it through go:generate, next to the struct it describes:
+//
+//	//go:generate go run github.com/behzadsh/monq/cmd/monqgen -type User
+//	type User struct {
+//		Email string `bson:"email"`
+//	}
+//
+// The flags are:
+//
+//	-type   the struct to read, required
+//	-out    the file to write, defaulting to the type name lowercased with _paths.go appended
+//	-print  write the path tree to standard output instead of generating a file
+//
+// The remaining argument is the package directory, which defaults to the current one. Paths follow the driver's
+// own tag rules, so a key is the field name lowercased unless a tag says otherwise, a tag of "-" drops the field,
+// and an embedded struct nests under its own name unless it is tagged ",inline".
+package main
+
+import (
+	"flag"
+	"fmt"
+	"os"
+	"strings"
+
+	"golang.org/x/tools/go/packages"
+)
+
+func main() {
+	typeName := flag.String("type", "", "name of the struct to read paths from")
+	out := flag.String("out", "", "file to write, defaults to <type>_paths.go")
+	printOnly := flag.Bool("print", false, "write the path tree to standard output instead of a file")
+
+	flag.Parse()
+
+	if *typeName == "" {
+		fmt.Fprintln(os.Stderr, "monqgen: -type is required")
+		flag.Usage()
+		os.Exit(2)
+	}
+
+	dir := "."
+	if flag.NArg() > 0 {
+		dir = flag.Arg(0)
+	}
+
+	if err := run(dir, *typeName, *out, *printOnly); err != nil {
+		fmt.Fprintf(os.Stderr, "monqgen: %v\n", err)
+		os.Exit(1)
+	}
+}
+
+// run loads the package, resolves the struct, and reports the path tree. Writing the generated file comes later;
+// for now the tree is what there is to show.
+func run(dir, typeName, out string, printOnly bool) error {
+	pkg, err := load(dir)
+	if err != nil {
+		return err
+	}
+
+	model, err := Parse(pkg, typeName)
+	if err != nil {
+		return err
+	}
+
+	if !printOnly {
+		return fmt.Errorf("generating %s is not implemented yet; run with -print to see the paths", outputName(typeName, out))
+	}
+
+	for _, path := range model.Paths() {
+		fmt.Println(path)
+	}
+
+	return nil
+}
+
+// load reads one package with its type information, which is what tells a document apart from a value that only
+// looks like one, such as a time.Time.
+func load(dir string) (*packages.Package, error) {
+	cfg := &packages.Config{
+		Mode: packages.NeedName | packages.NeedTypes | packages.NeedSyntax | packages.NeedTypesInfo,
+		Dir:  dir,
+	}
+
+	pkgs, err := packages.Load(cfg, ".")
+	if err != nil {
+		return nil, fmt.Errorf("loading package in %s: %w", dir, err)
+	}
+
+	if len(pkgs) != 1 {
+		return nil, fmt.Errorf("loading package in %s: found %d packages, want exactly one", dir, len(pkgs))
+	}
+
+	pkg := pkgs[0]
+	if len(pkg.Errors) > 0 {
+		return nil, fmt.Errorf("loading package %s: %w", pkg.PkgPath, pkg.Errors[0])
+	}
+
+	return pkg, nil
+}
+
+// outputName is the file the generated constants go into, one per type so that two go:generate lines in the same
+// package do not write over each other.
+func outputName(typeName, out string) string {
+	if out != "" {
+		return out
+	}
+
+	return strings.ToLower(typeName) + "_paths.go"
+}

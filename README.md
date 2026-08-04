@@ -70,7 +70,7 @@ Query operators available today:
 | Logical    | `And` `Or` `Nor` `Not`                                    |
 | Element    | `Exists` `Type`                                           |
 | Array      | `All` `ElemMatch` `Size`                                  |
-| Evaluation | `Expr` `JSONSchema` `Mod` `Regex` `Text`                  |
+| Evaluation | `Expr` `JSONSchema` `Mod` `Regex` `Text` `SampleRate`     |
 | Bitwise    | `BitsAllClear` `BitsAllSet` `BitsAnyClear` `BitsAnySet`   |
 | Geospatial | `GeoWithin` `GeoIntersects` `Near` `NearSphere`           |
 | Escape     | `Raw`                                                     |
@@ -213,10 +213,13 @@ stage.Group("$category",
 | Array shape | `Filter` `Map` `Reduce` `Range` `ReverseArray` `Slice` `SliceFrom` `SortArray` `Zip`         |
 | Object      | `ArrayToObject` `ObjectToArray` `MergeObjects` `GetField` `SetField` `UnsetField`            |
 | Set         | `AllElementsTrue` `AnyElementTrue` `SetDifference` `SetEquals` `SetIntersection` `SetIsSubset` `SetUnion` |
-| Date        | `DateAdd` `DateSubtract` `DateDiff` `DateFromParts` `DateToParts` `DateFromString` `DateToString`         |
+| Date        | `DateAdd` `DateSubtract` `DateDiff` `DateTrunc` `DateFromParts` `DateToParts` `DateFromString` `DateToString` |
 | Date parts  | `Year` `Month` `DayOfMonth` `DayOfWeek` `DayOfYear` `Hour` `Minute` `Second` `Millisecond` `Week` `IsoDayOfWeek` `IsoWeek` `IsoWeekYear` |
 | Conversion  | `Convert` `IsNumber` `Type` `ToBool` `ToDate` `ToDecimal` `ToDouble` `ToInt` `ToLong` `ToObjectID` `ToString` |
 | Accumulator | `Sum` `Avg` `Max` `Min` `Push` `AddToSet` `Count` `StdDevPop` `StdDevSamp` `Top` `TopN` `Bottom` `BottomN` `Median` `Percentile` |
+| Trigonometry | `Sin` `Cos` `Tan` `Asin` `Acos` `Atan` `Atan2` `Sinh` `Cosh` `Tanh` `Asinh` `Acosh` `Atanh` `DegreesToRadians` `RadiansToDegrees` |
+| Bitwise     | `BitAnd` `BitOr` `BitXor` `BitNot`             |
+| Misc        | `Let` `Rand` `BinarySize` `BSONSize` `TsSecond` `TsIncrement` |
 
 ## Sorting and indexes
 

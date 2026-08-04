@@ -9,6 +9,10 @@ import "go.mongodb.org/mongo-driver/v2/bson"
 // that hold a whole number, and binData values are considered; every other type, including a missing field, fails
 // to match. A negative bitmask or a non-integral double as the mask is a server-side error.
 //
+// This family tests bits. The other two do different jobs with similar names: [BitAnd] and its siblings are update
+// operators rewriting a stored field, and the expression operators in monq/expr compute a value from bits inside an
+// aggregation.
+//
 // Example:
 //
 //	monq.BitsAllClear("flags", 6)

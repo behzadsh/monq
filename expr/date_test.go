@@ -383,3 +383,62 @@ func ExampleStartOfWeek() {
 	printExpr(e)
 	// Output: {"$dateDiff":{"startDate":"$created_at","endDate":"$shipped_at","unit":"week","startOfWeek":"monday"}}
 }
+
+func TestDateTrunc(t *testing.T) {
+	tests := []struct {
+		name string
+		got  bson.D
+		want bson.D
+	}{
+		{
+			name: "truncates to a whole unit",
+			got:  expr.DateTrunc(expr.Field("created_at"), "day"),
+			want: bson.D{{Key: "$dateTrunc", Value: bson.D{
+				{Key: "date", Value: "$created_at"},
+				{Key: "unit", Value: "day"},
+			}}},
+		},
+		{
+			name: "bins several units at a time",
+			got:  expr.DateTrunc(expr.Field("created_at"), "minute", expr.BinSize(15)),
+			want: bson.D{{Key: "$dateTrunc", Value: bson.D{
+				{Key: "date", Value: "$created_at"},
+				{Key: "unit", Value: "minute"},
+				{Key: "binSize", Value: 15},
+			}}},
+		},
+		{
+			name: "weeks take a starting day and a time zone",
+			got: expr.DateTrunc(expr.Field("created_at"), "week",
+				expr.StartOfWeek("monday"), expr.Timezone("America/New_York")),
+			want: bson.D{{Key: "$dateTrunc", Value: bson.D{
+				{Key: "date", Value: "$created_at"},
+				{Key: "unit", Value: "week"},
+				{Key: "startOfWeek", Value: "monday"},
+				{Key: "timezone", Value: "America/New_York"},
+			}}},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if !reflect.DeepEqual(tt.got, tt.want) {
+				t.Fatalf("got %v, want %v", tt.got, tt.want)
+			}
+		})
+	}
+}
+
+func ExampleDateTrunc() {
+	e := expr.DateTrunc(expr.Field("created_at"), "minute", expr.BinSize(15))
+
+	printExpr(e)
+	// Output: {"$dateTrunc":{"date":"$created_at","unit":"minute","binSize":15}}
+}
+
+func ExampleBinSize() {
+	e := expr.DateTrunc(expr.Field("created_at"), "month", expr.BinSize(6))
+
+	printExpr(e)
+	// Output: {"$dateTrunc":{"date":"$created_at","unit":"month","binSize":6}}
+}

@@ -10,6 +10,17 @@ import "go.mongodb.org/mongo-driver/v2/bson"
 // produces a document the server rejects, in keeping with monq validating nothing itself.
 type DateOption func(*bson.D)
 
+// BinSize returns a [DateOption] setting how many units wide each bin of a [DateTrunc] is.
+//
+// It multiplies the unit, so a binSize of 15 with a unit of "minute" truncates to quarter hours and a binSize of 6
+// with "month" gives half years. Without it the bin is one unit wide. Bins are counted from a fixed reference
+// point rather than from the data, so the boundaries are the same for every document.
+func BinSize(n any) DateOption {
+	return func(d *bson.D) {
+		*d = append(*d, bson.E{Key: "binSize", Value: n})
+	}
+}
+
 // DateFormat returns a [DateOption] setting the format string of [DateToString] or [DateFromString].
 //
 // The format is built from specifiers such as %Y for a four-digit year, %m for the month, %d for the day, and %H,
@@ -220,6 +231,32 @@ func DateToString(date any, opts ...DateOption) bson.D {
 	spec := bson.D{{Key: "date", Value: date}}
 
 	return bson.D{{Key: "$dateToString", Value: applyDateOptions(spec, opts)}}
+}
+
+// DateTrunc returns an expression rounding a date down to the start of a bin.
+//
+// $dateTrunc is what turns timestamps into grouping keys: with a unit of "day" every moment in a day becomes that
+// day's midnight, so a $group on the result buckets by day while keeping a real date rather than the string
+// [DateToString] would give. The unit is one of "year", "quarter", "week", "month", "day", "hour", "minute",
+// "second", or "millisecond", and [BinSize] widens the bin to several units at once.
+//
+// [Timezone] decides which day or hour a moment belongs to, and matters here for the same reason it matters to
+// [Hour]. With a unit of "week", [StartOfWeek] says which day the week begins on.
+//
+// Example:
+//
+//	expr.DateTrunc(expr.Field("created_at"), "minute", expr.BinSize(15))
+//	// bson.D{{Key: "$dateTrunc", Value: bson.D{
+//	//     {Key: "date", Value: "$created_at"},
+//	//     {Key: "unit", Value: "minute"},
+//	//     {Key: "binSize", Value: 15},
+//	// }}}
+//
+// MongoDB docs: https://www.mongodb.com/docs/manual/reference/operator/aggregation/dateTrunc/
+func DateTrunc(date, unit any, opts ...DateOption) bson.D {
+	spec := bson.D{{Key: "date", Value: date}, {Key: "unit", Value: unit}}
+
+	return bson.D{{Key: "$dateTrunc", Value: applyDateOptions(spec, opts)}}
 }
 
 // DayOfMonth returns an expression yielding the day of the month of a date, from 1 to 31.

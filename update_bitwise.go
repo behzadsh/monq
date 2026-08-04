@@ -11,6 +11,10 @@ import "go.mongodb.org/mongo-driver/v2/bson"
 // sub-operators. Combine it with other operators through [Update]; two operator documents concatenated by hand
 // keep two separate keys, which MongoDB does not merge.
 //
+// This family rewrites a stored field. The other two do different jobs with similar names: [BitsAllClear] and its
+// siblings are query operators testing a field's bits, and the expression operators in monq/expr compute a value
+// from bits inside an aggregation.
+//
 // Example:
 //
 //	monq.BitAnd("flags", 6)

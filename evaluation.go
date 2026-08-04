@@ -73,6 +73,27 @@ func Regex(field FieldPath, pattern, options string) bson.D {
 	}
 }
 
+// SampleRate returns a filter that keeps a random fraction of the documents it sees.
+//
+// $sampleRate decides per document, with the given probability, so the number kept varies from run to run and only
+// approaches the fraction asked for over a large collection. A rate of 0 matches nothing and 1 matches everything;
+// anything outside that range is a server error. It is a filter rather than a stage, so it works in Find and in a
+// $match, which is what separates it from the $sample stage: $sample takes an exact count and needs a whole pass or
+// an index scan, while this one is a cheap coin flip per document with no guaranteed count.
+//
+// Being random, it is not stable across executions. The aggregation counterpart for a random number in an
+// expression is the $rand operator in monq/expr.
+//
+// Example:
+//
+//	monq.SampleRate(0.33)
+//	// bson.D{{Key: "$sampleRate", Value: 0.33}}
+//
+// MongoDB docs: https://www.mongodb.com/docs/manual/reference/operator/query/sampleRate/
+func SampleRate(rate float64) bson.D {
+	return bson.D{{Key: "$sampleRate", Value: rate}}
+}
+
 // TextOption configures one optional field of a [Text] filter.
 type TextOption func(*bson.D)
 

@@ -249,3 +249,32 @@ func ExampleDiacriticSensitive() {
 	fmt.Println(filter)
 	// Output: {"$text":{"$search":"café","$diacriticSensitive":true}}
 }
+
+func TestSampleRate(t *testing.T) {
+	tests := []struct {
+		name string
+		rate float64
+		want bson.D
+	}{
+		{name: "a third of the documents", rate: 0.33, want: bson.D{{Key: "$sampleRate", Value: 0.33}}},
+		{name: "everything", rate: 1, want: bson.D{{Key: "$sampleRate", Value: 1.0}}},
+		{name: "nothing", rate: 0, want: bson.D{{Key: "$sampleRate", Value: 0.0}}},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := monq.SampleRate(tt.rate)
+
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Fatalf("SampleRate() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func ExampleSampleRate() {
+	filter := monq.SampleRate(0.33)
+
+	printFilter(filter)
+	// Output: {"$sampleRate":0.33}
+}

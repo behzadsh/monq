@@ -159,6 +159,8 @@ stage.Group("$category",
 | Joining   | `Lookup` `LookupPipeline` `GraphLookup` `UnionWith`                               |
 | Reshaping | `Project` `AddFields` `Set` `Unset` `ReplaceRoot` `ReplaceWith`                    |
 | Output    | `Out` `Merge` `Documents`                                                          |
+| Windows   | `SetWindowFields` `WindowField` `WindowDocuments` `WindowRange` `WindowUnit`       |
+| Series    | `Densify` `DensifyRange` `Fill` `FillValue` `FillMethod` `Redact`                  |
 | Geospatial| `GeoNear`                                                                          |
 | Building  | `Field` `Accumulator` `FacetPipeline` `Namespace`                                  |
 | Assembly  | `Pipeline`                                                                         |
@@ -220,6 +222,9 @@ stage.Group("$category",
 | Trigonometry | `Sin` `Cos` `Tan` `Asin` `Acos` `Atan` `Atan2` `Sinh` `Cosh` `Tanh` `Asinh` `Acosh` `Atanh` `DegreesToRadians` `RadiansToDegrees` |
 | Bitwise     | `BitAnd` `BitOr` `BitXor` `BitNot`             |
 | Misc        | `Let` `Rand` `BinarySize` `BSONSize` `TsSecond` `TsIncrement` |
+| Window rank | `Rank` `DenseRank` `DocumentNumber` `Shift`   |
+| Window fill | `Locf` `LinearFill`                            |
+| Window calc | `Derivative` `Integral` `ExpMovingAvgN` `ExpMovingAvgAlpha` `CovariancePop` `CovarianceSamp` |
 
 ## Sorting and indexes
 

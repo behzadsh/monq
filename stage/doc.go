@@ -21,6 +21,11 @@
 // [Unset]'s fields), while an output field name ([Count], [Accumulator]) or an expression that happens to be a
 // string ([Unwind]'s path, [Group]'s id) is a plain string. Nothing here adds or strips a "$".
 //
+// A handful of expression operators exist only inside [SetWindowFields]: Rank, DenseRank, DocumentNumber, Shift,
+// Locf, LinearFill, Derivative, Integral, ExpMovingAvg, and the two covariance operators, all in monq/expr next to
+// the accumulators they resemble. Used anywhere else they are a server error, and most of them also need the stage
+// to have a sortBy.
+//
 // A few stages have to sit in a particular place, and nothing here checks that: [GeoNear] and [Documents] have to
 // come first, [Out] and [Merge] have to come last, and a [Match] carrying a $text search is only valid as the very
 // first stage. The server reports those mistakes at execution time.

@@ -2,9 +2,8 @@
 
 [![Release](https://img.shields.io/github/v/release/behzadsh/monq)](https://github.com/behzadsh/monq/releases/latest)
 [![Go Reference](https://pkg.go.dev/badge/github.com/behzadsh/monq.svg)](https://pkg.go.dev/github.com/behzadsh/monq)
-[![Go Report Card](https://goreportcard.com/badge/github.com/behzadsh/monq)](https://goreportcard.com/report/github.com/behzadsh/monq)
 [![License](https://img.shields.io/github/license/behzadsh/monq)](LICENSE)
-![Coverage](https://img.shields.io/badge/Coverage-0.0%25-red)
+[![codecov](https://codecov.io/gh/behzadsh/monq/branch/main/graph/badge.svg)](https://codecov.io/gh/behzadsh/monq)
 
 A composable query-building library for the [official MongoDB Go driver](https://pkg.go.dev/go.mongodb.org/mongo-driver/v2/mongo).
 

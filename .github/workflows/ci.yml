@@ -29,12 +29,13 @@ jobs:
       - name: Test
         run: go test -race -coverprofile=coverage.out -covermode=atomic ./...
 
-      - name: Upload coverage
+      - name: Upload coverage to Codecov
         if: matrix.go == '1.26'
-        uses: actions/upload-artifact@v7
+        uses: codecov/codecov-action@v7
         with:
-          name: coverage
-          path: coverage.out
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./coverage.out
+          slug: behzadsh/monq
 
   lint:
     name: Lint

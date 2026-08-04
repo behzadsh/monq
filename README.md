@@ -30,11 +30,11 @@ Filters compose by nesting function calls, no builder object, no method chaining
 
 ```go
 filter := monq.And(
-    monq.Eq("status", "active"),
-    monq.Or(
-        monq.Gte("stats.followers", 10000),
-        monq.Exists("verified_at", true),
-    ),
+monq.Eq("status", "active"),
+monq.Or(
+monq.Gte("stats.followers", 10000),
+monq.Exists("verified_at", true),
+),
 )
 
 cursor, err := collection.Find(ctx, filter)
@@ -45,8 +45,8 @@ with the rest of a query instead of forcing an all-or-nothing rewrite:
 
 ```go
 monq.And(
-    monq.Eq("status", "active"),
-    monq.Raw(bson.D{{Key: "$where", Value: "this.credits == this.debits"}}),
+monq.Eq("status", "active"),
+monq.Raw(bson.D{{Key: "$where", Value: "this.credits == this.debits"}}),
 )
 ```
 
@@ -54,8 +54,8 @@ Array conditions read the same way. `ElemMatch` takes the criteria a single arra
 
 ```go
 filter := monq.ElemMatch("items",
-    monq.Eq("sku", "abc"),
-    monq.Gte("qty", 2),
+monq.Eq("sku", "abc"),
+monq.Gte("qty", 2),
 )
 // {"items": {"$elemMatch": {"sku": {"$eq": "abc"}, "qty": {"$gte": 2}}}}
 ```
@@ -64,16 +64,16 @@ filter := monq.ElemMatch("items",
 
 Query operators available today:
 
-| Category   | Functions                                                |
-| ---------- | -------------------------------------------------------- |
-| Comparison | `Eq` `Ne` `Gt` `Gte` `Lt` `Lte` `In` `Nin`                |
-| Logical    | `And` `Or` `Nor` `Not`                                    |
-| Element    | `Exists` `Type`                                           |
-| Array      | `All` `ElemMatch` `Size`                                  |
-| Evaluation | `Expr` `JSONSchema` `Mod` `Regex` `Text` `SampleRate`     |
-| Bitwise    | `BitsAllClear` `BitsAllSet` `BitsAnyClear` `BitsAnySet`   |
-| Geospatial | `GeoWithin` `GeoIntersects` `Near` `NearSphere`           |
-| Escape     | `Raw`                                                     |
+| Category   | Functions                                               |
+|------------|---------------------------------------------------------|
+| Comparison | `Eq` `Ne` `Gt` `Gte` `Lt` `Lte` `In` `Nin`              |
+| Logical    | `And` `Or` `Nor` `Not`                                  |
+| Element    | `Exists` `Type`                                         |
+| Array      | `All` `ElemMatch` `Size`                                |
+| Evaluation | `Expr` `JSONSchema` `Mod` `Regex` `Text` `SampleRate`   |
+| Bitwise    | `BitsAllClear` `BitsAllSet` `BitsAnyClear` `BitsAnySet` |
+| Geospatial | `GeoWithin` `GeoIntersects` `Near` `NearSphere`         |
+| Escape     | `Raw`                                                   |
 
 Operators with optional parts take them as variadic options named after the MongoDB field they set:
 
@@ -96,9 +96,9 @@ A projection decides which fields come back. Entries merge the same way sort ent
 
 ```go
 projection := monq.Projection(
-    monq.Include("email", "items.sku"),
-    monq.Exclude("_id"),
-    monq.Slice("comments", -5),
+monq.Include("email", "items.sku"),
+monq.Exclude("_id"),
+monq.Slice("comments", -5),
 )
 
 cursor, err := collection.Find(ctx, filter, options.Find().SetProjection(projection))
@@ -109,8 +109,8 @@ Two operators you already have double as projection entries, because MongoDB spe
 array, and `TextScore` adds a `$text` relevance score to the result. `ArrayPath.Positional()` gives the `$` positional form, so
 `monq.Include(items.Positional())` returns just the element the query matched.
 
-| Category   | Functions                                             |
-| ---------- | ------------------------------------------------------ |
+| Category   | Functions                                                   |
+|------------|-------------------------------------------------------------|
 | Projection | `Projection` `Include` `Exclude` `Slice` `SliceFrom` `Meta` |
 
 ## Updates
@@ -127,19 +127,19 @@ Several of them go through `Update`, which merges operators sharing a key. It is
 
 ```go
 update := monq.Update(
-    monq.Set("status", "active"),
-    monq.Inc("logins", 1),
-    monq.Set("name", "ada"),
+monq.Set("status", "active"),
+monq.Inc("logins", 1),
+monq.Set("name", "ada"),
 )
 // {"$set": {"status": "active", "name": "ada"}, "$inc": {"logins": 1}}
 ```
 
 | Category     | Functions                                                                                         |
-| ------------ | ------------------------------------------------------------------------------------------------- |
-| Field update | `Set` `SetOnInsert` `Unset` `Inc` `Mul` `Min` `Max` `Rename` `CurrentDate` `CurrentDateTimestamp`  |
-| Array update | `Push` `PushEach` `AddToSet` `AddToSetEach` `Pull` `PullAll` `PopFirst` `PopLast`                  |
-| Bitwise      | `BitAnd` `BitOr` `BitXor`                                                                          |
-| Composition  | `Update`                                                                                            |
+|--------------|---------------------------------------------------------------------------------------------------|
+| Field update | `Set` `SetOnInsert` `Unset` `Inc` `Mul` `Min` `Max` `Rename` `CurrentDate` `CurrentDateTimestamp` |
+| Array update | `Push` `PushEach` `AddToSet` `AddToSetEach` `Pull` `PullAll` `PopFirst` `PopLast`                 |
+| Bitwise      | `BitAnd` `BitOr` `BitXor`                                                                         |
+| Composition  | `Update`                                                                                          |
 
 The `$each` form of `$push` is its own function, since the `$position`, `$slice`, and `$sort` modifiers only exist there:
 
@@ -155,9 +155,9 @@ Pipeline stages live in `monq/stage`, one function per stage. The package split 
 
 ```go
 pipeline := stage.Pipeline(
-    stage.Match(monq.Eq("status", "active")),
-    stage.Sort(bson.D{{Key: "created_at", Value: -1}}),
-    stage.Limit(20),
+stage.Match(monq.Eq("status", "active")),
+stage.Sort(bson.D{{Key: "created_at", Value: -1}}),
+stage.Limit(20),
 )
 
 cursor, err := collection.Aggregate(ctx, pipeline)
@@ -170,23 +170,23 @@ Grouping stages take their output fields as `Accumulator` pieces, merged into on
 
 ```go
 stage.Group("$category",
-    stage.Accumulator("total", bson.D{{Key: "$sum", Value: "$amount"}}),
+stage.Accumulator("total", bson.D{{Key: "$sum", Value: "$amount"}}),
 )
 // {"$group": {"_id": "$category", "total": {"$sum": "$amount"}}}
 ```
 
-| Category  | Functions                                                                        |
-| --------- | ---------------------------------------------------------------------------------- |
-| Filtering | `Match` `Limit` `Skip` `Sample` `Count` `Sort`                                    |
-| Grouping  | `Group` `Bucket` `BucketAuto` `SortByCount` `Facet` `Unwind`                       |
-| Joining   | `Lookup` `LookupPipeline` `GraphLookup` `UnionWith`                               |
-| Reshaping | `Project` `AddFields` `Set` `Unset` `ReplaceRoot` `ReplaceWith`                    |
-| Output    | `Out` `Merge` `Documents`                                                          |
-| Windows   | `SetWindowFields` `WindowField` `WindowDocuments` `WindowRange` `WindowUnit`       |
-| Series    | `Densify` `DensifyRange` `Fill` `FillValue` `FillMethod` `Redact`                  |
-| Geospatial| `GeoNear`                                                                          |
-| Building  | `Field` `Accumulator` `FacetPipeline` `Namespace`                                  |
-| Assembly  | `Pipeline`                                                                         |
+| Category   | Functions                                                                    |
+|------------|------------------------------------------------------------------------------|
+| Filtering  | `Match` `Limit` `Skip` `Sample` `Count` `Sort`                               |
+| Grouping   | `Group` `Bucket` `BucketAuto` `SortByCount` `Facet` `Unwind`                 |
+| Joining    | `Lookup` `LookupPipeline` `GraphLookup` `UnionWith`                          |
+| Reshaping  | `Project` `AddFields` `Set` `Unset` `ReplaceRoot` `ReplaceWith`              |
+| Output     | `Out` `Merge` `Documents`                                                    |
+| Windows    | `SetWindowFields` `WindowField` `WindowDocuments` `WindowRange` `WindowUnit` |
+| Series     | `Densify` `DensifyRange` `Fill` `FillValue` `FillMethod` `Redact`            |
+| Geospatial | `GeoNear`                                                                    |
+| Building   | `Field` `Accumulator` `FacetPipeline` `Namespace`                            |
+| Assembly   | `Pipeline`                                                                   |
 
 `GeoNear` takes the same geometry constructors the query operators do, which is why they return bare GeoJSON:
 
@@ -201,12 +201,12 @@ stage.GeoNear(monq.Point(-73.97, 40.77), "distance", stage.MaxDistance(1000), st
 
 ```go
 stage.Project(
-    stage.Field("name", 1),
-    stage.Field("grade", expr.Switch(
-        expr.Branch(expr.Gte(expr.Field("score"), 90), "A"),
-        expr.Branch(expr.Gte(expr.Field("score"), 80), "B"),
-        expr.DefaultCase("F"),
-    )),
+stage.Field("name", 1),
+stage.Field("grade", expr.Switch(
+expr.Branch(expr.Gte(expr.Field("score"), 90), "A"),
+expr.Branch(expr.Gte(expr.Field("score"), 80), "B"),
+expr.DefaultCase("F"),
+)),
 )
 ```
 
@@ -219,35 +219,35 @@ several add them up inside each document.
 
 ```go
 stage.Group("$category",
-    stage.Accumulator("total", expr.Sum(expr.Field("amount"))),
-    stage.Accumulator("best", expr.Top(bson.D{{Key: "score", Value: -1}}, expr.Field("name"))),
+stage.Accumulator("total", expr.Sum(expr.Field("amount"))),
+stage.Accumulator("best", expr.Top(bson.D{{Key: "score", Value: -1}}, expr.Field("name"))),
 )
 ```
 
-| Category    | Functions                                    |
-| ----------- | -------------------------------------------- |
-| References  | `Field` `Literal`                             |
-| Comparison  | `Cmp` `Eq` `Ne` `Gt` `Gte` `Lt` `Lte`         |
-| Boolean     | `And` `Or` `Not`                              |
-| Conditional | `Cond` `IfNull` `Switch` `Branch` `DefaultCase` |
-| Arithmetic  | `Abs` `Add` `Ceil` `Divide` `Exp` `Floor` `Ln` `Log` `Log10` `Mod` `Multiply` `Pow` `Round` `Sqrt` `Subtract` `Trunc` |
-| String      | `Concat` `Split` `SubstrBytes` `SubstrCP` `StrLenBytes` `StrLenCP` `Strcasecmp` `ToLower` `ToUpper` |
-| Trimming    | `Trim` `Ltrim` `Rtrim` `TrimChars`             |
-| Searching   | `IndexOfBytes` `IndexOfCP` `RegexFind` `RegexFindAll` `RegexMatch` `ReplaceOne` `ReplaceAll` |
-| Array       | `ArrayElemAt` `ConcatArrays` `First` `Last` `FirstN` `LastN` `MaxN` `MinN` `In` `IndexOfArray` `IsArray` `Size` |
-| Array shape | `Filter` `Map` `Reduce` `Range` `ReverseArray` `Slice` `SliceFrom` `SortArray` `Zip`         |
-| Object      | `ArrayToObject` `ObjectToArray` `MergeObjects` `GetField` `SetField` `UnsetField`            |
-| Set         | `AllElementsTrue` `AnyElementTrue` `SetDifference` `SetEquals` `SetIntersection` `SetIsSubset` `SetUnion` |
-| Date        | `DateAdd` `DateSubtract` `DateDiff` `DateTrunc` `DateFromParts` `DateToParts` `DateFromString` `DateToString` |
-| Date parts  | `Year` `Month` `DayOfMonth` `DayOfWeek` `DayOfYear` `Hour` `Minute` `Second` `Millisecond` `Week` `IsoDayOfWeek` `IsoWeek` `IsoWeekYear` |
-| Conversion  | `Convert` `IsNumber` `Type` `ToBool` `ToDate` `ToDecimal` `ToDouble` `ToInt` `ToLong` `ToObjectID` `ToString` |
-| Accumulator | `Sum` `Avg` `Max` `Min` `Push` `AddToSet` `Count` `StdDevPop` `StdDevSamp` `Top` `TopN` `Bottom` `BottomN` `Median` `Percentile` |
-| Trigonometry | `Sin` `Cos` `Tan` `Asin` `Acos` `Atan` `Atan2` `Sinh` `Cosh` `Tanh` `Asinh` `Acosh` `Atanh` `DegreesToRadians` `RadiansToDegrees` |
-| Bitwise     | `BitAnd` `BitOr` `BitXor` `BitNot`             |
-| Misc        | `Let` `Rand` `BinarySize` `BSONSize` `TsSecond` `TsIncrement` |
-| Window rank | `Rank` `DenseRank` `DocumentNumber` `Shift`   |
-| Window fill | `Locf` `LinearFill`                            |
-| Window calc | `Derivative` `Integral` `ExpMovingAvgN` `ExpMovingAvgAlpha` `CovariancePop` `CovarianceSamp` |
+| Category     | Functions                                                                                                                                |
+|--------------|------------------------------------------------------------------------------------------------------------------------------------------|
+| References   | `Field` `Literal`                                                                                                                        |
+| Comparison   | `Cmp` `Eq` `Ne` `Gt` `Gte` `Lt` `Lte`                                                                                                    |
+| Boolean      | `And` `Or` `Not`                                                                                                                         |
+| Conditional  | `Cond` `IfNull` `Switch` `Branch` `DefaultCase`                                                                                          |
+| Arithmetic   | `Abs` `Add` `Ceil` `Divide` `Exp` `Floor` `Ln` `Log` `Log10` `Mod` `Multiply` `Pow` `Round` `Sqrt` `Subtract` `Trunc`                    |
+| String       | `Concat` `Split` `SubstrBytes` `SubstrCP` `StrLenBytes` `StrLenCP` `Strcasecmp` `ToLower` `ToUpper`                                      |
+| Trimming     | `Trim` `Ltrim` `Rtrim` `TrimChars`                                                                                                       |
+| Searching    | `IndexOfBytes` `IndexOfCP` `RegexFind` `RegexFindAll` `RegexMatch` `ReplaceOne` `ReplaceAll`                                             |
+| Array        | `ArrayElemAt` `ConcatArrays` `First` `Last` `FirstN` `LastN` `MaxN` `MinN` `In` `IndexOfArray` `IsArray` `Size`                          |
+| Array shape  | `Filter` `Map` `Reduce` `Range` `ReverseArray` `Slice` `SliceFrom` `SortArray` `Zip`                                                     |
+| Object       | `ArrayToObject` `ObjectToArray` `MergeObjects` `GetField` `SetField` `UnsetField`                                                        |
+| Set          | `AllElementsTrue` `AnyElementTrue` `SetDifference` `SetEquals` `SetIntersection` `SetIsSubset` `SetUnion`                                |
+| Date         | `DateAdd` `DateSubtract` `DateDiff` `DateTrunc` `DateFromParts` `DateToParts` `DateFromString` `DateToString`                            |
+| Date parts   | `Year` `Month` `DayOfMonth` `DayOfWeek` `DayOfYear` `Hour` `Minute` `Second` `Millisecond` `Week` `IsoDayOfWeek` `IsoWeek` `IsoWeekYear` |
+| Conversion   | `Convert` `IsNumber` `Type` `ToBool` `ToDate` `ToDecimal` `ToDouble` `ToInt` `ToLong` `ToObjectID` `ToString`                            |
+| Accumulator  | `Sum` `Avg` `Max` `Min` `Push` `AddToSet` `Count` `StdDevPop` `StdDevSamp` `Top` `TopN` `Bottom` `BottomN` `Median` `Percentile`         |
+| Trigonometry | `Sin` `Cos` `Tan` `Asin` `Acos` `Atan` `Atan2` `Sinh` `Cosh` `Tanh` `Asinh` `Acosh` `Atanh` `DegreesToRadians` `RadiansToDegrees`        |
+| Bitwise      | `BitAnd` `BitOr` `BitXor` `BitNot`                                                                                                       |
+| Misc         | `Let` `Rand` `BinarySize` `BSONSize` `TsSecond` `TsIncrement`                                                                            |
+| Window rank  | `Rank` `DenseRank` `DocumentNumber` `Shift`                                                                                              |
+| Window fill  | `Locf` `LinearFill`                                                                                                                      |
+| Window calc  | `Derivative` `Integral` `ExpMovingAvgN` `ExpMovingAvgAlpha` `CovariancePop` `CovarianceSamp`                                             |
 
 ## Sorting and indexes
 
@@ -264,9 +264,9 @@ Index models live in `monq/index`, where keys and options are one argument list:
 
 ```go
 model := index.New(
-    index.Asc("email"),
-    index.Unique(),
-    index.PartialFilter(monq.Exists("deleted_at", false)),
+index.Asc("email"),
+index.Unique(),
+index.PartialFilter(monq.Exists("deleted_at", false)),
 )
 
 _, err := collection.Indexes().CreateOne(ctx, model)
@@ -275,9 +275,9 @@ _, err := collection.Indexes().CreateOne(ctx, model)
 That package is separate on purpose. `mongo.IndexModel` comes from the driver's `mongo` package, which carries several third-party dependencies; keeping it
 out of the root means a program that only builds queries never compiles any of them.
 
-| Package      | Functions                                                                                |
-| ------------ | ------------------------------------------------------------------------------------------ |
-| `monq`       | `Sort` `Asc` `Desc` `TextScore`                                                            |
+| Package      | Functions                                                                                                        |
+|--------------|------------------------------------------------------------------------------------------------------------------|
+| `monq`       | `Sort` `Asc` `Desc` `TextScore`                                                                                  |
 | `monq/index` | `New` `Asc` `Desc` `Text` `Hashed` `Geo2D` `Geo2DSphere` `Unique` `Sparse` `TTL` `PartialFilter` `Name` `Hidden` |
 
 ## Generated field paths
@@ -289,32 +289,53 @@ paths out as typed constants:
 //go:generate go run github.com/behzadsh/monq/cmd/monqgen -type User
 
 type User struct {
-    ID    bson.ObjectID `bson:"_id"`
-    Email string        `bson:"email"`
-    Items []Item        `bson:"items"`
+ID    bson.ObjectID `bson:"_id"`
+Email string        `bson:"email"`
+Items []Item        `bson:"items"`
 }
 ```
 
 `go generate ./...` writes `user_paths.go` next to it, and the paths go straight into any operator that takes one:
 
 ```go
-monq.Eq(UserPaths.Email, "a@b.c")           // {"email": {"$eq": "a@b.c"}}
-monq.Eq(UserPaths.Items.SKU, "abc")         // {"items.sku": {"$eq": "abc"}}
-monq.Size(UserPaths.Items.Path, 3)          // {"items": {"$size": 3}}
+monq.Eq(UserPaths.Email, "a@b.c") // {"email": {"$eq": "a@b.c"}}
+monq.Eq(UserPaths.Items.SKU, "abc") // {"items.sku": {"$eq": "abc"}}
+monq.Size(UserPaths.Items.Path, 3) // {"items": {"$size": 3}}
 ```
 
 Arrays carry the four ways MongoDB names a position, so the punctuation never has to be remembered:
 
 ```go
-UserPaths.Items.At(3).Quantity        // "items.3.qty"
-UserPaths.Items.Positional().Price    // "items.$.price"
-UserPaths.Items.All().SKU             // "items.$[].sku"
+UserPaths.Items.At(3).Quantity // "items.3.qty"
+UserPaths.Items.Positional().Price // "items.$.price"
+UserPaths.Items.All().SKU // "items.$[].sku"
 UserPaths.Items.Filtered("cheap").SKU // "items.$[cheap].sku"
 ```
 
 Paths follow the driver's own tag rules rather than `encoding/json`'s: a key defaults to the field name lowercased whole, `bson:"-"` drops a field, and an
 embedded struct nests under its own name unless it is tagged `,inline`. Types that encode themselves, such as `time.Time` and `bson.ObjectID`, are leaves.
 The same positional helpers are available by hand through `monq.ArrayPath` when there is no generated struct.
+
+The command reads the package directory given as its argument, defaulting to the current one, which is why a `go:generate` line needs nothing but the type:
+
+| Flag     | Meaning                                                                             |
+|----------|-------------------------------------------------------------------------------------|
+| `-type`  | the struct to read paths from; required                                             |
+| `-out`   | the file to write, defaulting to the type name lowercased with `_paths.go` appended |
+| `-print` | write the path tree to standard output and generate nothing                         |
+
+`-print` answers what a struct yields without touching the disk, which is the quickest way to check a tag change:
+
+```sh
+$ go run github.com/behzadsh/monq/cmd/monqgen -type User -print ./internal/model
+_id
+email
+items
+items.sku
+```
+
+Two types in one package means two `go:generate` lines, and the default output name keeps them in separate files. monqgen refuses to overwrite a file that
+does not carry its generated header, so a mistyped `-out` cannot eat source.
 
 The generated file is regular Go source with no runtime magic: [`cmd/monqgen/internal/example`](cmd/monqgen/internal/example) holds a struct, the file
 monqgen wrote from it, and tests using those paths against every part of the API. Codegen is entirely optional, and paths written by hand work the same

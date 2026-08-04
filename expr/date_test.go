@@ -348,3 +348,38 @@ func ExampleIsoWeekYear() {
 	printExpr(e)
 	// Output: {"$isoWeekYear":"$created_at"}
 }
+
+func ExampleDateFormat() {
+	e := expr.DateToString(expr.Field("created_at"), expr.DateFormat("%Y-%m-%d"))
+
+	printExpr(e)
+	// Output: {"$dateToString":{"date":"$created_at","format":"%Y-%m-%d"}}
+}
+
+func ExampleDateOnNull() {
+	e := expr.DateToString(expr.Field("created_at"), expr.DateOnNull("unknown"))
+
+	printExpr(e)
+	// Output: {"$dateToString":{"date":"$created_at","onNull":"unknown"}}
+}
+
+func ExampleDateOnError() {
+	e := expr.DateFromString(expr.Field("created_on"), expr.DateOnError(nil))
+
+	printExpr(e)
+	// Output: {"$dateFromString":{"dateString":"$created_on","onError":null}}
+}
+
+func ExampleISO8601() {
+	e := expr.DateToParts(expr.Field("created_at"), expr.ISO8601())
+
+	printExpr(e)
+	// Output: {"$dateToParts":{"date":"$created_at","iso8601":true}}
+}
+
+func ExampleStartOfWeek() {
+	e := expr.DateDiff(expr.Field("created_at"), expr.Field("shipped_at"), "week", expr.StartOfWeek("monday"))
+
+	printExpr(e)
+	// Output: {"$dateDiff":{"startDate":"$created_at","endDate":"$shipped_at","unit":"week","startOfWeek":"monday"}}
+}

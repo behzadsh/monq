@@ -402,3 +402,18 @@ func ExampleZip() {
 	printExpr(e)
 	// Output: {"$zip":{"inputs":["$names","$scores"]}}
 }
+
+func ExampleZipUseLongestLength() {
+	e := expr.Zip([]any{expr.Field("names"), expr.Field("scores")}, expr.ZipUseLongestLength())
+
+	printExpr(e)
+	// Output: {"$zip":{"inputs":["$names","$scores"],"useLongestLength":true}}
+}
+
+func ExampleZipDefaults() {
+	e := expr.Zip([]any{expr.Field("names"), expr.Field("scores")},
+		expr.ZipUseLongestLength(), expr.ZipDefaults(bson.A{"", 0}))
+
+	printExpr(e)
+	// Output: {"$zip":{"inputs":["$names","$scores"],"useLongestLength":true,"defaults":["",0]}}
+}

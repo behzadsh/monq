@@ -1,6 +1,10 @@
 package stage
 
-import "go.mongodb.org/mongo-driver/v2/bson"
+import (
+	"go.mongodb.org/mongo-driver/v2/bson"
+
+	"github.com/behzadsh/monq"
+)
 
 // Accumulator returns one output field of a [Group], [Bucket], or [BucketAuto] stage.
 //
@@ -19,7 +23,7 @@ import "go.mongodb.org/mongo-driver/v2/bson"
 //
 // MongoDB docs: https://www.mongodb.com/docs/manual/reference/operator/aggregation/group/#accumulator-operator
 func Accumulator(name string, accumulator any) bson.D {
-	return Field(name, accumulator)
+	return Field(monq.FieldPath(name), accumulator)
 }
 
 // BucketOption configures one optional field of a [Bucket] or [BucketAuto] stage.

@@ -182,3 +182,26 @@ func ExampleFacet() {
 	printStage(s)
 	// Output: {"$facet":{"newest":[{"$sort":{"created_at":-1}},{"$limit":5}],"total":[{"$count":"n"}]}}
 }
+
+func ExampleBucketDefault() {
+	s := stage.Bucket("$price", []any{0, 50, 100}, stage.BucketDefault("other"))
+
+	printStage(s)
+	// Output: {"$bucket":{"groupBy":"$price","boundaries":[0,50,100],"default":"other"}}
+}
+
+func ExampleBucketGranularity() {
+	s := stage.BucketAuto("$price", 4, stage.BucketGranularity("R20"))
+
+	printStage(s)
+	// Output: {"$bucketAuto":{"groupBy":"$price","buckets":4,"granularity":"R20"}}
+}
+
+func ExampleBucketOutput() {
+	s := stage.Bucket("$price", []any{0, 100},
+		stage.BucketOutput(stage.Accumulator("total", bson.D{{Key: "$sum", Value: "$amount"}})),
+	)
+
+	printStage(s)
+	// Output: {"$bucket":{"groupBy":"$price","boundaries":[0,100],"output":{"total":{"$sum":"$amount"}}}}
+}

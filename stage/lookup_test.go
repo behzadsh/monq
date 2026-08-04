@@ -145,3 +145,27 @@ func ExampleUnionWith() {
 	printStage(s)
 	// Output: {"$unionWith":{"coll":"archived_orders","pipeline":[{"$match":{"region":{"$eq":"eu"}}}]}}
 }
+
+func ExampleMaxDepth() {
+	s := stage.GraphLookup("employees", "$reports_to", "reports_to", "name", "chain", stage.MaxDepth(3))
+
+	printStage(s)
+	// Output: {"$graphLookup":{"from":"employees","startWith":"$reports_to","connectFromField":"reports_to","connectToField":"name","as":"chain","maxDepth":3}}
+}
+
+func ExampleDepthField() {
+	s := stage.GraphLookup("staff", "$boss", "boss", "name", "chain", stage.DepthField("level"))
+
+	printStage(s)
+	// Output: {"$graphLookup":{"from":"staff","startWith":"$boss","connectFromField":"boss","connectToField":"name","as":"chain","depthField":"level"}}
+}
+
+func ExampleRestrictSearchWithMatch() {
+	// Passed to stage.GraphLookup, this option contributes one field to the stage's specification. It is applied
+	// on its own here only to show that field without the rest of a $graphLookup around it.
+	var spec bson.D
+	stage.RestrictSearchWithMatch(monq.Eq("active", true))(&spec)
+
+	printStage(spec)
+	// Output: {"restrictSearchWithMatch":{"active":{"$eq":true}}}
+}

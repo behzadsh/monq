@@ -28,9 +28,10 @@ func AddFields(fields ...bson.D) bson.D {
 // Field returns one name-to-value pair of a stage that describes its output field by field.
 //
 // It is the building block [Project], [AddFields], and [Set] take, and the same pair [Accumulator] builds for the
-// grouping stages. The name is an output field name rather than a path expression: it may use dots to reach into
-// a subdocument, but it does not take the "$field" form, which belongs on the value side. The value is an
-// aggregation expression, or 1 and 0 in a [Project] to include and exclude.
+// grouping stages. The name is a path into the document, dots included, which is why it is a monq.FieldPath: these
+// stages name fields that already exist as often as they create new ones. It does not take the "$field" form
+// though, which belongs on the value side. The value is an aggregation expression, or 1 and 0 in a [Project] to
+// include and exclude.
 //
 // Example:
 //
@@ -38,8 +39,8 @@ func AddFields(fields ...bson.D) bson.D {
 //	// bson.D{{Key: "name", Value: "$profile.display_name"}}
 //
 // MongoDB docs: https://www.mongodb.com/docs/manual/reference/operator/aggregation/project/
-func Field(name string, value any) bson.D {
-	return bson.D{{Key: name, Value: value}}
+func Field(name monq.FieldPath, value any) bson.D {
+	return bson.D{{Key: string(name), Value: value}}
 }
 
 // Project returns a stage that reshapes documents, keeping, renaming, and computing fields.

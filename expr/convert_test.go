@@ -171,3 +171,17 @@ func ExampleToString() {
 	printExpr(e)
 	// Output: {"$toString":"$quantity"}
 }
+
+func ExampleConvertOnError() {
+	e := expr.Convert(expr.Field("legacy_id"), "objectId", expr.ConvertOnError(nil))
+
+	printExpr(e)
+	// Output: {"$convert":{"input":"$legacy_id","to":"objectId","onError":null}}
+}
+
+func ExampleConvertOnNull() {
+	e := expr.Convert(expr.Field("quantity"), "int", expr.ConvertOnNull(0))
+
+	printExpr(e)
+	// Output: {"$convert":{"input":"$quantity","to":"int","onNull":0}}
+}

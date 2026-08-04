@@ -112,3 +112,17 @@ func ExampleSwitch() {
 	printExpr(e)
 	// Output: {"$switch":{"branches":[{"case":{"$gte":["$score",90]},"then":"A"},{"case":{"$gte":["$score",80]},"then":"B"}],"default":"F"}}
 }
+
+func ExampleBranch() {
+	e := expr.Switch(expr.Branch(expr.Gte(expr.Field("score"), 90), "A"))
+
+	printExpr(e)
+	// Output: {"$switch":{"branches":[{"case":{"$gte":["$score",90]},"then":"A"}]}}
+}
+
+func ExampleDefaultCase() {
+	e := expr.Switch(expr.Branch(expr.Gte(expr.Field("score"), 90), "A"), expr.DefaultCase("F"))
+
+	printExpr(e)
+	// Output: {"$switch":{"branches":[{"case":{"$gte":["$score",90]},"then":"A"}],"default":"F"}}
+}

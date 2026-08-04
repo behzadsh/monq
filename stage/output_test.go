@@ -141,3 +141,34 @@ func ExampleMerge() {
 	printStage(s)
 	// Output: {"$merge":{"into":"daily_totals","on":"date","whenMatched":"replace"}}
 }
+
+func ExampleMergeOn() {
+	s := stage.Merge("daily_totals", stage.MergeOn("date", "region"))
+
+	printStage(s)
+	// Output: {"$merge":{"into":"daily_totals","on":["date","region"]}}
+}
+
+func ExampleMergeWhenMatched() {
+	s := stage.Merge("daily_totals", stage.MergeWhenMatched("replace"))
+
+	printStage(s)
+	// Output: {"$merge":{"into":"daily_totals","whenMatched":"replace"}}
+}
+
+func ExampleMergeWhenNotMatched() {
+	s := stage.Merge("daily_totals", stage.MergeWhenNotMatched("discard"))
+
+	printStage(s)
+	// Output: {"$merge":{"into":"daily_totals","whenNotMatched":"discard"}}
+}
+
+func ExampleMergeLet() {
+	s := stage.Merge("daily_totals",
+		stage.MergeLet(bson.D{{Key: "amount", Value: "$total"}}),
+		stage.MergeWhenMatched([]bson.D{stage.Set(stage.Field("total", "$$amount"))}),
+	)
+
+	printStage(s)
+	// Output: {"$merge":{"into":"daily_totals","let":{"amount":"$total"},"whenMatched":[{"$set":{"total":"$$amount"}}]}}
+}

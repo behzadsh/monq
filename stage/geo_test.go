@@ -81,3 +81,52 @@ func ExampleGeoNear() {
 	printStage(s)
 	// Output: {"$geoNear":{"near":{"type":"Point","coordinates":[-73.97,40.77]},"distanceField":"distance","maxDistance":1000.0,"spherical":true}}
 }
+
+func ExampleSpherical() {
+	s := stage.GeoNear(monq.Point(-73.97, 40.77), "distance", stage.Spherical())
+
+	printStage(s)
+	// Output: {"$geoNear":{"near":{"type":"Point","coordinates":[-73.97,40.77]},"distanceField":"distance","spherical":true}}
+}
+
+func ExampleMaxDistance() {
+	s := stage.GeoNear(monq.Point(-73.97, 40.77), "distance", stage.MaxDistance(1000))
+
+	printStage(s)
+	// Output: {"$geoNear":{"near":{"type":"Point","coordinates":[-73.97,40.77]},"distanceField":"distance","maxDistance":1000.0}}
+}
+
+func ExampleMinDistance() {
+	s := stage.GeoNear(monq.Point(-73.97, 40.77), "distance", stage.MinDistance(10))
+
+	printStage(s)
+	// Output: {"$geoNear":{"near":{"type":"Point","coordinates":[-73.97,40.77]},"distanceField":"distance","minDistance":10.0}}
+}
+
+func ExampleDistanceMultiplier() {
+	s := stage.GeoNear(monq.Point(-73.97, 40.77), "km", stage.DistanceMultiplier(0.001))
+
+	printStage(s)
+	// Output: {"$geoNear":{"near":{"type":"Point","coordinates":[-73.97,40.77]},"distanceField":"km","distanceMultiplier":0.001}}
+}
+
+func ExampleIncludeLocs() {
+	s := stage.GeoNear(monq.Point(-73.97, 40.77), "distance", stage.IncludeLocs("matched_location"))
+
+	printStage(s)
+	// Output: {"$geoNear":{"near":{"type":"Point","coordinates":[-73.97,40.77]},"distanceField":"distance","includeLocs":"matched_location"}}
+}
+
+func ExampleGeoNearQuery() {
+	s := stage.GeoNear(monq.Point(-73.97, 40.77), "distance", stage.GeoNearQuery(monq.Eq("open", true)))
+
+	printStage(s)
+	// Output: {"$geoNear":{"near":{"type":"Point","coordinates":[-73.97,40.77]},"distanceField":"distance","query":{"open":{"$eq":true}}}}
+}
+
+func ExampleGeoNearKey() {
+	s := stage.GeoNear(monq.Point(-73.97, 40.77), "distance", stage.GeoNearKey("loc"))
+
+	printStage(s)
+	// Output: {"$geoNear":{"near":{"type":"Point","coordinates":[-73.97,40.77]},"distanceField":"distance","key":"loc"}}
+}

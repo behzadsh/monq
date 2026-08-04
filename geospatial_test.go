@@ -287,3 +287,17 @@ func ExampleNearSphere() {
 	printFilter(filter)
 	// Output: {"loc":{"$nearSphere":{"$geometry":{"type":"Point","coordinates":[-73.97,40.77]},"$minDistance":10.0}}}
 }
+
+func ExampleMaxDistance() {
+	filter := monq.Near("loc", monq.Geometry(monq.Point(-73.97, 40.77)), monq.MaxDistance(1000))
+
+	printFilter(filter)
+	// Output: {"loc":{"$near":{"$geometry":{"type":"Point","coordinates":[-73.97,40.77]},"$maxDistance":1000.0}}}
+}
+
+func ExampleMinDistance() {
+	filter := monq.Near("loc", monq.Geometry(monq.Point(-73.97, 40.77)), monq.MinDistance(10))
+
+	printFilter(filter)
+	// Output: {"loc":{"$near":{"$geometry":{"type":"Point","coordinates":[-73.97,40.77]},"$minDistance":10.0}}}
+}

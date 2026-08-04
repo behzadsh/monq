@@ -228,3 +228,24 @@ func ExampleText() {
 	fmt.Println(filter)
 	// Output: {"$text":{"$search":"coffee shop","$language":"en","$caseSensitive":true}}
 }
+
+func ExampleLanguage() {
+	filter := monq.Text("coffee", monq.Language("fr"))
+
+	fmt.Println(filter)
+	// Output: {"$text":{"$search":"coffee","$language":"fr"}}
+}
+
+func ExampleCaseSensitive() {
+	filter := monq.Text("Coffee", monq.CaseSensitive())
+
+	fmt.Println(filter)
+	// Output: {"$text":{"$search":"Coffee","$caseSensitive":true}}
+}
+
+func ExampleDiacriticSensitive() {
+	filter := monq.Text("café", monq.DiacriticSensitive())
+
+	fmt.Println(filter)
+	// Output: {"$text":{"$search":"café","$diacriticSensitive":true}}
+}

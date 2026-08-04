@@ -293,6 +293,10 @@ Paths follow the driver's own tag rules rather than `encoding/json`'s: a key def
 embedded struct nests under its own name unless it is tagged `,inline`. Types that encode themselves, such as `time.Time` and `bson.ObjectID`, are leaves.
 The same positional helpers are available by hand through `monq.ArrayPath` when there is no generated struct.
 
+The generated file is regular Go source with no runtime magic: [`cmd/monqgen/internal/example`](cmd/monqgen/internal/example) holds a struct, the file
+monqgen wrote from it, and tests using those paths against every part of the API. Codegen is entirely optional, and paths written by hand work the same
+way.
+
 ## Install
 
 ```sh

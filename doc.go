@@ -34,6 +34,11 @@
 // models, kept separate so that programs which only build queries do not compile the driver's mongo package and its
 // dependencies.
 //
+// Field paths are strings, so a renamed field becomes a query that quietly matches nothing. The monqgen command
+// under cmd/monqgen reads the struct a collection stores and writes its paths out as [FieldPath] constants, with
+// [ArrayPath] naming positions inside an array. Nothing else in monq depends on it: paths written by hand work
+// exactly as well.
+//
 // monq is not an ODM: there are no models, no sessions, and no query execution. Every function returns a raw driver
 // value (bson.D) that plugs directly into Find, Aggregate, UpdateOne, and friends with zero adapter layer. Nothing is
 // validated either, so a malformed query is reported by MongoDB rather than by monq. Operators monq does not cover

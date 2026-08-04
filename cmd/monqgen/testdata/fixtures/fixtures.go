@@ -77,3 +77,15 @@ type Custom struct {
 	Blob  Marshaled `bson:"blob"`
 	Blobs []Marshaled
 }
+
+// ReservedItem has a field whose name is one the generated array type already uses, so generating paths for an
+// array of these has to fail rather than shadow it.
+type ReservedItem struct {
+	Path string `bson:"path"`
+	Name string `bson:"name"`
+}
+
+// Reserved holds an array of the element that collides.
+type Reserved struct {
+	Items []ReservedItem `bson:"items"`
+}

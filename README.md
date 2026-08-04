@@ -257,6 +257,42 @@ out of the root means a program that only builds queries never compiles any of t
 | `monq`       | `Sort` `Asc` `Desc` `TextScore`                                                            |
 | `monq/index` | `New` `Asc` `Desc` `Text` `Hashed` `Geo2D` `Geo2DSphere` `Unique` `Sparse` `TTL` `PartialFilter` `Name` `Hidden` |
 
+## Generated field paths
+
+Field paths are strings, so a renamed field turns into a query that silently matches nothing. `monqgen` reads the struct a collection stores and writes its
+paths out as typed constants:
+
+```go
+//go:generate go run github.com/behzadsh/monq/cmd/monqgen -type User
+
+type User struct {
+    ID    bson.ObjectID `bson:"_id"`
+    Email string        `bson:"email"`
+    Items []Item        `bson:"items"`
+}
+```
+
+`go generate ./...` writes `user_paths.go` next to it, and the paths go straight into any operator that takes one:
+
+```go
+monq.Eq(UserPaths.Email, "a@b.c")           // {"email": {"$eq": "a@b.c"}}
+monq.Eq(UserPaths.Items.SKU, "abc")         // {"items.sku": {"$eq": "abc"}}
+monq.Size(UserPaths.Items.Path, 3)          // {"items": {"$size": 3}}
+```
+
+Arrays carry the four ways MongoDB names a position, so the punctuation never has to be remembered:
+
+```go
+UserPaths.Items.At(3).Quantity        // "items.3.qty"
+UserPaths.Items.Positional().Price    // "items.$.price"
+UserPaths.Items.All().SKU             // "items.$[].sku"
+UserPaths.Items.Filtered("cheap").SKU // "items.$[cheap].sku"
+```
+
+Paths follow the driver's own tag rules rather than `encoding/json`'s: a key defaults to the field name lowercased whole, `bson:"-"` drops a field, and an
+embedded struct nests under its own name unless it is tagged `,inline`. Types that encode themselves, such as `time.Time` and `bson.ObjectID`, are leaves.
+The same positional helpers are available by hand through `monq.ArrayPath` when there is no generated struct.
+
 ## Install
 
 ```sh

@@ -1,5 +1,6 @@
 # monq
 
+[![CI](https://github.com/behzadsh/monq/actions/workflows/ci.yml/badge.svg)](https://github.com/behzadsh/monq/actions/workflows/ci.yml)
 [![Release](https://img.shields.io/github/v/release/behzadsh/monq)](https://github.com/behzadsh/monq/releases/latest)
 [![Go Reference](https://pkg.go.dev/badge/github.com/behzadsh/monq.svg)](https://pkg.go.dev/github.com/behzadsh/monq)
 [![License](https://img.shields.io/github/license/behzadsh/monq)](LICENSE)

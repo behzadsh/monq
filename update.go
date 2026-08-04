@@ -87,14 +87,3 @@ func mergeOperand(existing, incoming any) any {
 
 	return target
 }
-
-// indexOfKey returns the position of key in d, or -1 when d has no such key.
-func indexOfKey(d bson.D, key string) int {
-	for i, e := range d {
-		if e.Key == key {
-			return i
-		}
-	}
-
-	return -1
-}

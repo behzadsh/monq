@@ -49,20 +49,7 @@ func Desc(field FieldPath) bson.D {
 //
 // MongoDB docs: https://www.mongodb.com/docs/manual/reference/method/cursor.sort/
 func Sort(entries ...bson.D) bson.D {
-	sort := bson.D{}
-	for _, entry := range entries {
-		for _, e := range entry {
-			if i := indexOfKey(sort, e.Key); i >= 0 {
-				sort[i].Value = e.Value
-
-				continue
-			}
-
-			sort = append(sort, e)
-		}
-	}
-
-	return sort
+	return mergeEntries(entries)
 }
 
 // TextScore returns a sort entry ordering documents by how well they matched a text search.
@@ -71,6 +58,9 @@ func Sort(entries ...bson.D) bson.D {
 // field is an output name rather than a stored path: it names where the score would appear, and by convention is
 // called "score". Sorting by it without a $text search in the same query is an error.
 //
+// The same entry works in a [Projection], where it adds the score to the returned documents instead of ordering
+// them. [Meta] is the general form, covering the other values MongoDB can report this way.
+//
 // Example:
 //
 //	monq.Sort(monq.TextScore("score"))
@@ -78,5 +68,5 @@ func Sort(entries ...bson.D) bson.D {
 //
 // MongoDB docs: https://www.mongodb.com/docs/manual/reference/operator/aggregation/meta/
 func TextScore(field FieldPath) bson.D {
-	return bson.D{{Key: string(field), Value: bson.D{{Key: "$meta", Value: "textScore"}}}}
+	return Meta(field, "textScore")
 }

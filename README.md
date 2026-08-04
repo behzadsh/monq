@@ -90,6 +90,29 @@ monq.Near("loc", monq.Geometry(monq.Point(-73.97, 40.77)), monq.MaxDistance(1000
 // {"loc": {"$near": {"$geometry": {"type": "Point", "coordinates": [-73.97, 40.77]}, "$maxDistance": 1000.0}}}
 ```
 
+## Projections
+
+A projection decides which fields come back. Entries merge the same way sort entries do, in the order given:
+
+```go
+projection := monq.Projection(
+    monq.Include("email", "items.sku"),
+    monq.Exclude("_id"),
+    monq.Slice("comments", -5),
+)
+
+cursor, err := collection.Find(ctx, filter, options.Find().SetProjection(projection))
+// {"email": 1, "items.sku": 1, "_id": 0, "comments": {"$slice": -5}}
+```
+
+Two operators you already have double as projection entries, because MongoDB spells them the same way: `ElemMatch` returns the first matching element of an
+array, and `TextScore` adds a `$text` relevance score to the result. `ArrayPath.Positional()` gives the `$` positional form, so
+`monq.Include(items.Positional())` returns just the element the query matched.
+
+| Category   | Functions                                             |
+| ---------- | ------------------------------------------------------ |
+| Projection | `Projection` `Include` `Exclude` `Slice` `SliceFrom` `Meta` |
+
 ## Updates
 
 Update operators work the same way, one field each, and a single one is already a valid update document:

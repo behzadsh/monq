@@ -20,7 +20,8 @@
 // documents concatenated by hand would collide. It is to updates what [And] is to filters.
 //
 // Sort documents come from [Sort] with [Asc], [Desc], and [TextScore] entries, and keep the order they are given,
-// which is the order MongoDB applies them in.
+// which is the order MongoDB applies them in. Projections are built the same way, from [Projection] with [Include],
+// [Exclude], [Slice], and [Meta] entries.
 //
 // Geospatial queries come with their geometry, so GeoJSON never has to be written by hand: [Point], [Polygon], and
 // [GeoJSON] build the shape, [Geometry] hands it to [GeoWithin], [GeoIntersects], [Near], or [NearSphere], and the

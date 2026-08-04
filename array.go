@@ -32,6 +32,9 @@ func All(field FieldPath, values ...any) bson.D {
 // where the criteria are bare operator expressions with no field name, which no monq comparison operator emits; build
 // those with [Raw], e.g. ElemMatch("scores", Raw(bson.D{{Key: "$gte", Value: 80}})).
 //
+// The same document works as a [Projection] entry, where it returns only the first element matching the criteria
+// instead of selecting documents. A field cannot carry both that and a positional entry.
+//
 // Example:
 //
 //	monq.ElemMatch("items", monq.Eq("sku", "abc"), monq.Gte("qty", 2))

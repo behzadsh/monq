@@ -303,6 +303,8 @@ way.
 go get github.com/behzadsh/monq
 ```
 
+Go 1.25 or newer, matching the releases the Go team still supports.
+
 ## License
 
 [MIT](LICENSE)

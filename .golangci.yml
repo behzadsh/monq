@@ -3,7 +3,7 @@ run:
   timeout: 5m
   relative-path-mode: gomod
   allow-parallel-runners: true
-  go: "1.24"
+  go: "1.25"
 linters:
   default: none
   enable:

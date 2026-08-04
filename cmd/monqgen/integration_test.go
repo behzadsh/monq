@@ -62,7 +62,7 @@ func TestRunWritesAndRefusesToClobber(t *testing.T) {
 		}
 	}
 
-	write("go.mod", "module example\n\ngo 1.24\n")
+	write("go.mod", "module example\n\ngo 1.25\n")
 	write("user.go", tempStruct)
 
 	if err := run(dir, "User", "", false); err != nil {

@@ -341,6 +341,20 @@ The generated file is regular Go source with no runtime magic: [`cmd/monqgen/int
 monqgen wrote from it, and tests using those paths against every part of the API. Codegen is entirely optional, and paths written by hand work the same
 way.
 
+## Examples
+
+[`examples/`](examples) is a runnable program covering every area of the API against a real MongoDB. Each step prints the `bson.D` that monq built and then
+the documents the server returned for it, which is the part a godoc example cannot show:
+
+```sh
+docker run --rm -p 27017:27017 mongo:8
+go run ./examples              # every demo, in order
+go run ./examples find update  # or just the ones named
+```
+
+The demos are `find`, `project`, `update`, `aggregate`, `compute`, `geo`, `index`, and `paths`, one file each. The database is reseeded before every demo,
+so they are independent and safe to run in any order. See [`examples/README.md`](examples/README.md) for what each one covers.
+
 ## Install
 
 ```sh

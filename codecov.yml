@@ -1,3 +1,9 @@
+# The examples program is a demo runner that needs a live MongoDB, so it is compiled by CI but never covered by
+# the test suite. Counting it would report the library as a third less tested than it is.
+ignore:
+  - "examples"
+  - "examples/**/*"
+
 coverage:
   status:
     project:

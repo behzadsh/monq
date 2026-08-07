@@ -85,6 +85,38 @@ func GraphLookup(
 	return bson.D{{Key: "$graphLookup", Value: spec}}
 }
 
+// LookupOption configures one optional field of a [Lookup] stage.
+type LookupOption func(*bson.D)
+
+// SubPipeline returns a [LookupOption] that runs stages against the joined documents before they are collected.
+//
+// Adding a sub-pipeline to a [Lookup] is the concise correlated form of $lookup, available from MongoDB 5.0 on:
+// the equality on localField and foreignField still selects the documents, and the stages then filter, sort, or
+// reshape what came back. The equality is applied first, so the join can still use an index on foreignField,
+// which is what separates this from writing the same condition as an $expr inside [LookupPipeline].
+//
+// The stages cannot contain $out or $merge. Values of the outer document reach them only through variables
+// declared with [Let].
+func SubPipeline(stages ...bson.D) LookupOption {
+	return func(d *bson.D) {
+		*d = append(*d, bson.E{Key: "pipeline", Value: toStageArray(stages)})
+	}
+}
+
+// Let returns a [LookupOption] declaring variables the sub-pipeline of a [Lookup] can read.
+//
+// Each value is an aggregation expression evaluated against the outer document, so a field of it is written
+// "$total" here and the variable is then read as "$$total" inside the stages, with the doubled dollar sign that
+// is easy to miss. A stage comparing a variable against a field of the joined collection has to go through
+// $expr, since an ordinary query condition cannot see variables.
+//
+// Without [SubPipeline] there is nothing to read the variables, and MongoDB rejects the stage.
+func Let(vars bson.D) LookupOption {
+	return func(d *bson.D) {
+		*d = append(*d, bson.E{Key: "let", Value: vars})
+	}
+}
+
 // Lookup returns a stage that joins documents from another collection on equality.
 //
 // $lookup adds an array field holding, for each input document, the documents of the from collection whose
@@ -92,27 +124,35 @@ func GraphLookup(
 // left outer join; following it with an [Unwind] turns it into an inner join, or a left outer one with
 // [PreserveNullAndEmptyArrays]. A missing localField is treated as null and matches foreign nulls.
 //
-// The from collection has to be in the same database. For a join on anything other than equality, or one that
-// filters the joined documents, use [LookupPipeline].
+// The from collection has to be in the same database. [SubPipeline] and [Let] add the concise correlated form of
+// MongoDB 5.0 and later, which keeps the field equality and narrows what it found; for a join on something other
+// than equality, use [LookupPipeline] instead.
 //
 // Example:
 //
-//	stage.Lookup("orders", "_id", "customer_id", "orders")
+//	stage.Lookup("orders", "_id", "customer_id", "orders", stage.SubPipeline(stage.Sort(monq.Sort(monq.Asc("placed_at")))))
 //	// bson.D{{Key: "$lookup", Value: bson.D{
 //	//     {Key: "from", Value: "orders"},
 //	//     {Key: "localField", Value: "_id"},
 //	//     {Key: "foreignField", Value: "customer_id"},
 //	//     {Key: "as", Value: "orders"},
+//	//     {Key: "pipeline", Value: bson.A{...}},
 //	// }}}
 //
 // MongoDB docs: https://www.mongodb.com/docs/manual/reference/operator/aggregation/lookup/
-func Lookup(from string, localField, foreignField monq.FieldPath, as string) bson.D {
-	return bson.D{{Key: "$lookup", Value: bson.D{
+func Lookup(from string, localField, foreignField monq.FieldPath, as string, opts ...LookupOption) bson.D {
+	spec := bson.D{
 		{Key: "from", Value: from},
 		{Key: "localField", Value: string(localField)},
 		{Key: "foreignField", Value: string(foreignField)},
 		{Key: "as", Value: as},
-	}}}
+	}
+
+	for _, opt := range opts {
+		opt(&spec)
+	}
+
+	return bson.D{{Key: "$lookup", Value: spec}}
 }
 
 // LookupPipeline returns a stage that joins documents from another collection through a sub-pipeline.

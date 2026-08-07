@@ -179,7 +179,7 @@ stage.Accumulator("total", bson.D{{Key: "$sum", Value: "$amount"}}),
 |------------|------------------------------------------------------------------------------|
 | Filtering  | `Match` `Limit` `Skip` `Sample` `Count` `Sort`                               |
 | Grouping   | `Group` `Bucket` `BucketAuto` `SortByCount` `Facet` `Unwind`                 |
-| Joining    | `Lookup` `LookupPipeline` `GraphLookup` `UnionWith`                          |
+| Joining    | `Lookup` `SubPipeline` `Let` `LookupPipeline` `GraphLookup` `UnionWith`      |
 | Reshaping  | `Project` `AddFields` `Set` `Unset` `ReplaceRoot` `ReplaceWith`              |
 | Output     | `Out` `Merge` `Documents`                                                    |
 | Windows    | `SetWindowFields` `WindowField` `WindowDocuments` `WindowRange` `WindowUnit` |
@@ -187,6 +187,14 @@ stage.Accumulator("total", bson.D{{Key: "$sum", Value: "$amount"}}),
 | Geospatial | `GeoNear`                                                                    |
 | Building   | `Field` `Accumulator` `FacetPipeline` `Namespace`                            |
 | Assembly   | `Pipeline`                                                                   |
+
+`Lookup` joins on field equality, and `SubPipeline` narrows what the join found without giving up the index on the foreign field. `LookupPipeline` is
+the other form, for a join condition that is not an equality:
+
+```go
+stage.Lookup("orders", "_id", "customer_id", "orders", stage.SubPipeline(stage.Sort(monq.Sort(monq.Asc("placed_at")))))
+// {"$lookup": {"from": "orders", "localField": "_id", "foreignField": "customer_id", "as": "orders", "pipeline": [{"$sort": {"placed_at": 1}}]}}
+```
 
 `GeoNear` takes the same geometry constructors the query operators do, which is why they return bare GeoJSON:
 

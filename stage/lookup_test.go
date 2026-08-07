@@ -27,6 +27,42 @@ func TestJoinStages(t *testing.T) {
 			}}},
 		},
 		{
+			name: "Lookup with a sub-pipeline",
+			got: stage.Lookup("orders", "_id", "customer_id", "orders",
+				stage.SubPipeline(stage.Sort(monq.Sort(monq.Asc("placed_at")))),
+			),
+			want: bson.D{{Key: "$lookup", Value: bson.D{
+				{Key: "from", Value: "orders"},
+				{Key: "localField", Value: "_id"},
+				{Key: "foreignField", Value: "customer_id"},
+				{Key: "as", Value: "orders"},
+				{Key: "pipeline", Value: bson.A{
+					bson.D{{Key: "$sort", Value: bson.D{{Key: "placed_at", Value: 1}}}},
+				}},
+			}}},
+		},
+		{
+			name: "Lookup with variables and a sub-pipeline",
+			got: stage.Lookup("orders", "_id", "customer_id", "orders",
+				stage.Let(bson.D{{Key: "region", Value: "$region"}}),
+				stage.SubPipeline(stage.Match(monq.Expr(bson.D{
+					{Key: "$eq", Value: bson.A{"$region", "$$region"}},
+				}))),
+			),
+			want: bson.D{{Key: "$lookup", Value: bson.D{
+				{Key: "from", Value: "orders"},
+				{Key: "localField", Value: "_id"},
+				{Key: "foreignField", Value: "customer_id"},
+				{Key: "as", Value: "orders"},
+				{Key: "let", Value: bson.D{{Key: "region", Value: "$region"}}},
+				{Key: "pipeline", Value: bson.A{
+					bson.D{{Key: "$match", Value: bson.D{{Key: "$expr", Value: bson.D{
+						{Key: "$eq", Value: bson.A{"$region", "$$region"}},
+					}}}}},
+				}},
+			}}},
+		},
+		{
 			name: "LookupPipeline with variables",
 			got: stage.LookupPipeline("orders",
 				bson.D{{Key: "customer", Value: "$_id"}},
@@ -115,10 +151,12 @@ func TestJoinStages(t *testing.T) {
 }
 
 func ExampleLookup() {
-	s := stage.Lookup("orders", "_id", "customer_id", "orders")
+	s := stage.Lookup("orders", "_id", "customer_id", "orders",
+		stage.SubPipeline(stage.Sort(monq.Sort(monq.Asc("placed_at")))),
+	)
 
 	printStage(s)
-	// Output: {"$lookup":{"from":"orders","localField":"_id","foreignField":"customer_id","as":"orders"}}
+	// Output: {"$lookup":{"from":"orders","localField":"_id","foreignField":"customer_id","as":"orders","pipeline":[{"$sort":{"placed_at":1}}]}}
 }
 
 func ExampleLookupPipeline() {

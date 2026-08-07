@@ -12,8 +12,9 @@
 //	cursor, err := collection.Aggregate(ctx, pipeline)
 //
 // Some stage names are also operator names, which is why they live in their own package: stage.Set is the $set
-// stage that adds fields to documents, while monq.Set is the $set update operator. The package qualifier says
-// which one is meant, and neither name has to be bent out of shape.
+// stage that adds fields to documents, while monq.Set is the $set update operator. The same goes for stage.Let,
+// which declares the variables a [Lookup] sub-pipeline reads, against expr.Let, which is the $let expression. The
+// package qualifier says which one is meant, and neither name has to be bent out of shape.
 //
 // Aggregation expressions inside stages refer to fields with the "$field" string form rather than a bare field
 // name, since that is how the aggregation framework tells a field reference from a literal string. Parameter types

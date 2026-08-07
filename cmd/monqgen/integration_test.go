@@ -23,25 +23,29 @@ func TestGeneratedFileIsUpToDate(t *testing.T) {
 		t.Fatalf("loading %s: %v", examplePackage, err)
 	}
 
-	model, err := Parse(pkg, "User")
-	if err != nil {
-		t.Fatalf("Parse() error = %v", err)
-	}
+	for _, typeName := range []string{"User", "sessionDoc"} {
+		t.Run(typeName, func(t *testing.T) {
+			model, err := Parse(pkg, typeName)
+			if err != nil {
+				t.Fatalf("Parse() error = %v", err)
+			}
 
-	got, err := Generate(model, pkg.Name)
-	if err != nil {
-		t.Fatalf("Generate() error = %v", err)
-	}
+			got, err := Generate(model, pkg.Name, "")
+			if err != nil {
+				t.Fatalf("Generate() error = %v", err)
+			}
 
-	path := filepath.Join("internal", "example", outputName("User", ""))
+			path := filepath.Join("internal", "example", outputName(typeName, ""))
 
-	want, err := os.ReadFile(path) //nolint:gosec // a fixed path inside the package being tested
-	if err != nil {
-		t.Fatalf("reading %s: %v", path, err)
-	}
+			want, err := os.ReadFile(path) //nolint:gosec // a fixed path inside the package being tested
+			if err != nil {
+				t.Fatalf("reading %s: %v", path, err)
+			}
 
-	if string(got) != string(want) {
-		t.Errorf("%s is out of date; run go generate ./... to rewrite it", path)
+			if string(got) != string(want) {
+				t.Errorf("%s is out of date; run go generate ./... to rewrite it", path)
+			}
+		})
 	}
 }
 
@@ -65,7 +69,7 @@ func TestRunWritesAndRefusesToClobber(t *testing.T) {
 	write("go.mod", "module example\n\ngo 1.25\n")
 	write("user.go", tempStruct)
 
-	if err := run(dir, "User", "", false); err != nil {
+	if err := run(dir, "User", "", "", false); err != nil {
 		t.Fatalf("run() error = %v", err)
 	}
 
@@ -95,21 +99,46 @@ func TestRunWritesAndRefusesToClobber(t *testing.T) {
 	// A file monqgen did not write is left alone.
 	write("handwritten.go", "package example\n")
 
-	if err := run(dir, "User", "handwritten.go", false); err == nil {
+	if err := run(dir, "User", "", "handwritten.go", false); err == nil {
 		t.Error("run() overwrote a file it did not generate, want a refusal")
+	}
+}
+
+// TestRunNamesTheValue drives -var the way a go:generate line would, since the flag reaching the generated file is
+// the part the generator's own tests cannot show.
+func TestRunNamesTheValue(t *testing.T) {
+	dir := t.TempDir()
+
+	for name, contents := range map[string]string{"go.mod": "module example\n\ngo 1.25\n", "user.go": tempStruct} {
+		if err := os.WriteFile(filepath.Join(dir, name), []byte(contents), 0o600); err != nil {
+			t.Fatalf("writing %s: %v", name, err)
+		}
+	}
+
+	if err := run(dir, "User", "paths", "", false); err != nil {
+		t.Fatalf("run() error = %v", err)
+	}
+
+	written, err := os.ReadFile(filepath.Join(dir, "user_paths.go")) //nolint:gosec // a fixed path in a temp dir
+	if err != nil {
+		t.Fatalf("reading the generated file: %v", err)
+	}
+
+	if !strings.Contains(string(written), "var paths = _UserPaths{") {
+		t.Errorf("the generated file does not name the value paths:\n%s", written)
 	}
 }
 
 // TestRunPrints walks the tree without writing anything, which is what -print is for.
 func TestRunPrints(t *testing.T) {
-	if err := run(examplePackage, "User", "", true); err != nil {
+	if err := run(examplePackage, "User", "", "", true); err != nil {
 		t.Fatalf("run() error = %v", err)
 	}
 }
 
 // TestRunReportsAMissingType checks the error a mistyped -type produces.
 func TestRunReportsAMissingType(t *testing.T) {
-	if err := run(examplePackage, "Missing", "", true); err == nil {
+	if err := run(examplePackage, "Missing", "", "", true); err == nil {
 		t.Error("run() error = nil, want an error naming the missing type")
 	}
 }

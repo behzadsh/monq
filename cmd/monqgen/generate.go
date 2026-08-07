@@ -26,7 +26,15 @@ var reserved = map[string]string{
 //
 // Names are worked out first, in one pass over the tree, so that the type declarations and the values built from
 // them agree. Rendering then reads those names rather than deriving them a second time.
-func Generate(model *Struct, pkgName string) ([]byte, error) {
+//
+// The value the paths land in is named by varName, or by the model with Paths appended when varName is empty. Only
+// the value takes that name: the types are the generator's own business and go on being named after the model, so
+// renaming the value cannot rename anything a caller reads.
+func Generate(model *Struct, pkgName, varName string) ([]byte, error) {
+	if varName == "" {
+		varName = model.Name + "Paths"
+	}
+
 	g := &generator{names: map[string]bool{}}
 
 	plan := g.plan(model, model.Name, "")
@@ -34,12 +42,16 @@ func Generate(model *Struct, pkgName string) ([]byte, error) {
 		return nil, err
 	}
 
+	if g.names[varName] {
+		return nil, fmt.Errorf("the value cannot be named %s: a generated type already has that name", varName)
+	}
+
 	var buf bytes.Buffer
 
 	fmt.Fprintf(&buf, "%s\n\npackage %s\n\nimport \"github.com/behzadsh/monq\"\n", header, pkgName)
 	buf.WriteString(plan.declarations())
-	fmt.Fprintf(&buf, "\n// %sPaths holds the document paths of %s.\nvar %sPaths = %s\n",
-		model.Name, model.Name, model.Name, plan.literal())
+	fmt.Fprintf(&buf, "\n// %s holds the document paths of %s.\nvar %s = %s\n",
+		varName, model.Name, varName, plan.literal())
 
 	src, err := format.Source(buf.Bytes())
 	if err != nil {
@@ -97,9 +109,13 @@ func (g *generator) plan(s *Struct, base, prefix string) *document {
 	return doc
 }
 
-// typeName reserves an unexported name for a generated type, adding a number if that name is already taken.
+// typeName reserves a name for a generated type, adding a number if that name is already taken.
+//
+// The name is the one the value would have with an underscore in front of it, _UserPaths beside UserPaths. That
+// keeps the type out of the way of the value, which is the name callers write, and out of the way of an
+// unexported model, whose value would otherwise want the same identifier the root type does.
 func (g *generator) typeName(base string) string {
-	name := unexport(base) + "Paths"
+	name := "_" + base + "Paths"
 	if !g.names[name] {
 		g.names[name] = true
 
@@ -181,8 +197,8 @@ func (d *document) literal() string {
 	for _, f := range d.fields {
 		switch {
 		case f.kind == KindArray && f.child != nil:
-			fmt.Fprintf(&b, "\t%s: %s{Path: %q, %s: new%s(%q)},\n",
-				f.goName, f.wrapper, f.path, f.child.typeName, export(f.child.typeName), f.path)
+			fmt.Fprintf(&b, "\t%s: %s{Path: %q, %s: %s(%q)},\n",
+				f.goName, f.wrapper, f.path, f.child.typeName, ctor(f.child.typeName), f.path)
 		case f.kind == KindArray:
 			fmt.Fprintf(&b, "\t%s: monq.ArrayPath{Path: %q},\n", f.goName, f.path)
 		case f.kind == KindDocument && f.child != nil:
@@ -202,8 +218,8 @@ func (d *document) literal() string {
 func (d *document) constructor() string {
 	var b strings.Builder
 
-	fmt.Fprintf(&b, "// new%s returns the paths of one element under prefix.\n", export(d.typeName))
-	fmt.Fprintf(&b, "func new%s(prefix string) %s {\n\treturn %s{\n", export(d.typeName), d.typeName, d.typeName)
+	fmt.Fprintf(&b, "// %s returns the paths of one element under prefix.\n", ctor(d.typeName))
+	fmt.Fprintf(&b, "func %s(prefix string) %s {\n\treturn %s{\n", ctor(d.typeName), d.typeName, d.typeName)
 
 	for _, f := range d.fields {
 		key := f.path[strings.LastIndex(f.path, ".")+1:]
@@ -212,7 +228,7 @@ func (d *document) constructor() string {
 		case f.kind == KindArray && f.child == nil:
 			fmt.Fprintf(&b, "\t\t%s: monq.ArrayPath{Path: monq.FieldPath(prefix + %q)},\n", f.goName, "."+key)
 		case f.child != nil:
-			fmt.Fprintf(&b, "\t\t%s: new%s(prefix + %q),\n", f.goName, export(f.child.typeName), "."+key)
+			fmt.Fprintf(&b, "\t\t%s: %s(prefix + %q),\n", f.goName, ctor(f.child.typeName), "."+key)
 		default:
 			fmt.Fprintf(&b, "\t\t%s: monq.FieldPath(prefix + %q),\n", f.goName, "."+key)
 		}
@@ -248,8 +264,8 @@ func (f field) arrayType() string {
 	for _, m := range methods {
 		fmt.Fprintf(&b, "\n// %s returns the paths of %s.\nfunc (a %s) %s(%s) %s {\n",
 			m.name, m.doc, f.wrapper, m.name, m.params, f.child.typeName)
-		fmt.Fprintf(&b, "\treturn new%s(string(monq.ArrayPath{Path: a.Path}.%s(%s)))\n}\n",
-			export(f.child.typeName), m.name, m.arguments)
+		fmt.Fprintf(&b, "\treturn %s(string(monq.ArrayPath{Path: a.Path}.%s(%s)))\n}\n",
+			ctor(f.child.typeName), m.name, m.arguments)
 	}
 
 	return b.String()
@@ -264,20 +280,15 @@ func join(prefix, key string) string {
 	return prefix + "." + key
 }
 
-// export uppercases the first letter, which turns a generated type name into the name of its constructor.
-func export(name string) string {
+// ctor names the function building a generated type's paths under a prefix.
+//
+// The underscore that keeps generated types out of the way of the values named after them has no place in a
+// function name, so it comes off and the letter it hid is capitalised: _UserItemsPaths gives newUserItemsPaths.
+func ctor(typeName string) string {
+	name := strings.TrimPrefix(typeName, "_")
 	if name == "" {
-		return name
+		return "new"
 	}
 
-	return strings.ToUpper(name[:1]) + name[1:]
-}
-
-// unexport lowercases the first letter, since generated type names are internal to the package they land in.
-func unexport(name string) string {
-	if name == "" {
-		return name
-	}
-
-	return strings.ToLower(name[:1]) + name[1:]
+	return "new" + strings.ToUpper(name[:1]) + name[1:]
 }

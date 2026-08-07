@@ -78,6 +78,14 @@ type Custom struct {
 	Blobs []Marshaled
 }
 
+// unexportedDoc is named the way a document struct kept inside a package usually is. The value monqgen writes is
+// named after the model as given, so an unexported model puts the value and the root type in the same namespace.
+type unexportedDoc struct { //nolint:unused // parsed by name, never referenced from Go code
+	ID      bson.ObjectID `bson:"_id"`
+	Name    string        `bson:"name"`
+	Address Address       `bson:"address"`
+}
+
 // ReservedItem has a field whose name is one the generated array type already uses, so generating paths for an
 // array of these has to fail rather than shadow it.
 type ReservedItem struct {

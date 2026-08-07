@@ -14,6 +14,7 @@
 // The flags are:
 //
 //	-type   the struct to read, required
+//	-var    the value the paths land in, defaulting to the type name with Paths appended
 //	-out    the file to write, defaulting to the type name lowercased with _paths.go appended
 //	-print  write the path tree to standard output instead of generating a file
 //
@@ -27,6 +28,7 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"go/token"
 	"os"
 	"path/filepath"
 	"strings"
@@ -36,6 +38,7 @@ import (
 
 func main() {
 	typeName := flag.String("type", "", "name of the struct to read paths from")
+	varName := flag.String("var", "", "name of the generated value, defaults to <type>Paths")
 	out := flag.String("out", "", "file to write, defaults to <type>_paths.go")
 	printOnly := flag.Bool("print", false, "write the path tree to standard output instead of a file")
 
@@ -47,12 +50,17 @@ func main() {
 		os.Exit(2)
 	}
 
+	if err := checkVarName(*varName); err != nil {
+		fmt.Fprintf(os.Stderr, "monqgen: %v\n", err)
+		os.Exit(2)
+	}
+
 	dir := "."
 	if flag.NArg() > 0 {
 		dir = flag.Arg(0)
 	}
 
-	if err := run(dir, *typeName, *out, *printOnly); err != nil {
+	if err := run(dir, *typeName, *varName, *out, *printOnly); err != nil {
 		fmt.Fprintf(os.Stderr, "monqgen: %v\n", err)
 		os.Exit(1)
 	}
@@ -60,7 +68,7 @@ func main() {
 
 // run loads the package, resolves the struct, and reports the path tree. Writing the generated file comes later;
 // for now the tree is what there is to show.
-func run(dir, typeName, out string, printOnly bool) error {
+func run(dir, typeName, varName, out string, printOnly bool) error {
 	pkg, err := load(dir)
 	if err != nil {
 		return err
@@ -79,7 +87,7 @@ func run(dir, typeName, out string, printOnly bool) error {
 		return nil
 	}
 
-	src, err := Generate(model, pkg.Name)
+	src, err := Generate(model, pkg.Name, varName)
 	if err != nil {
 		return err
 	}
@@ -91,6 +99,20 @@ func run(dir, typeName, out string, printOnly bool) error {
 
 	if err := os.WriteFile(target, src, 0o600); err != nil {
 		return fmt.Errorf("writing %s: %w", target, err)
+	}
+
+	return nil
+}
+
+// checkVarName rejects a -var that would not compile, since the generated file is the first place the mistake
+// would otherwise show up. An empty name is the default and stands for <type>Paths.
+func checkVarName(name string) error {
+	if name == "" {
+		return nil
+	}
+
+	if !token.IsIdentifier(name) || token.Lookup(name).IsKeyword() {
+		return fmt.Errorf("-var %q is not a Go identifier", name)
 	}
 
 	return nil

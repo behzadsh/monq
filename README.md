@@ -311,6 +311,15 @@ monq.Eq(UserPaths.Items.SKU, "abc") // {"items.sku": {"$eq": "abc"}}
 monq.Size(UserPaths.Items.Path, 3) // {"items": {"$size": 3}}
 ```
 
+`UserPaths` is the name to write; the struct behind it is declared as `_UserPaths`. The underscore keeps the type out of the way of the value, which
+matters for a document struct that is itself unexported: `campaignDoc` gives `var campaignDocPaths = _campaignDocPaths{...}`, and the two never collide.
+`-var` names the value something else. The types are not touched, since the value is the only name written by hand:
+
+```sh
+$ go run github.com/behzadsh/monq/cmd/monqgen -type campaignDoc -var paths ./internal/domains/brand
+# var paths = _campaignDocPaths{...}
+```
+
 Arrays carry the four ways MongoDB names a position, so the punctuation never has to be remembered:
 
 ```go
@@ -329,6 +338,7 @@ The command reads the package directory given as its argument, defaulting to the
 | Flag     | Meaning                                                                             |
 |----------|-------------------------------------------------------------------------------------|
 | `-type`  | the struct to read paths from; required                                             |
+| `-var`   | the value the paths land in, defaulting to the type name with `Paths` appended      |
 | `-out`   | the file to write, defaulting to the type name lowercased with `_paths.go` appended |
 | `-print` | write the path tree to standard output and generate nothing                         |
 

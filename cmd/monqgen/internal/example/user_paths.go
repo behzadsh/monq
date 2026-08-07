@@ -4,71 +4,71 @@ package example
 
 import "github.com/behzadsh/monq"
 
-type userAddressPaths struct {
+type _UserAddressPaths struct {
 	Street monq.FieldPath
 	City   monq.FieldPath
 }
 
-type userItemsPaths struct {
+type _UserItemsPaths struct {
 	SKU      monq.FieldPath
 	Quantity monq.FieldPath
 	Price    monq.FieldPath
 }
 
 // newUserItemsPaths returns the paths of one element under prefix.
-func newUserItemsPaths(prefix string) userItemsPaths {
-	return userItemsPaths{
+func newUserItemsPaths(prefix string) _UserItemsPaths {
+	return _UserItemsPaths{
 		SKU:      monq.FieldPath(prefix + ".sku"),
 		Quantity: monq.FieldPath(prefix + ".qty"),
 		Price:    monq.FieldPath(prefix + ".price"),
 	}
 }
 
-// userItemsPathsArray is the Items array: its own path, the dotted paths of its elements, and the positional
+// _UserItemsPathsArray is the Items array: its own path, the dotted paths of its elements, and the positional
 // forms for naming particular elements.
-type userItemsPathsArray struct {
+type _UserItemsPathsArray struct {
 	Path monq.FieldPath
-	userItemsPaths
+	_UserItemsPaths
 }
 
 // At returns the paths of the element at index i.
-func (a userItemsPathsArray) At(i int) userItemsPaths {
+func (a _UserItemsPathsArray) At(i int) _UserItemsPaths {
 	return newUserItemsPaths(string(monq.ArrayPath{Path: a.Path}.At(i)))
 }
 
 // Positional returns the paths of the element a query matched.
-func (a userItemsPathsArray) Positional() userItemsPaths {
+func (a _UserItemsPathsArray) Positional() _UserItemsPaths {
 	return newUserItemsPaths(string(monq.ArrayPath{Path: a.Path}.Positional()))
 }
 
 // All returns the paths of every element.
-func (a userItemsPathsArray) All() userItemsPaths {
+func (a _UserItemsPathsArray) All() _UserItemsPaths {
 	return newUserItemsPaths(string(monq.ArrayPath{Path: a.Path}.All()))
 }
 
 // Filtered returns the paths of the elements an array filter picks out.
-func (a userItemsPathsArray) Filtered(identifier string) userItemsPaths {
+func (a _UserItemsPathsArray) Filtered(identifier string) _UserItemsPaths {
 	return newUserItemsPaths(string(monq.ArrayPath{Path: a.Path}.Filtered(identifier)))
 }
 
-type userPaths struct {
+type _UserPaths struct {
 	ID        monq.FieldPath
 	Email     monq.FieldPath
-	Address   userAddressPaths
+	Address   _UserAddressPaths
 	Tags      monq.ArrayPath
-	Items     userItemsPathsArray
+	Items     _UserItemsPathsArray
 	CreatedAt monq.FieldPath
 }
 
 // UserPaths holds the document paths of User.
-var UserPaths = userPaths{
+var UserPaths = _UserPaths{
 	ID:    "_id",
 	Email: "email",
-	Address: userAddressPaths{
+	Address: _UserAddressPaths{
 		Street: "address.street",
 		City:   "address.city",
 	},
 	Tags:      monq.ArrayPath{Path: "tags"},
-	Items:     userItemsPathsArray{Path: "items", userItemsPaths: newUserItemsPaths("items")},
+	Items:     _UserItemsPathsArray{Path: "items", _UserItemsPaths: newUserItemsPaths("items")},
 	CreatedAt: "created_at",
 }

@@ -18,14 +18,14 @@ func goldenPath(typeName string) string {
 }
 
 func TestGenerate(t *testing.T) {
-	for _, typeName := range []string{"User", "Custom"} {
+	for _, typeName := range []string{"User", "Custom", "unexportedDoc"} {
 		t.Run(typeName, func(t *testing.T) {
 			model, err := Parse(loadFixtures(t), typeName)
 			if err != nil {
 				t.Fatalf("Parse() error = %v", err)
 			}
 
-			got, err := Generate(model, "fixtures")
+			got, err := Generate(model, "fixtures", "")
 			if err != nil {
 				t.Fatalf("Generate() error = %v", err)
 			}
@@ -58,7 +58,7 @@ func TestGenerateRefusesAReservedName(t *testing.T) {
 		t.Fatalf("Parse() error = %v", err)
 	}
 
-	_, err = Generate(model, "fixtures")
+	_, err = Generate(model, "fixtures", "")
 	if err == nil {
 		t.Fatal("Generate() error = nil, want an error about the reserved field name")
 	}
@@ -74,7 +74,7 @@ func TestGenerateProducesFormattedSource(t *testing.T) {
 		t.Fatalf("Parse() error = %v", err)
 	}
 
-	got, err := Generate(model, "fixtures")
+	got, err := Generate(model, "fixtures", "")
 	if err != nil {
 		t.Fatalf("Generate() error = %v", err)
 	}
@@ -84,13 +84,77 @@ func TestGenerateProducesFormattedSource(t *testing.T) {
 	}
 
 	// Generate runs the source through go/format, so a second pass has nothing left to change.
-	second, err := Generate(model, "fixtures")
+	second, err := Generate(model, "fixtures", "")
 	if err != nil {
 		t.Fatalf("Generate() error = %v", err)
 	}
 
 	if string(got) != string(second) {
 		t.Error("Generate() is not deterministic across two runs")
+	}
+}
+
+func TestGenerateNamesTheValue(t *testing.T) {
+	model, err := Parse(loadFixtures(t), "User")
+	if err != nil {
+		t.Fatalf("Parse() error = %v", err)
+	}
+
+	got, err := Generate(model, "fixtures", "paths")
+	if err != nil {
+		t.Fatalf("Generate() error = %v", err)
+	}
+
+	// Only the value is renamed: the types go on being named after the model, since nothing outside the file reads
+	// them.
+	for _, want := range []string{"var paths = _UserPaths{", "type _UserPaths struct {"} {
+		if !strings.Contains(string(got), want) {
+			t.Errorf("generated source is missing %q:\n%s", want, got)
+		}
+	}
+
+	if strings.Contains(string(got), "var UserPaths") {
+		t.Errorf("generated source still declares the default value name:\n%s", got)
+	}
+}
+
+func TestGenerateRefusesAValueNamedAfterAType(t *testing.T) {
+	model, err := Parse(loadFixtures(t), "User")
+	if err != nil {
+		t.Fatalf("Parse() error = %v", err)
+	}
+
+	_, err = Generate(model, "fixtures", "_UserPaths")
+	if err == nil {
+		t.Fatal("Generate() error = nil, want an error about the name the root type has")
+	}
+}
+
+func TestCheckVarName(t *testing.T) {
+	tests := []struct {
+		name      string
+		varName   string
+		wantError bool
+	}{
+		{name: "empty stands for the default"},
+		{name: "an identifier", varName: "campaignDocPaths"},
+		{name: "an underscore is allowed", varName: "_paths"},
+		{name: "a space is not", varName: "campaign paths", wantError: true},
+		{name: "a dot is not", varName: "brand.Paths", wantError: true},
+		{name: "a keyword is not", varName: "type", wantError: true},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := checkVarName(tt.varName)
+			if tt.wantError && err == nil {
+				t.Fatalf("checkVarName(%q) error = nil, want a refusal", tt.varName)
+			}
+
+			if !tt.wantError && err != nil {
+				t.Fatalf("checkVarName(%q) error = %v, want nil", tt.varName, err)
+			}
+		})
 	}
 }
 
@@ -101,10 +165,10 @@ func TestTypeNamesDoNotCollide(t *testing.T) {
 		base string
 		want string
 	}{
-		{base: "User", want: "userPaths"},
-		{base: "User", want: "userPaths2"},
-		{base: "User", want: "userPaths3"},
-		{base: "Order", want: "orderPaths"},
+		{base: "User", want: "_UserPaths"},
+		{base: "User", want: "_UserPaths2"},
+		{base: "User", want: "_UserPaths3"},
+		{base: "Order", want: "_OrderPaths"},
 	}
 
 	for _, tt := range tests {

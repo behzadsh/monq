@@ -30,11 +30,11 @@ Filters compose by nesting function calls, no builder object, no method chaining
 
 ```go
 filter := monq.And(
-monq.Eq("status", "active"),
-monq.Or(
-monq.Gte("stats.followers", 10000),
-monq.Exists("verified_at", true),
-),
+    monq.Eq("status", "active"),
+    monq.Or(
+        monq.Gte("stats.followers", 10000),
+        monq.Exists("verified_at", true),
+    ),
 )
 
 cursor, err := collection.Find(ctx, filter)
@@ -45,17 +45,18 @@ with the rest of a query instead of forcing an all-or-nothing rewrite:
 
 ```go
 monq.And(
-monq.Eq("status", "active"),
-monq.Raw(bson.D{{Key: "$where", Value: "this.credits == this.debits"}}),
+    monq.Eq("status", "active"),
+    monq.Raw(bson.D{{Key: "$where", Value: "this.credits == this.debits"}}),
 )
 ```
 
 Array conditions read the same way. `ElemMatch` takes the criteria a single array element has to satisfy:
 
 ```go
-filter := monq.ElemMatch("items",
-monq.Eq("sku", "abc"),
-monq.Gte("qty", 2),
+filter := monq.ElemMatch(
+	"items",
+    monq.Eq("sku", "abc"),
+    monq.Gte("qty", 2),
 )
 // {"items": {"$elemMatch": {"sku": {"$eq": "abc"}, "qty": {"$gte": 2}}}}
 ```
@@ -96,9 +97,9 @@ A projection decides which fields come back. Entries merge the same way sort ent
 
 ```go
 projection := monq.Projection(
-monq.Include("email", "items.sku"),
-monq.Exclude("_id"),
-monq.Slice("comments", -5),
+    monq.Include("email", "items.sku"),
+    monq.Exclude("_id"),
+    monq.Slice("comments", -5),
 )
 
 cursor, err := collection.Find(ctx, filter, options.Find().SetProjection(projection))
@@ -127,9 +128,9 @@ Several of them go through `Update`, which merges operators sharing a key. It is
 
 ```go
 update := monq.Update(
-monq.Set("status", "active"),
-monq.Inc("logins", 1),
-monq.Set("name", "ada"),
+    monq.Set("status", "active"),
+    monq.Inc("logins", 1),
+    monq.Set("name", "ada"),
 )
 // {"$set": {"status": "active", "name": "ada"}, "$inc": {"logins": 1}}
 ```
@@ -155,9 +156,9 @@ Pipeline stages live in `monq/stage`, one function per stage. The package split 
 
 ```go
 pipeline := stage.Pipeline(
-stage.Match(monq.Eq("status", "active")),
-stage.Sort(bson.D{{Key: "created_at", Value: -1}}),
-stage.Limit(20),
+    stage.Match(monq.Eq("status", "active")),
+    stage.Sort(bson.D{{Key: "created_at", Value: -1}}),
+    stage.Limit(20),
 )
 
 cursor, err := collection.Aggregate(ctx, pipeline)
@@ -169,8 +170,9 @@ too.
 Grouping stages take their output fields as `Accumulator` pieces, merged into one document by the stage:
 
 ```go
-stage.Group("$category",
-stage.Accumulator("total", bson.D{{Key: "$sum", Value: "$amount"}}),
+stage.Group(
+	"$category",
+    stage.Accumulator("total", bson.D{{Key: "$sum", Value: "$amount"}}),
 )
 // {"$group": {"_id": "$category", "total": {"$sum": "$amount"}}}
 ```
@@ -209,12 +211,12 @@ stage.GeoNear(monq.Point(-73.97, 40.77), "distance", stage.MaxDistance(1000), st
 
 ```go
 stage.Project(
-stage.Field("name", 1),
-stage.Field("grade", expr.Switch(
-expr.Branch(expr.Gte(expr.Field("score"), 90), "A"),
-expr.Branch(expr.Gte(expr.Field("score"), 80), "B"),
-expr.DefaultCase("F"),
-)),
+    stage.Field("name", 1),
+    stage.Field("grade", expr.Switch(
+        expr.Branch(expr.Gte(expr.Field("score"), 90), "A"),
+        expr.Branch(expr.Gte(expr.Field("score"), 80), "B"),
+        expr.DefaultCase("F"),
+    )),
 )
 ```
 
@@ -227,8 +229,8 @@ several add them up inside each document.
 
 ```go
 stage.Group("$category",
-stage.Accumulator("total", expr.Sum(expr.Field("amount"))),
-stage.Accumulator("best", expr.Top(bson.D{{Key: "score", Value: -1}}, expr.Field("name"))),
+    stage.Accumulator("total", expr.Sum(expr.Field("amount"))),
+    stage.Accumulator("best", expr.Top(bson.D{{Key: "score", Value: -1}}, expr.Field("name"))),
 )
 ```
 
@@ -272,9 +274,9 @@ Index models live in `monq/index`, where keys and options are one argument list:
 
 ```go
 model := index.New(
-index.Asc("email"),
-index.Unique(),
-index.PartialFilter(monq.Exists("deleted_at", false)),
+    index.Asc("email"),
+    index.Unique(),
+    index.PartialFilter(monq.Exists("deleted_at", false)),
 )
 
 _, err := collection.Indexes().CreateOne(ctx, model)
@@ -297,9 +299,9 @@ paths out as typed constants:
 //go:generate go run github.com/behzadsh/monq/cmd/monqgen -type User
 
 type User struct {
-ID    bson.ObjectID `bson:"_id"`
-Email string        `bson:"email"`
-Items []Item        `bson:"items"`
+    ID    bson.ObjectID `bson:"_id"`
+    Email string        `bson:"email"`
+    Items []Item        `bson:"items"`
 }
 ```
 

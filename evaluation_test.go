@@ -39,18 +39,20 @@ func TestRegex(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got := monq.Regex(tt.field, tt.pattern, tt.options)
+		t.Run(
+			tt.name, func(t *testing.T) {
+				got := monq.Regex(tt.field, tt.pattern, tt.options)
 
-			inner, ok := got[0].Value.(bson.D)
-			if !ok || inner[0].Key != "$regex" || inner[0].Value != tt.pattern {
-				t.Fatalf("Regex() = %v, want %v", got, tt.want)
-			}
+				inner, ok := got[0].Value.(bson.D)
+				if !ok || inner[0].Key != "$regex" || inner[0].Value != tt.pattern {
+					t.Fatalf("Regex() = %v, want %v", got, tt.want)
+				}
 
-			if inner[1].Key != "$options" || inner[1].Value != tt.options {
-				t.Fatalf("Regex() = %v, want %v", got, tt.want)
-			}
-		})
+				if inner[1].Key != "$options" || inner[1].Value != tt.options {
+					t.Fatalf("Regex() = %v, want %v", got, tt.want)
+				}
+			},
+		)
 	}
 }
 
@@ -77,13 +79,15 @@ func TestExpr(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got := monq.Expr(tt.expression)
+		t.Run(
+			tt.name, func(t *testing.T) {
+				got := monq.Expr(tt.expression)
 
-			if got[0].Key != "$expr" || !reflect.DeepEqual(got[0].Value, tt.expression) {
-				t.Fatalf("Expr() = %v, want {$expr: %v}", got, tt.expression)
-			}
-		})
+				if got[0].Key != "$expr" || !reflect.DeepEqual(got[0].Value, tt.expression) {
+					t.Fatalf("Expr() = %v, want {$expr: %v}", got, tt.expression)
+				}
+			},
+		)
 	}
 }
 
@@ -110,13 +114,15 @@ func TestJSONSchema(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got := monq.JSONSchema(tt.schema)
+		t.Run(
+			tt.name, func(t *testing.T) {
+				got := monq.JSONSchema(tt.schema)
 
-			if got[0].Key != "$jsonSchema" || !reflect.DeepEqual(got[0].Value, tt.schema) {
-				t.Fatalf("JSONSchema() = %v, want {$jsonSchema: %v}", got, tt.schema)
-			}
-		})
+				if got[0].Key != "$jsonSchema" || !reflect.DeepEqual(got[0].Value, tt.schema) {
+					t.Fatalf("JSONSchema() = %v, want {$jsonSchema: %v}", got, tt.schema)
+				}
+			},
+		)
 	}
 }
 
@@ -149,19 +155,21 @@ func TestMod(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got := monq.Mod(tt.field, tt.divisor, tt.remainder)
+		t.Run(
+			tt.name, func(t *testing.T) {
+				got := monq.Mod(tt.field, tt.divisor, tt.remainder)
 
-			inner, ok := got[0].Value.(bson.D)
-			if !ok || got[0].Key != string(tt.field) || inner[0].Key != "$mod" {
-				t.Fatalf("Mod() = %v, want a $mod operator document on %q", got, tt.field)
-			}
+				inner, ok := got[0].Value.(bson.D)
+				if !ok || got[0].Key != string(tt.field) || inner[0].Key != "$mod" {
+					t.Fatalf("Mod() = %v, want a $mod operator document on %q", got, tt.field)
+				}
 
-			want := bson.A{tt.divisor, tt.remainder}
-			if !reflect.DeepEqual(inner[0].Value, want) {
-				t.Fatalf("Mod() value = %v, want %v", inner[0].Value, want)
-			}
-		})
+				want := bson.A{tt.divisor, tt.remainder}
+				if !reflect.DeepEqual(inner[0].Value, want) {
+					t.Fatalf("Mod() value = %v, want %v", inner[0].Value, want)
+				}
+			},
+		)
 	}
 }
 
@@ -207,18 +215,20 @@ func TestText(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got := monq.Text(tt.search, tt.opts...)
+		t.Run(
+			tt.name, func(t *testing.T) {
+				got := monq.Text(tt.search, tt.opts...)
 
-			inner, ok := got[0].Value.(bson.D)
-			if !ok || got[0].Key != "$text" {
-				t.Fatalf("Text() = %v, want a $text document", got)
-			}
+				inner, ok := got[0].Value.(bson.D)
+				if !ok || got[0].Key != "$text" {
+					t.Fatalf("Text() = %v, want a $text document", got)
+				}
 
-			if !reflect.DeepEqual(inner, tt.want) {
-				t.Fatalf("Text() = %v, want %v", inner, tt.want)
-			}
-		})
+				if !reflect.DeepEqual(inner, tt.want) {
+					t.Fatalf("Text() = %v, want %v", inner, tt.want)
+				}
+			},
+		)
 	}
 }
 
@@ -262,13 +272,15 @@ func TestSampleRate(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got := monq.SampleRate(tt.rate)
+		t.Run(
+			tt.name, func(t *testing.T) {
+				got := monq.SampleRate(tt.rate)
 
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Fatalf("SampleRate() = %v, want %v", got, tt.want)
-			}
-		})
+				if !reflect.DeepEqual(got, tt.want) {
+					t.Fatalf("SampleRate() = %v, want %v", got, tt.want)
+				}
+			},
+		)
 	}
 }
 

@@ -42,14 +42,22 @@ func DensifyPartitionByFields(fields ...monq.FieldPath) DensifyOption {
 // Example:
 //
 //	stage.Densify("timestamp", stage.DensifyRange(1, stage.DensifyFull, "hour"))
-//	// bson.D{{Key: "$densify", Value: bson.D{
-//	//     {Key: "field", Value: "timestamp"},
-//	//     {Key: "range", Value: bson.D{
-//	//         {Key: "step", Value: 1},
-//	//         {Key: "bounds", Value: "full"},
-//	//         {Key: "unit", Value: "hour"},
-//	//     }},
-//	// }}}
+//	// bson.D{
+//	//     {
+//	//         Key: "$densify",
+//	//         Value: bson.D{
+//	//             {Key: "field", Value: "timestamp"},
+//	//             {
+//	//                 Key: "range",
+//	//                 Value: bson.D{
+//	//                     {Key: "step", Value: 1},
+//	//                     {Key: "bounds", Value: "full"},
+//	//                     {Key: "unit", Value: "hour"},
+//	//                 },
+//	//             },
+//	//         },
+//	//     },
+//	// }
 //
 // MongoDB docs: https://www.mongodb.com/docs/manual/reference/operator/aggregation/densify/
 func Densify(field monq.FieldPath, rangeSpec bson.D, opts ...DensifyOption) bson.D {
@@ -102,10 +110,15 @@ func DensifyRange(step, bounds any, unit ...any) bson.D {
 // Example:
 //
 //	stage.Fill([]bson.D{stage.FillMethod("price", "locf")}, stage.FillSortBy(monq.Sort(monq.Asc("date"))))
-//	// bson.D{{Key: "$fill", Value: bson.D{
-//	//     {Key: "sortBy", Value: bson.D{{Key: "date", Value: 1}}},
-//	//     {Key: "output", Value: bson.D{{Key: "price", Value: bson.D{{Key: "method", Value: "locf"}}}}},
-//	// }}}
+//	// bson.D{
+//	//     {
+//	//         Key: "$fill",
+//	//         Value: bson.D{
+//	//             {Key: "sortBy", Value: bson.D{{Key: "date", Value: 1}}},
+//	//             {Key: "output", Value: bson.D{{Key: "price", Value: bson.D{{Key: "method", Value: "locf"}}}}},
+//	//         },
+//	//     },
+//	// }
 //
 // MongoDB docs: https://www.mongodb.com/docs/manual/reference/operator/aggregation/fill/
 func Fill(output []bson.D, opts ...FillOption) bson.D {

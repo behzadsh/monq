@@ -38,10 +38,20 @@ func All(field FieldPath, values ...any) bson.D {
 // Example:
 //
 //	monq.ElemMatch("items", monq.Eq("sku", "abc"), monq.Gte("qty", 2))
-//	// bson.D{{Key: "items", Value: bson.D{{Key: "$elemMatch", Value: bson.D{
-//	//     {Key: "sku", Value: bson.D{{Key: "$eq", Value: "abc"}}},
-//	//     {Key: "qty", Value: bson.D{{Key: "$gte", Value: 2}}},
-//	// }}}}}
+//	// bson.D{
+//	//     {
+//	//         Key: "items",
+//	//         Value: bson.D{
+//	//             {
+//	//                 Key: "$elemMatch",
+//	//                 Value: bson.D{
+//	//                     {Key: "sku", Value: bson.D{{Key: "$eq", Value: "abc"}}},
+//	//                     {Key: "qty", Value: bson.D{{Key: "$gte", Value: 2}}},
+//	//                 },
+//	//             },
+//	//         },
+//	//     },
+//	// }
 //
 // MongoDB docs: https://www.mongodb.com/docs/manual/reference/operator/query/elemMatch/
 func ElemMatch(field FieldPath, filters ...bson.D) bson.D {

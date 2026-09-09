@@ -16,7 +16,8 @@ import (
 // from monq/expr. The split is what keeps the names honest, since stage.Set is the $set stage while monq.Set is
 // the $set update operator, and expr.Eq compares two expressions while monq.Eq tests a field.
 func runAggregate(ctx context.Context, db *mongo.Database) error {
-	if err := runParts(ctx, db.Collection(productsColl),
+	if err := runParts(
+		ctx, db.Collection(productsColl),
 		aggBasics,
 		aggGroup,
 		aggComputed,
@@ -28,7 +29,8 @@ func runAggregate(ctx context.Context, db *mongo.Database) error {
 		return err
 	}
 
-	if err := runParts(ctx, db.Collection(ordersColl),
+	if err := runParts(
+		ctx, db.Collection(ordersColl),
 		aggUnwind,
 		aggLookup,
 		aggSeries,
@@ -66,7 +68,8 @@ func aggGroup(ctx context.Context, coll *mongo.Collection) error {
 	step("$group takes its _id and then one Accumulator per output field")
 
 	stages := stage.Pipeline(
-		stage.Group(expr.Field(ProductPaths.Category),
+		stage.Group(
+			expr.Field(ProductPaths.Category),
 			stage.Accumulator("products", expr.Sum(1)),
 			stage.Accumulator("stock", expr.Sum(expr.Field(ProductPaths.Stock))),
 			stage.Accumulator("avgPrice", expr.Avg(expr.Field(ProductPaths.Price))),
@@ -96,15 +99,19 @@ func aggComputed(ctx context.Context, coll *mongo.Collection) error {
 		stage.Match(monq.In(ProductPaths.Category, "peripherals", "displays", "computers")),
 		stage.AddFields(
 			stage.Field("value", expr.Round(expr.Multiply(expr.Field(ProductPaths.Price), expr.Field(ProductPaths.Stock)), 2)),
-			stage.Field("tier", expr.Switch(
-				expr.Branch(expr.Gte(expr.Field(ProductPaths.Price), 500), "premium"),
-				expr.Branch(expr.Gte(expr.Field(ProductPaths.Price), 100), "standard"),
-				expr.DefaultCase("budget"),
-			)),
+			stage.Field(
+				"tier", expr.Switch(
+					expr.Branch(expr.Gte(expr.Field(ProductPaths.Price), 500), "premium"),
+					expr.Branch(expr.Gte(expr.Field(ProductPaths.Price), 100), "standard"),
+					expr.DefaultCase("budget"),
+				),
+			),
 			stage.Field("available", expr.Cond(expr.Gt(expr.Field(ProductPaths.Stock), 0), "yes", "no")),
 		),
-		stage.Project(stage.Field(ProductPaths.ID, 0), stage.Field(ProductPaths.SKU, 1), stage.Field("value", 1), stage.Field("tier", 1),
-			stage.Field("available", 1)),
+		stage.Project(
+			stage.Field(ProductPaths.ID, 0), stage.Field(ProductPaths.SKU, 1), stage.Field("value", 1), stage.Field("tier", 1),
+			stage.Field("available", 1),
+		),
 		stage.Sort(monq.Sort(monq.Asc(ProductPaths.SKU))),
 	)
 	if err := showAggregate(ctx, coll, "stage.AddFields(stage.Field(\"tier\", expr.Switch(expr.Branch(...), expr.DefaultCase(...))))", stages); err != nil {
@@ -133,7 +140,8 @@ func aggBuckets(ctx context.Context, coll *mongo.Collection) error {
 	step("$bucket needs its boundaries and a default for whatever falls outside them")
 
 	buckets := stage.Pipeline(
-		stage.Bucket(expr.Field(ProductPaths.Price), []any{0, 50, 250, 1500},
+		stage.Bucket(
+			expr.Field(ProductPaths.Price), []any{0, 50, 250, 1500},
 			stage.BucketDefault("other"),
 			stage.BucketOutput(
 				stage.Accumulator("count", expr.Sum(1)),
@@ -149,16 +157,20 @@ func aggBuckets(ctx context.Context, coll *mongo.Collection) error {
 
 	facets := stage.Pipeline(
 		stage.Facet(
-			stage.FacetPipeline("byCategory",
+			stage.FacetPipeline(
+				"byCategory",
 				stage.SortByCount(expr.Field(ProductPaths.Category)),
 			),
-			stage.FacetPipeline("priceStats",
-				stage.Group(nil,
+			stage.FacetPipeline(
+				"priceStats",
+				stage.Group(
+					nil,
 					stage.Accumulator("min", expr.Min(expr.Field(ProductPaths.Price))),
 					stage.Accumulator("max", expr.Max(expr.Field(ProductPaths.Price))),
 				),
 			),
-			stage.FacetPipeline("cheapest",
+			stage.FacetPipeline(
+				"cheapest",
 				stage.Sort(monq.Sort(monq.Asc(ProductPaths.Price))),
 				stage.Limit(2),
 				stage.Project(stage.Field(ProductPaths.ID, 0), stage.Field(ProductPaths.SKU, 1), stage.Field(ProductPaths.Price, 1)),
@@ -174,14 +186,18 @@ func aggWindows(ctx context.Context, coll *mongo.Collection) error {
 	step("$setWindowFields ranks and accumulates within a partition, without collapsing the documents")
 
 	stages := stage.Pipeline(
-		stage.SetWindowFields(expr.Field(ProductPaths.Category), monq.Sort(monq.Desc(ProductPaths.Price)),
+		stage.SetWindowFields(
+			expr.Field(ProductPaths.Category), monq.Sort(monq.Desc(ProductPaths.Price)),
 			stage.WindowField("rank", expr.Rank()),
-			stage.WindowField("runningStock", expr.Sum(expr.Field(ProductPaths.Stock)),
+			stage.WindowField(
+				"runningStock", expr.Sum(expr.Field(ProductPaths.Stock)),
 				stage.WindowDocuments(stage.WindowUnbounded, stage.WindowCurrent),
 			),
 		),
-		stage.Project(stage.Field(ProductPaths.ID, 0), stage.Field(ProductPaths.SKU, 1), stage.Field(ProductPaths.Category, 1),
-			stage.Field("rank", 1), stage.Field("runningStock", 1)),
+		stage.Project(
+			stage.Field(ProductPaths.ID, 0), stage.Field(ProductPaths.SKU, 1), stage.Field(ProductPaths.Category, 1),
+			stage.Field("rank", 1), stage.Field("runningStock", 1),
+		),
 		stage.Sort(monq.Sort(monq.Asc(ProductPaths.Category), monq.Asc("rank"))),
 		stage.Limit(6),
 	)
@@ -196,8 +212,10 @@ func aggUnwind(ctx context.Context, coll *mongo.Collection) error {
 	stages := stage.Pipeline(
 		stage.Match(monq.Eq(OrderPaths.Status, "shipped")),
 		stage.Unwind(expr.Field(OrderPaths.Items.Path), stage.IncludeArrayIndex("line")),
-		stage.Project(stage.Field(OrderPaths.ID, 0), stage.Field(OrderPaths.Customer, 1), stage.Field(OrderPaths.Items.SKU, 1),
-			stage.Field(OrderPaths.Items.Quantity, 1), stage.Field("line", 1)),
+		stage.Project(
+			stage.Field(OrderPaths.ID, 0), stage.Field(OrderPaths.Customer, 1), stage.Field(OrderPaths.Items.SKU, 1),
+			stage.Field(OrderPaths.Items.Quantity, 1), stage.Field("line", 1),
+		),
 	)
 	if err := showAggregate(ctx, coll, "stage.Unwind(expr.Field(items), stage.IncludeArrayIndex(\"line\"))", stages); err != nil {
 		return err
@@ -207,7 +225,8 @@ func aggUnwind(ctx context.Context, coll *mongo.Collection) error {
 
 	perSKU := stage.Pipeline(
 		stage.Unwind(expr.Field(OrderPaths.Items.Path)),
-		stage.Group(expr.Field(OrderPaths.Items.SKU),
+		stage.Group(
+			expr.Field(OrderPaths.Items.SKU),
 			stage.Accumulator("sold", expr.Sum(expr.Field(OrderPaths.Items.Quantity))),
 			stage.Accumulator("revenue", expr.Sum(expr.Multiply(expr.Field(OrderPaths.Items.Quantity), expr.Field(OrderPaths.Items.Price)))),
 		),
@@ -241,7 +260,8 @@ func aggLookup(ctx context.Context, coll *mongo.Collection) error {
 
 	joined := stage.Pipeline(
 		stage.Match(monq.Eq(OrderPaths.Customer, "grace")),
-		stage.LookupPipeline(productsColl,
+		stage.LookupPipeline(
+			productsColl,
 			bson.D{{Key: "spent", Value: expr.Field(OrderPaths.Total)}},
 			stage.Pipeline(
 				stage.Match(monq.Expr(expr.Gt(expr.Field(ProductPaths.Price), "$$spent"))),
@@ -262,10 +282,12 @@ func aggReshape(ctx context.Context, coll *mongo.Collection) error {
 
 	stages := stage.Pipeline(
 		stage.Match(monq.Eq(ProductPaths.Category, "peripherals")),
-		stage.ReplaceWith(expr.MergeObjects(
-			bson.D{{Key: "label", Value: expr.Concat(expr.Field(ProductPaths.SKU), " ", expr.Field(ProductPaths.Name))}},
-			expr.Field(warehousePath),
-		)),
+		stage.ReplaceWith(
+			expr.MergeObjects(
+				bson.D{{Key: "label", Value: expr.Concat(expr.Field(ProductPaths.SKU), " ", expr.Field(ProductPaths.Name))}},
+				expr.Field(warehousePath),
+			),
+		),
 		stage.Unset("type"),
 	)
 	if err := showAggregate(ctx, coll, "stage.ReplaceWith(expr.MergeObjects(...)), stage.Unset(\"type\")", stages); err != nil {
@@ -326,7 +348,8 @@ func aggCounting(ctx context.Context, coll *mongo.Collection) error {
 	both := stage.Pipeline(
 		stage.Match(monq.Eq(ProductPaths.Category, "furniture")),
 		stage.Project(stage.Field(ProductPaths.ID, 0), stage.Field("label", expr.Field(ProductPaths.SKU))),
-		stage.UnionWith(ordersColl,
+		stage.UnionWith(
+			ordersColl,
 			stage.Match(monq.Eq(OrderPaths.Status, "pending")),
 			stage.Project(stage.Field(OrderPaths.ID, 0), stage.Field("label", expr.Field(OrderPaths.Customer))),
 		),
@@ -340,10 +363,12 @@ func aggOutput(ctx context.Context, coll *mongo.Collection) error {
 	step("$merge writes into a collection and returns nothing, deciding per document what to do about one already there")
 
 	merged := stage.Pipeline(
-		stage.Group(expr.Field(ProductPaths.Category),
+		stage.Group(
+			expr.Field(ProductPaths.Category),
 			stage.Accumulator("stock", expr.Sum(expr.Field(ProductPaths.Stock))),
 		),
-		stage.Merge(stage.Namespace(coll.Database().Name(), "category_stock"),
+		stage.Merge(
+			stage.Namespace(coll.Database().Name(), "category_stock"),
 			stage.MergeOn("_id"),
 			stage.MergeWhenMatched("replace"),
 			stage.MergeWhenNotMatched("insert"),
@@ -398,13 +423,17 @@ func aggSeries(ctx context.Context, coll *mongo.Collection) error {
 	step("$fill then gives those documents values, either a fixed one or one derived from their neighbors")
 
 	filled := stage.Pipeline(
-		stage.Project(stage.Field(OrderPaths.ID, 0), stage.Field(OrderPaths.PlacedAt, 1), stage.Field(OrderPaths.Total, 1),
-			stage.Field(OrderPaths.Status, 1)),
+		stage.Project(
+			stage.Field(OrderPaths.ID, 0), stage.Field(OrderPaths.PlacedAt, 1), stage.Field(OrderPaths.Total, 1),
+			stage.Field(OrderPaths.Status, 1),
+		),
 		stage.Densify(OrderPaths.PlacedAt, stage.DensifyRange(1, stage.DensifyFull, "month")),
-		stage.Fill([]bson.D{
-			stage.FillValue(OrderPaths.Status, "none"),
-			stage.FillMethod(OrderPaths.Total, "locf"),
-		}, stage.FillSortBy(monq.Sort(monq.Asc(OrderPaths.PlacedAt)))),
+		stage.Fill(
+			[]bson.D{
+				stage.FillValue(OrderPaths.Status, "none"),
+				stage.FillMethod(OrderPaths.Total, "locf"),
+			}, stage.FillSortBy(monq.Sort(monq.Asc(OrderPaths.PlacedAt))),
+		),
 		stage.Sort(monq.Sort(monq.Asc(OrderPaths.PlacedAt))),
 	)
 
@@ -418,7 +447,8 @@ func aggGraph(ctx context.Context, coll *mongo.Collection) error {
 
 	stages := stage.Pipeline(
 		stage.Match(monq.Eq("name", "accessories")),
-		stage.GraphLookup(categoriesColl, expr.Field("parent"), "parent", "name", "ancestors",
+		stage.GraphLookup(
+			categoriesColl, expr.Field("parent"), "parent", "name", "ancestors",
 			stage.DepthField("depth"),
 			stage.MaxDepth(5),
 		),

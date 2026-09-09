@@ -59,10 +59,15 @@ func ConcatArrays(arrays ...any) bson.D {
 // Example:
 //
 //	expr.Filter(expr.Field("scores"), expr.Gte("$$this", 80))
-//	// bson.D{{Key: "$filter", Value: bson.D{
-//	//     {Key: "input", Value: "$scores"},
-//	//     {Key: "cond", Value: bson.D{{Key: "$gte", Value: bson.A{"$$this", 80}}}},
-//	// }}}
+//	// bson.D{
+//	//     {
+//	//         Key: "$filter",
+//	//         Value: bson.D{
+//	//             {Key: "input", Value: "$scores"},
+//	//             {Key: "cond", Value: bson.D{{Key: "$gte", Value: bson.A{"$$this", 80}}}},
+//	//         },
+//	//     },
+//	// }
 //
 // MongoDB docs: https://www.mongodb.com/docs/manual/reference/operator/aggregation/filter/
 func Filter(input, cond any, opts ...FilterOption) bson.D {
@@ -215,10 +220,15 @@ func LastN(input, n any) bson.D {
 // Example:
 //
 //	expr.Map(expr.Field("prices"), expr.Multiply("$$this", 1.1))
-//	// bson.D{{Key: "$map", Value: bson.D{
-//	//     {Key: "input", Value: "$prices"},
-//	//     {Key: "in", Value: bson.D{{Key: "$multiply", Value: bson.A{"$$this", 1.1}}}},
-//	// }}}
+//	// bson.D{
+//	//     {
+//	//         Key: "$map",
+//	//         Value: bson.D{
+//	//             {Key: "input", Value: "$prices"},
+//	//             {Key: "in", Value: bson.D{{Key: "$multiply", Value: bson.A{"$$this", 1.1}}}},
+//	//         },
+//	//     },
+//	// }
 //
 // MongoDB docs: https://www.mongodb.com/docs/manual/reference/operator/aggregation/map/
 func Map(input, in any, opts ...MapOption) bson.D {
@@ -320,19 +330,29 @@ func Range(start, end any, step ...any) bson.D {
 // Example:
 //
 //	expr.Reduce(expr.Field("scores"), 0, expr.Add("$$value", "$$this"))
-//	// bson.D{{Key: "$reduce", Value: bson.D{
-//	//     {Key: "input", Value: "$scores"},
-//	//     {Key: "initialValue", Value: 0},
-//	//     {Key: "in", Value: bson.D{{Key: "$add", Value: bson.A{"$$value", "$$this"}}}},
-//	// }}}
+//	// bson.D{
+//	//     {
+//	//         Key: "$reduce",
+//	//         Value: bson.D{
+//	//             {Key: "input", Value: "$scores"},
+//	//             {Key: "initialValue", Value: 0},
+//	//             {Key: "in", Value: bson.D{{Key: "$add", Value: bson.A{"$$value", "$$this"}}}},
+//	//         },
+//	//     },
+//	// }
 //
 // MongoDB docs: https://www.mongodb.com/docs/manual/reference/operator/aggregation/reduce/
 func Reduce(input, initialValue, in any) bson.D {
-	return bson.D{{Key: "$reduce", Value: bson.D{
-		{Key: "input", Value: input},
-		{Key: "initialValue", Value: initialValue},
-		{Key: "in", Value: in},
-	}}}
+	return bson.D{
+		{
+			Key: "$reduce",
+			Value: bson.D{
+				{Key: "input", Value: input},
+				{Key: "initialValue", Value: initialValue},
+				{Key: "in", Value: in},
+			},
+		},
+	}
 }
 
 // ReverseArray returns an expression yielding an array in reverse order.
@@ -406,17 +426,26 @@ func SliceFrom(array, position, n any) bson.D {
 // Example:
 //
 //	expr.SortArray(expr.Field("items"), bson.D{{Key: "price", Value: -1}})
-//	// bson.D{{Key: "$sortArray", Value: bson.D{
-//	//     {Key: "input", Value: "$items"},
-//	//     {Key: "sortBy", Value: bson.D{{Key: "price", Value: -1}}},
-//	// }}}
+//	// bson.D{
+//	//     {
+//	//         Key: "$sortArray",
+//	//         Value: bson.D{
+//	//             {Key: "input", Value: "$items"},
+//	//             {Key: "sortBy", Value: bson.D{{Key: "price", Value: -1}}},
+//	//         },
+//	//     },
+//	// }
 //
 // MongoDB docs: https://www.mongodb.com/docs/manual/reference/operator/aggregation/sortArray/
 func SortArray(input, sortBy any) bson.D {
-	return bson.D{{Key: "$sortArray", Value: bson.D{
-		{Key: "input", Value: input},
-		{Key: "sortBy", Value: sortBy},
-	}}}
+	return bson.D{
+		{
+			Key: "$sortArray", Value: bson.D{
+				{Key: "input", Value: input},
+				{Key: "sortBy", Value: sortBy},
+			},
+		},
+	}
 }
 
 // Zip returns an expression stitching several arrays together element by element.
@@ -428,9 +457,14 @@ func SortArray(input, sortBy any) bson.D {
 // Example:
 //
 //	expr.Zip([]any{expr.Field("names"), expr.Field("scores")})
-//	// bson.D{{Key: "$zip", Value: bson.D{
-//	//     {Key: "inputs", Value: bson.A{"$names", "$scores"}},
-//	// }}}
+//	// bson.D{
+//	//     {
+//	//         Key: "$zip",
+//	//         Value: bson.D{
+//	//             {Key: "inputs", Value: bson.A{"$names", "$scores"}},
+//	//         },
+//	//     },
+//	// }
 //
 // MongoDB docs: https://www.mongodb.com/docs/manual/reference/operator/aggregation/zip/
 func Zip(inputs []any, opts ...ZipOption) bson.D {

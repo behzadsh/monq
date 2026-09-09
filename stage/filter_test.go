@@ -19,17 +19,29 @@ func TestFilterStages(t *testing.T) {
 		{
 			name: "Match carries a monq filter",
 			got:  stage.Match(monq.Eq("status", "active")),
-			want: bson.D{{Key: "$match", Value: bson.D{
-				{Key: "status", Value: bson.D{{Key: "$eq", Value: "active"}}},
-			}}},
+			want: bson.D{
+				{
+					Key: "$match", Value: bson.D{
+						{Key: "status", Value: bson.D{{Key: "$eq", Value: "active"}}},
+					},
+				},
+			},
 		},
 		{
 			name: "Match carries a composed filter",
 			got:  stage.Match(monq.And(monq.Eq("status", "active"), monq.Gte("age", 18))),
-			want: bson.D{{Key: "$match", Value: bson.D{{Key: "$and", Value: bson.A{
-				bson.D{{Key: "status", Value: bson.D{{Key: "$eq", Value: "active"}}}},
-				bson.D{{Key: "age", Value: bson.D{{Key: "$gte", Value: 18}}}},
-			}}}}},
+			want: bson.D{
+				{
+					Key: "$match", Value: bson.D{
+						{
+							Key: "$and", Value: bson.A{
+								bson.D{{Key: "status", Value: bson.D{{Key: "$eq", Value: "active"}}}},
+								bson.D{{Key: "age", Value: bson.D{{Key: "$gte", Value: 18}}}},
+							},
+						},
+					},
+				},
+			},
 		},
 		{
 			name: "Match with an empty filter",
@@ -59,19 +71,25 @@ func TestFilterStages(t *testing.T) {
 		{
 			name: "Sort keeps the order of its keys",
 			got:  stage.Sort(bson.D{{Key: "created_at", Value: -1}, {Key: "_id", Value: 1}}),
-			want: bson.D{{Key: "$sort", Value: bson.D{
-				{Key: "created_at", Value: -1},
-				{Key: "_id", Value: 1},
-			}}},
+			want: bson.D{
+				{
+					Key: "$sort", Value: bson.D{
+						{Key: "created_at", Value: -1},
+						{Key: "_id", Value: 1},
+					},
+				},
+			},
 		},
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if !reflect.DeepEqual(tt.got, tt.want) {
-				t.Fatalf("got %v, want %v", tt.got, tt.want)
-			}
-		})
+		t.Run(
+			tt.name, func(t *testing.T) {
+				if !reflect.DeepEqual(tt.got, tt.want) {
+					t.Fatalf("got %v, want %v", tt.got, tt.want)
+				}
+			},
+		)
 	}
 }
 

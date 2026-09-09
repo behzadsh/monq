@@ -16,9 +16,14 @@ import (
 // Example:
 //
 //	stage.AddFields(stage.Field("total", bson.D{{Key: "$sum", Value: "$items.price"}}))
-//	// bson.D{{Key: "$addFields", Value: bson.D{
-//	//     {Key: "total", Value: bson.D{{Key: "$sum", Value: "$items.price"}}},
-//	// }}}
+//	// bson.D{
+//	//     {
+//	//         Key: "$addFields",
+//	//         Value: bson.D{
+//	//             {Key: "total", Value: bson.D{{Key: "$sum", Value: "$items.price"}}},
+//	//         },
+//	//     },
+//	// }
 //
 // MongoDB docs: https://www.mongodb.com/docs/manual/reference/operator/aggregation/addFields/
 func AddFields(fields ...bson.D) bson.D {

@@ -78,14 +78,30 @@ func WindowUnit(unit any) WindowOption {
 //		stage.WindowField("running_total", expr.Sum(expr.Field("amount")),
 //			stage.WindowDocuments(stage.WindowUnbounded, stage.WindowCurrent)),
 //	)
-//	// bson.D{{Key: "$setWindowFields", Value: bson.D{
-//	//     {Key: "partitionBy", Value: "$account"},
-//	//     {Key: "sortBy", Value: bson.D{{Key: "date", Value: 1}}},
-//	//     {Key: "output", Value: bson.D{{Key: "running_total", Value: bson.D{
-//	//         {Key: "$sum", Value: "$amount"},
-//	//         {Key: "window", Value: bson.D{{Key: "documents", Value: bson.A{"unbounded", "current"}}}},
-//	//     }}}},
-//	// }}}
+//	// bson.D{
+//	//     {
+//	//         Key: "$setWindowFields",
+//	//         Value: bson.D{
+//	//             {Key: "partitionBy", Value: "$account"},
+//	//             {Key: "sortBy", Value: bson.D{{Key: "date", Value: 1}}},
+//	//             {
+//	//                 Key: "output",
+//	//                 Value: bson.D{
+//	//                     {
+//	//                         Key: "running_total",
+//	//                         Value: bson.D{
+//	//                             {Key: "$sum", Value: "$amount"},
+//	//                             {
+//	//                                 Key: "window",
+//	//                                 Value: bson.D{{Key: "documents", Value: bson.A{"unbounded", "current"}}},
+//	//                             },
+//	//                         },
+//	//                     },
+//	//                 },
+//	//             },
+//	//         },
+//	//     },
+//	// }
 //
 // MongoDB docs: https://www.mongodb.com/docs/manual/reference/operator/aggregation/setWindowFields/
 func SetWindowFields(partitionBy any, sortBy bson.D, output ...bson.D) bson.D {
@@ -117,10 +133,15 @@ func SetWindowFields(partitionBy any, sortBy bson.D, output ...bson.D) bson.D {
 //
 //	stage.WindowField("running_total", expr.Sum(expr.Field("amount")),
 //		stage.WindowDocuments(stage.WindowUnbounded, stage.WindowCurrent))
-//	// bson.D{{Key: "running_total", Value: bson.D{
-//	//     {Key: "$sum", Value: "$amount"},
-//	//     {Key: "window", Value: bson.D{{Key: "documents", Value: bson.A{"unbounded", "current"}}}},
-//	// }}}
+//	// bson.D{
+//	//     {
+//	//         Key: "running_total",
+//	//         Value: bson.D{
+//	//             {Key: "$sum", Value: "$amount"},
+//	//             {Key: "window", Value: bson.D{{Key: "documents", Value: bson.A{"unbounded", "current"}}}},
+//	//         },
+//	//     },
+//	// }
 //
 // MongoDB docs: https://www.mongodb.com/docs/manual/reference/operator/aggregation/setWindowFields/
 func WindowField(name monq.FieldPath, operator bson.D, opts ...WindowOption) bson.D {

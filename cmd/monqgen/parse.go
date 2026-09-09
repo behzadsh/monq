@@ -100,9 +100,11 @@ func (s *Struct) walkFrom(prefix []string, fn func(path []string, field Field)) 
 func (s *Struct) Paths() []string {
 	var paths []string
 
-	s.Walk(func(path []string, _ Field) {
-		paths = append(paths, strings.Join(path, "."))
-	})
+	s.Walk(
+		func(path []string, _ Field) {
+			paths = append(paths, strings.Join(path, "."))
+		},
+	)
 
 	return paths
 }

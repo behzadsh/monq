@@ -123,19 +123,26 @@ func TestArithmeticExpressions(t *testing.T) {
 		{
 			name: "operators nest",
 			got:  expr.Round(expr.Divide(expr.Field("total"), expr.Field("count")), 2),
-			want: bson.D{{Key: "$round", Value: bson.A{
-				bson.D{{Key: "$divide", Value: bson.A{"$total", "$count"}}},
-				2,
-			}}},
+			want: bson.D{
+				{
+					Key: "$round",
+					Value: bson.A{
+						bson.D{{Key: "$divide", Value: bson.A{"$total", "$count"}}},
+						2,
+					},
+				},
+			},
 		},
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if !reflect.DeepEqual(tt.got, tt.want) {
-				t.Fatalf("got %v, want %v", tt.got, tt.want)
-			}
-		})
+		t.Run(
+			tt.name, func(t *testing.T) {
+				if !reflect.DeepEqual(tt.got, tt.want) {
+					t.Fatalf("got %v, want %v", tt.got, tt.want)
+				}
+			},
+		)
 	}
 }
 

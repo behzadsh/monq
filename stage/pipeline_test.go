@@ -37,13 +37,15 @@ func TestPipeline(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got := stage.Pipeline(tt.stages...)
+		t.Run(
+			tt.name, func(t *testing.T) {
+				got := stage.Pipeline(tt.stages...)
 
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Fatalf("Pipeline() = %v, want %v", got, tt.want)
-			}
-		})
+				if !reflect.DeepEqual(got, tt.want) {
+					t.Fatalf("Pipeline() = %v, want %v", got, tt.want)
+				}
+			},
+		)
 	}
 }
 

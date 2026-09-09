@@ -28,10 +28,14 @@ func TestUpdate(t *testing.T) {
 		{
 			name: "same operator merges its fields",
 			ops:  []bson.D{monq.Set("status", "active"), monq.Set("name", "ada")},
-			want: bson.D{{Key: "$set", Value: bson.D{
-				{Key: "status", Value: "active"},
-				{Key: "name", Value: "ada"},
-			}}},
+			want: bson.D{
+				{
+					Key: "$set", Value: bson.D{
+						{Key: "status", Value: "active"},
+						{Key: "name", Value: "ada"},
+					},
+				},
+			},
 		},
 		{
 			name: "different operators keep first-seen order",
@@ -42,10 +46,12 @@ func TestUpdate(t *testing.T) {
 				monq.Unset("deleted_at"),
 			},
 			want: bson.D{
-				{Key: "$set", Value: bson.D{
-					{Key: "status", Value: "active"},
-					{Key: "name", Value: "ada"},
-				}},
+				{
+					Key: "$set", Value: bson.D{
+						{Key: "status", Value: "active"},
+						{Key: "name", Value: "ada"},
+					},
+				},
 				{Key: "$inc", Value: bson.D{{Key: "logins", Value: 1}}},
 				{Key: "$unset", Value: bson.D{{Key: "deleted_at", Value: ""}}},
 			},
@@ -62,10 +68,12 @@ func TestUpdate(t *testing.T) {
 				monq.Set("name", "ada"),
 			},
 			want: bson.D{
-				{Key: "$set", Value: bson.D{
-					{Key: "status", Value: "active"},
-					{Key: "name", Value: "ada"},
-				}},
+				{
+					Key: "$set", Value: bson.D{
+						{Key: "status", Value: "active"},
+						{Key: "name", Value: "ada"},
+					},
+				},
 				{Key: "$inc", Value: bson.D{{Key: "logins", Value: 1}}},
 			},
 		},
@@ -75,21 +83,27 @@ func TestUpdate(t *testing.T) {
 				monq.Set("status", "active"),
 				monq.Raw(bson.D{{Key: "$set", Value: bson.D{{Key: "legacy", Value: 1}}}}),
 			},
-			want: bson.D{{Key: "$set", Value: bson.D{
-				{Key: "status", Value: "active"},
-				{Key: "legacy", Value: 1},
-			}}},
+			want: bson.D{
+				{
+					Key: "$set", Value: bson.D{
+						{Key: "status", Value: "active"},
+						{Key: "legacy", Value: 1},
+					},
+				},
+			},
 		},
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got := monq.Update(tt.ops...)
+		t.Run(
+			tt.name, func(t *testing.T) {
+				got := monq.Update(tt.ops...)
 
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Fatalf("Update() = %v, want %v", got, tt.want)
-			}
-		})
+				if !reflect.DeepEqual(got, tt.want) {
+					t.Fatalf("Update() = %v, want %v", got, tt.want)
+				}
+			},
+		)
 	}
 }
 

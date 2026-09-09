@@ -96,12 +96,17 @@ func Spherical() GeoNearOption {
 // Example:
 //
 //	stage.GeoNear(monq.Point(-73.97, 40.77), "distance", stage.MaxDistance(1000), stage.Spherical())
-//	// bson.D{{Key: "$geoNear", Value: bson.D{
-//	//     {Key: "near", Value: bson.D{{Key: "type", Value: "Point"}, {Key: "coordinates", Value: ...}}},
-//	//     {Key: "distanceField", Value: "distance"},
-//	//     {Key: "maxDistance", Value: 1000.0},
-//	//     {Key: "spherical", Value: true},
-//	// }}}
+//	// bson.D{
+//	//     {
+//	//         Key: "$geoNear",
+//	//         Value: bson.D{
+//	//             {Key: "near", Value: bson.D{{Key: "type", Value: "Point"}, {Key: "coordinates", Value: ...}}},
+//	//             {Key: "distanceField", Value: "distance"},
+//	//             {Key: "maxDistance", Value: 1000.0},
+//	//             {Key: "spherical", Value: true},
+//	//         },
+//	//     },
+//	// }
 //
 // MongoDB docs: https://www.mongodb.com/docs/manual/reference/operator/aggregation/geoNear/
 func GeoNear(near any, distanceField string, opts ...GeoNearOption) bson.D {

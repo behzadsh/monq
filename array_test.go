@@ -43,19 +43,21 @@ func TestAll(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got := monq.All(tt.field, tt.values...)
+		t.Run(
+			tt.name, func(t *testing.T) {
+				got := monq.All(tt.field, tt.values...)
 
-			inner, ok := got[0].Value.(bson.D)
-			if !ok || got[0].Key != string(tt.field) || inner[0].Key != "$all" {
-				t.Fatalf("All() = %v, want a $all operator document on %q", got, tt.field)
-			}
+				inner, ok := got[0].Value.(bson.D)
+				if !ok || got[0].Key != string(tt.field) || inner[0].Key != "$all" {
+					t.Fatalf("All() = %v, want a $all operator document on %q", got, tt.field)
+				}
 
-			arr, ok := inner[0].Value.(bson.A)
-			if !ok || len(arr) != len(tt.want) {
-				t.Fatalf("All() values = %v, want %v", inner[0].Value, tt.want)
-			}
-		})
+				arr, ok := inner[0].Value.(bson.A)
+				if !ok || len(arr) != len(tt.want) {
+					t.Fatalf("All() values = %v, want %v", inner[0].Value, tt.want)
+				}
+			},
+		)
 	}
 }
 
@@ -100,25 +102,27 @@ func TestElemMatch(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got := monq.ElemMatch(tt.field, tt.filters...)
+		t.Run(
+			tt.name, func(t *testing.T) {
+				got := monq.ElemMatch(tt.field, tt.filters...)
 
-			inner, ok := got[0].Value.(bson.D)
-			if !ok || got[0].Key != string(tt.field) || inner[0].Key != "$elemMatch" {
-				t.Fatalf("ElemMatch() = %v, want a $elemMatch operator document on %q", got, tt.field)
-			}
-
-			criteria, ok := inner[0].Value.(bson.D)
-			if !ok || len(criteria) != len(tt.want) {
-				t.Fatalf("ElemMatch() criteria = %v, want %v", inner[0].Value, tt.want)
-			}
-
-			for i, e := range tt.want {
-				if criteria[i].Key != e.Key {
-					t.Fatalf("ElemMatch() criteria[%d] = %q, want %q", i, criteria[i].Key, e.Key)
+				inner, ok := got[0].Value.(bson.D)
+				if !ok || got[0].Key != string(tt.field) || inner[0].Key != "$elemMatch" {
+					t.Fatalf("ElemMatch() = %v, want a $elemMatch operator document on %q", got, tt.field)
 				}
-			}
-		})
+
+				criteria, ok := inner[0].Value.(bson.D)
+				if !ok || len(criteria) != len(tt.want) {
+					t.Fatalf("ElemMatch() criteria = %v, want %v", inner[0].Value, tt.want)
+				}
+
+				for i, e := range tt.want {
+					if criteria[i].Key != e.Key {
+						t.Fatalf("ElemMatch() criteria[%d] = %q, want %q", i, criteria[i].Key, e.Key)
+					}
+				}
+			},
+		)
 	}
 }
 
@@ -151,14 +155,16 @@ func TestSize(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got := monq.Size(tt.field, tt.size)
+		t.Run(
+			tt.name, func(t *testing.T) {
+				got := monq.Size(tt.field, tt.size)
 
-			inner, ok := got[0].Value.(bson.D)
-			if !ok || got[0].Key != string(tt.field) || inner[0].Key != "$size" || inner[0].Value != tt.size {
-				t.Fatalf("Size() = %v, want %v", got, tt.want)
-			}
-		})
+				inner, ok := got[0].Value.(bson.D)
+				if !ok || got[0].Key != string(tt.field) || inner[0].Key != "$size" || inner[0].Value != tt.size {
+					t.Fatalf("Size() = %v, want %v", got, tt.want)
+				}
+			},
+		)
 	}
 }
 
@@ -182,18 +188,20 @@ func TestArrayOperatorsComposeWithNot(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got := monq.Not(tt.expr)
+		t.Run(
+			tt.name, func(t *testing.T) {
+				got := monq.Not(tt.expr)
 
-			outer, ok := got[0].Value.(bson.D)
-			if !ok || outer[0].Key != "$not" {
-				t.Fatalf("Not() = %v, want a $not operator document", got)
-			}
+				outer, ok := got[0].Value.(bson.D)
+				if !ok || outer[0].Key != "$not" {
+					t.Fatalf("Not() = %v, want a $not operator document", got)
+				}
 
-			innerOp, ok := outer[0].Value.(bson.D)
-			if !ok || innerOp[0].Key != tt.op {
-				t.Fatalf("Not() inner operator = %v, want %q", outer[0].Value, tt.op)
-			}
-		})
+				innerOp, ok := outer[0].Value.(bson.D)
+				if !ok || innerOp[0].Key != tt.op {
+					t.Fatalf("Not() inner operator = %v, want %q", outer[0].Value, tt.op)
+				}
+			},
+		)
 	}
 }

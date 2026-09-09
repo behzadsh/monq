@@ -78,11 +78,16 @@ func BucketOutput(accumulators ...bson.D) BucketOption {
 // Example:
 //
 //	stage.Bucket("$price", []any{0, 50, 100}, stage.BucketDefault("other"))
-//	// bson.D{{Key: "$bucket", Value: bson.D{
-//	//     {Key: "groupBy", Value: "$price"},
-//	//     {Key: "boundaries", Value: bson.A{0, 50, 100}},
-//	//     {Key: "default", Value: "other"},
-//	// }}}
+//	// bson.D{
+//	//     {
+//	//         Key: "$bucket",
+//	//         Value: bson.D{
+//	//             {Key: "groupBy", Value: "$price"},
+//	//             {Key: "boundaries", Value: bson.A{0, 50, 100}},
+//	//             {Key: "default", Value: "other"},
+//	//         },
+//	//     },
+//	// }
 //
 // MongoDB docs: https://www.mongodb.com/docs/manual/reference/operator/aggregation/bucket/
 func Bucket(groupBy any, boundaries []any, opts ...BucketOption) bson.D {
@@ -108,11 +113,16 @@ func Bucket(groupBy any, boundaries []any, opts ...BucketOption) bson.D {
 // Example:
 //
 //	stage.BucketAuto("$price", 4, stage.BucketGranularity("R20"))
-//	// bson.D{{Key: "$bucketAuto", Value: bson.D{
-//	//     {Key: "groupBy", Value: "$price"},
-//	//     {Key: "buckets", Value: 4},
-//	//     {Key: "granularity", Value: "R20"},
-//	// }}}
+//	// bson.D{
+//	//     {
+//	//         Key: "$bucketAuto",
+//	//         Value: bson.D{
+//	//             {Key: "groupBy", Value: "$price"},
+//	//             {Key: "buckets", Value: 4},
+//	//             {Key: "granularity", Value: "R20"},
+//	//         },
+//	//     },
+//	// }
 //
 // MongoDB docs: https://www.mongodb.com/docs/manual/reference/operator/aggregation/bucketAuto/
 func BucketAuto(groupBy any, buckets int, opts ...BucketOption) bson.D {
@@ -144,10 +154,15 @@ func BucketAuto(groupBy any, buckets int, opts ...BucketOption) bson.D {
 //		stage.FacetPipeline("newest", stage.Sort(bson.D{{Key: "created_at", Value: -1}}), stage.Limit(5)),
 //		stage.FacetPipeline("total", stage.Count("n")),
 //	)
-//	// bson.D{{Key: "$facet", Value: bson.D{
-//	//     {Key: "newest", Value: bson.A{...}},
-//	//     {Key: "total", Value: bson.A{...}},
-//	// }}}
+//	// bson.D{
+//	//     {
+//	//         Key: "$facet",
+//	//         Value: bson.D{
+//	//             {Key: "newest", Value: bson.A{...}},
+//	//             {Key: "total", Value: bson.A{...}},
+//	//         },
+//	//     },
+//	// }
 //
 // MongoDB docs: https://www.mongodb.com/docs/manual/reference/operator/aggregation/facet/
 func Facet(facets ...bson.D) bson.D {
@@ -183,10 +198,15 @@ func FacetPipeline(name string, stages ...bson.D) bson.D {
 // Example:
 //
 //	stage.Group("$category", stage.Accumulator("total", bson.D{{Key: "$sum", Value: "$amount"}}))
-//	// bson.D{{Key: "$group", Value: bson.D{
-//	//     {Key: "_id", Value: "$category"},
-//	//     {Key: "total", Value: bson.D{{Key: "$sum", Value: "$amount"}}},
-//	// }}}
+//	// bson.D{
+//	//     {
+//	//         Key: "$group",
+//	//         Value: bson.D{
+//	//             {Key: "_id", Value: "$category"},
+//	//             {Key: "total", Value: bson.D{{Key: "$sum", Value: "$amount"}}},
+//	//         },
+//	//     },
+//	// }
 //
 // MongoDB docs: https://www.mongodb.com/docs/manual/reference/operator/aggregation/group/
 func Group(id any, accumulators ...bson.D) bson.D {

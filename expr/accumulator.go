@@ -43,10 +43,15 @@ func Avg(values ...any) bson.D {
 // Example:
 //
 //	expr.Bottom(bson.D{{Key: "score", Value: 1}}, expr.Field("name"))
-//	// bson.D{{Key: "$bottom", Value: bson.D{
-//	//     {Key: "sortBy", Value: bson.D{{Key: "score", Value: 1}}},
-//	//     {Key: "output", Value: "$name"},
-//	// }}}
+//	// bson.D{
+//	//     {
+//	//         Key: "$bottom",
+//	//         Value: bson.D{
+//	//             {Key: "sortBy", Value: bson.D{{Key: "score", Value: 1}}},
+//	//             {Key: "output", Value: "$name"},
+//	//         },
+//	//     },
+//	// }
 //
 // MongoDB docs: https://www.mongodb.com/docs/manual/reference/operator/aggregation/bottom/
 func Bottom(sortBy, output any) bson.D {
@@ -61,11 +66,16 @@ func Bottom(sortBy, output any) bson.D {
 // Example:
 //
 //	expr.BottomN(3, bson.D{{Key: "score", Value: 1}}, expr.Field("name"))
-//	// bson.D{{Key: "$bottomN", Value: bson.D{
-//	//     {Key: "n", Value: 3},
-//	//     {Key: "sortBy", Value: bson.D{{Key: "score", Value: 1}}},
-//	//     {Key: "output", Value: "$name"},
-//	// }}}
+//	// bson.D{
+//	//     {
+//	//         Key: "$bottomN",
+//	//         Value: bson.D{
+//	//             {Key: "n", Value: 3},
+//	//             {Key: "sortBy", Value: bson.D{{Key: "score", Value: 1}}},
+//	//             {Key: "output", Value: "$name"},
+//	//         },
+//	//     },
+//	// }
 //
 // MongoDB docs: https://www.mongodb.com/docs/manual/reference/operator/aggregation/bottomN/
 func BottomN(n, sortBy, output any) bson.D {
@@ -134,17 +144,27 @@ func Min(values ...any) bson.D {
 // Example:
 //
 //	expr.Median(expr.Field("score"), "approximate")
-//	// bson.D{{Key: "$median", Value: bson.D{
-//	//     {Key: "input", Value: "$score"},
-//	//     {Key: "method", Value: "approximate"},
-//	// }}}
+//	// bson.D{
+//	//     {
+//	//         Key: "$median",
+//	//         Value: bson.D{
+//	//             {Key: "input", Value: "$score"},
+//	//             {Key: "method", Value: "approximate"},
+//	//         },
+//	//     },
+//	// }
 //
 // MongoDB docs: https://www.mongodb.com/docs/manual/reference/operator/aggregation/median/
 func Median(input, method any) bson.D {
-	return bson.D{{Key: "$median", Value: bson.D{
-		{Key: "input", Value: input},
-		{Key: "method", Value: method},
-	}}}
+	return bson.D{
+		{
+			Key: "$median",
+			Value: bson.D{
+				{Key: "input", Value: input},
+				{Key: "method", Value: method},
+			},
+		},
+	}
 }
 
 // Percentile returns an accumulator yielding one or more percentiles of a numeric expression.
@@ -156,19 +176,29 @@ func Median(input, method any) bson.D {
 // Example:
 //
 //	expr.Percentile(expr.Field("score"), bson.A{0.5, 0.95}, "approximate")
-//	// bson.D{{Key: "$percentile", Value: bson.D{
-//	//     {Key: "input", Value: "$score"},
-//	//     {Key: "p", Value: bson.A{0.5, 0.95}},
-//	//     {Key: "method", Value: "approximate"},
-//	// }}}
+//	// bson.D{
+//	//     {
+//	//         Key: "$percentile",
+//	//         Value: bson.D{
+//	//             {Key: "input", Value: "$score"},
+//	//             {Key: "p", Value: bson.A{0.5, 0.95}},
+//	//             {Key: "method", Value: "approximate"},
+//	//         },
+//	//     },
+//	// }
 //
 // MongoDB docs: https://www.mongodb.com/docs/manual/reference/operator/aggregation/percentile/
 func Percentile(input, p, method any) bson.D {
-	return bson.D{{Key: "$percentile", Value: bson.D{
-		{Key: "input", Value: input},
-		{Key: "p", Value: p},
-		{Key: "method", Value: method},
-	}}}
+	return bson.D{
+		{
+			Key: "$percentile",
+			Value: bson.D{
+				{Key: "input", Value: input},
+				{Key: "p", Value: p},
+				{Key: "method", Value: method},
+			},
+		},
+	}
 }
 
 // Push returns an accumulator collecting a value from every document of a group into an array.
@@ -245,10 +275,15 @@ func Sum(values ...any) bson.D {
 // Example:
 //
 //	expr.Top(bson.D{{Key: "score", Value: -1}}, expr.Field("name"))
-//	// bson.D{{Key: "$top", Value: bson.D{
-//	//     {Key: "sortBy", Value: bson.D{{Key: "score", Value: -1}}},
-//	//     {Key: "output", Value: "$name"},
-//	// }}}
+//	// bson.D{
+//	//     {
+//	//         Key: "$top",
+//	//         Value: bson.D{
+//	//             {Key: "sortBy", Value: bson.D{{Key: "score", Value: -1}}},
+//	//             {Key: "output", Value: "$name"},
+//	//         },
+//	//     },
+//	// }
 //
 // MongoDB docs: https://www.mongodb.com/docs/manual/reference/operator/aggregation/top/
 func Top(sortBy, output any) bson.D {
@@ -263,11 +298,16 @@ func Top(sortBy, output any) bson.D {
 // Example:
 //
 //	expr.TopN(3, bson.D{{Key: "score", Value: -1}}, expr.Field("name"))
-//	// bson.D{{Key: "$topN", Value: bson.D{
-//	//     {Key: "n", Value: 3},
-//	//     {Key: "sortBy", Value: bson.D{{Key: "score", Value: -1}}},
-//	//     {Key: "output", Value: "$name"},
-//	// }}}
+//	// bson.D{
+//	//     {
+//	//         Key: "$topN",
+//	//         Value: bson.D{
+//	//             {Key: "n", Value: 3},
+//	//             {Key: "sortBy", Value: bson.D{{Key: "score", Value: -1}}},
+//	//             {Key: "output", Value: "$name"},
+//	//         },
+//	//     },
+//	// }
 //
 // MongoDB docs: https://www.mongodb.com/docs/manual/reference/operator/aggregation/topN/
 func TopN(n, sortBy, output any) bson.D {

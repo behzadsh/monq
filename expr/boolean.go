@@ -11,10 +11,15 @@ import "go.mongodb.org/mongo-driver/v2/bson"
 // Example:
 //
 //	expr.And(expr.Gte(expr.Field("age"), 18), expr.Eq(expr.Field("status"), "active"))
-//	// bson.D{{Key: "$and", Value: bson.A{
-//	//     bson.D{{Key: "$gte", Value: bson.A{"$age", 18}}},
-//	//     bson.D{{Key: "$eq", Value: bson.A{"$status", "active"}}},
-//	// }}}
+//	// bson.D{
+//	//     {
+//	//         Key: "$and",
+//	//         Value: bson.A{
+//	//             bson.D{{Key: "$gte", Value: bson.A{"$age", 18}}},
+//	//             bson.D{{Key: "$eq", Value: bson.A{"$status", "active"}}},
+//	//         },
+//	//     },
+//	// }
 //
 // MongoDB docs: https://www.mongodb.com/docs/manual/reference/operator/aggregation/and/
 func And(expressions ...any) bson.D {
@@ -30,9 +35,14 @@ func And(expressions ...any) bson.D {
 // Example:
 //
 //	expr.Not(expr.Eq(expr.Field("status"), "banned"))
-//	// bson.D{{Key: "$not", Value: bson.A{
-//	//     bson.D{{Key: "$eq", Value: bson.A{"$status", "banned"}}},
-//	// }}}
+//	// bson.D{
+//	//     {
+//	//         Key: "$not",
+//	//         Value: bson.A{
+//	//             bson.D{{Key: "$eq", Value: bson.A{"$status", "banned"}}},
+//	//         },
+//	//     },
+//	// }
 //
 // MongoDB docs: https://www.mongodb.com/docs/manual/reference/operator/aggregation/not/
 func Not(expression any) bson.D {
@@ -47,10 +57,15 @@ func Not(expression any) bson.D {
 // Example:
 //
 //	expr.Or(expr.Gte(expr.Field("score"), 90), expr.Eq(expr.Field("staff"), true))
-//	// bson.D{{Key: "$or", Value: bson.A{
-//	//     bson.D{{Key: "$gte", Value: bson.A{"$score", 90}}},
-//	//     bson.D{{Key: "$eq", Value: bson.A{"$staff", true}}},
-//	// }}}
+//	// bson.D{
+//	//     {
+//	//         Key: "$or",
+//	//         Value: bson.A{
+//	//             bson.D{{Key: "$gte", Value: bson.A{"$score", 90}}},
+//	//             bson.D{{Key: "$eq", Value: bson.A{"$staff", true}}},
+//	//         },
+//	//     },
+//	// }
 //
 // MongoDB docs: https://www.mongodb.com/docs/manual/reference/operator/aggregation/or/
 func Or(expressions ...any) bson.D {

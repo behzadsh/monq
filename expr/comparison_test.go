@@ -58,19 +58,25 @@ func TestComparisonExpressions(t *testing.T) {
 		{
 			name: "nested expressions on both sides",
 			got:  expr.Gt(expr.Cmp(expr.Field("a"), expr.Field("b")), 0),
-			want: bson.D{{Key: "$gt", Value: bson.A{
-				bson.D{{Key: "$cmp", Value: bson.A{"$a", "$b"}}},
-				0,
-			}}},
+			want: bson.D{
+				{
+					Key: "$gt", Value: bson.A{
+						bson.D{{Key: "$cmp", Value: bson.A{"$a", "$b"}}},
+						0,
+					},
+				},
+			},
 		},
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if !reflect.DeepEqual(tt.got, tt.want) {
-				t.Fatalf("got %v, want %v", tt.got, tt.want)
-			}
-		})
+		t.Run(
+			tt.name, func(t *testing.T) {
+				if !reflect.DeepEqual(tt.got, tt.want) {
+					t.Fatalf("got %v, want %v", tt.got, tt.want)
+				}
+			},
+		)
 	}
 }
 

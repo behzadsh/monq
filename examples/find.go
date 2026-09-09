@@ -16,7 +16,8 @@ import (
 // other driver call that takes a filter. Nothing here wraps the driver, the filter is a bson.D and Find takes it
 // as it is.
 func runFind(ctx context.Context, db *mongo.Database) error {
-	return runParts(ctx, db.Collection(productsColl),
+	return runParts(
+		ctx, db.Collection(productsColl),
 		findComparison,
 		findLogical,
 		findElement,
@@ -139,8 +140,10 @@ func findEvaluation(ctx context.Context, coll *mongo.Collection) error {
 	price := expr.Field(ProductPaths.Price)
 	stock := expr.Field(ProductPaths.Stock)
 
-	if err := showFind(ctx, coll, "monq.Expr(expr.Gt(expr.Field(price), expr.Multiply(expr.Field(stock), 10)))",
-		monq.Expr(expr.Gt(price, expr.Multiply(stock, 10))), brief()); err != nil {
+	if err := showFind(
+		ctx, coll, "monq.Expr(expr.Gt(expr.Field(price), expr.Multiply(expr.Field(stock), 10)))",
+		monq.Expr(expr.Gt(price, expr.Multiply(stock, 10))), brief(),
+	); err != nil {
 		return err
 	}
 
@@ -162,12 +165,17 @@ func findEvaluation(ctx context.Context, coll *mongo.Collection) error {
 func findSchemaAndSample(ctx context.Context, coll *mongo.Collection) error {
 	step("$jsonSchema validates the whole document, and the schema goes in as a bson.D since it is JSON Schema, not monq")
 
-	schema := monq.JSONSchema(bson.D{
-		{Key: "required", Value: bson.A{string(ProductPaths.SKU), string(ProductPaths.Ratings.Path)}},
-		{Key: "properties", Value: bson.D{
-			{Key: string(ProductPaths.Price), Value: bson.D{{Key: "bsonType", Value: "double"}, {Key: "maximum", Value: 100}}},
-		}},
-	})
+	schema := monq.JSONSchema(
+		bson.D{
+			{Key: "required", Value: bson.A{string(ProductPaths.SKU), string(ProductPaths.Ratings.Path)}},
+			{
+				Key: "properties",
+				Value: bson.D{
+					{Key: string(ProductPaths.Price), Value: bson.D{{Key: "bsonType", Value: "double"}, {Key: "maximum", Value: 100}}},
+				},
+			},
+		},
+	)
 	if err := showFind(ctx, coll, "monq.JSONSchema(bson.D{...})", schema, brief()); err != nil {
 		return err
 	}
@@ -182,8 +190,10 @@ func findSchemaAndSample(ctx context.Context, coll *mongo.Collection) error {
 func findArray(ctx context.Context, coll *mongo.Collection) error {
 	step("$all wants every value present, in any order")
 
-	if err := showFind(ctx, coll, `monq.All(ProductPaths.Tags.Path, "usb-c", "powered")`,
-		monq.All(ProductPaths.Tags.Path, "usb-c", "powered"), brief()); err != nil {
+	if err := showFind(
+		ctx, coll, `monq.All(ProductPaths.Tags.Path, "usb-c", "powered")`,
+		monq.All(ProductPaths.Tags.Path, "usb-c", "powered"), brief(),
+	); err != nil {
 		return err
 	}
 
@@ -205,7 +215,8 @@ func findArray(ctx context.Context, coll *mongo.Collection) error {
 
 	step("$elemMatch is how one element is made to satisfy all of them at once, and its paths are element relative")
 
-	tight := monq.ElemMatch(ProductPaths.Ratings.Path,
+	tight := monq.ElemMatch(
+		ProductPaths.Ratings.Path,
 		monq.Eq("user", "ada"),
 		monq.Eq("score", 5),
 	)

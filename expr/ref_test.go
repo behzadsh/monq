@@ -35,11 +35,13 @@ func TestField(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := expr.Field(tt.field); got != tt.want {
-				t.Fatalf("Field() = %q, want %q", got, tt.want)
-			}
-		})
+		t.Run(
+			tt.name, func(t *testing.T) {
+				if got := expr.Field(tt.field); got != tt.want {
+					t.Fatalf("Field() = %q, want %q", got, tt.want)
+				}
+			},
+		)
 	}
 }
 
@@ -62,11 +64,13 @@ func TestLiteral(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := expr.Literal(tt.value); !reflect.DeepEqual(got, tt.want) {
-				t.Fatalf("Literal() = %v, want %v", got, tt.want)
-			}
-		})
+		t.Run(
+			tt.name, func(t *testing.T) {
+				if got := expr.Literal(tt.value); !reflect.DeepEqual(got, tt.want) {
+					t.Fatalf("Literal() = %v, want %v", got, tt.want)
+				}
+			},
+		)
 	}
 }
 

@@ -78,62 +78,94 @@ func TestAccumulatorExpressions(t *testing.T) {
 		{
 			name: "Top",
 			got:  expr.Top(bson.D{{Key: "score", Value: -1}}, expr.Field("name")),
-			want: bson.D{{Key: "$top", Value: bson.D{
-				{Key: "sortBy", Value: bson.D{{Key: "score", Value: -1}}},
-				{Key: "output", Value: "$name"},
-			}}},
+			want: bson.D{
+				{
+					Key: "$top",
+					Value: bson.D{
+						{Key: "sortBy", Value: bson.D{{Key: "score", Value: -1}}},
+						{Key: "output", Value: "$name"},
+					},
+				},
+			},
 		},
 		{
 			name: "TopN puts n first",
 			got:  expr.TopN(3, bson.D{{Key: "score", Value: -1}}, expr.Field("name")),
-			want: bson.D{{Key: "$topN", Value: bson.D{
-				{Key: "n", Value: 3},
-				{Key: "sortBy", Value: bson.D{{Key: "score", Value: -1}}},
-				{Key: "output", Value: "$name"},
-			}}},
+			want: bson.D{
+				{
+					Key: "$topN",
+					Value: bson.D{
+						{Key: "n", Value: 3},
+						{Key: "sortBy", Value: bson.D{{Key: "score", Value: -1}}},
+						{Key: "output", Value: "$name"},
+					},
+				},
+			},
 		},
 		{
 			name: "Bottom",
 			got:  expr.Bottom(bson.D{{Key: "score", Value: 1}}, expr.Field("name")),
-			want: bson.D{{Key: "$bottom", Value: bson.D{
-				{Key: "sortBy", Value: bson.D{{Key: "score", Value: 1}}},
-				{Key: "output", Value: "$name"},
-			}}},
+			want: bson.D{
+				{
+					Key: "$bottom",
+					Value: bson.D{
+						{Key: "sortBy", Value: bson.D{{Key: "score", Value: 1}}},
+						{Key: "output", Value: "$name"},
+					},
+				},
+			},
 		},
 		{
 			name: "BottomN puts n first",
 			got:  expr.BottomN(3, bson.D{{Key: "score", Value: 1}}, expr.Field("name")),
-			want: bson.D{{Key: "$bottomN", Value: bson.D{
-				{Key: "n", Value: 3},
-				{Key: "sortBy", Value: bson.D{{Key: "score", Value: 1}}},
-				{Key: "output", Value: "$name"},
-			}}},
+			want: bson.D{
+				{
+					Key: "$bottomN",
+					Value: bson.D{
+						{Key: "n", Value: 3},
+						{Key: "sortBy", Value: bson.D{{Key: "score", Value: 1}}},
+						{Key: "output", Value: "$name"},
+					},
+				},
+			},
 		},
 		{
 			name: "Median",
 			got:  expr.Median(expr.Field("score"), "approximate"),
-			want: bson.D{{Key: "$median", Value: bson.D{
-				{Key: "input", Value: "$score"},
-				{Key: "method", Value: "approximate"},
-			}}},
+			want: bson.D{
+				{
+					Key: "$median",
+					Value: bson.D{
+						{Key: "input", Value: "$score"},
+						{Key: "method", Value: "approximate"},
+					},
+				},
+			},
 		},
 		{
 			name: "Percentile",
 			got:  expr.Percentile(expr.Field("score"), bson.A{0.5, 0.95}, "approximate"),
-			want: bson.D{{Key: "$percentile", Value: bson.D{
-				{Key: "input", Value: "$score"},
-				{Key: "p", Value: bson.A{0.5, 0.95}},
-				{Key: "method", Value: "approximate"},
-			}}},
+			want: bson.D{
+				{
+					Key: "$percentile",
+					Value: bson.D{
+						{Key: "input", Value: "$score"},
+						{Key: "p", Value: bson.A{0.5, 0.95}},
+						{Key: "method", Value: "approximate"},
+					},
+				},
+			},
 		},
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if !reflect.DeepEqual(tt.got, tt.want) {
-				t.Fatalf("got %v, want %v", tt.got, tt.want)
-			}
-		})
+		t.Run(
+			tt.name, func(t *testing.T) {
+				if !reflect.DeepEqual(tt.got, tt.want) {
+					t.Fatalf("got %v, want %v", tt.got, tt.want)
+				}
+			},
+		)
 	}
 }
 

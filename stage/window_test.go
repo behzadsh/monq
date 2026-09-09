@@ -19,60 +19,120 @@ func TestSetWindowFields(t *testing.T) {
 	}{
 		{
 			name: "partition, sort, and one running total",
-			got: stage.SetWindowFields("$account", bson.D{{Key: "date", Value: 1}},
-				stage.WindowField("running_total", expr.Sum(expr.Field("amount")),
-					stage.WindowDocuments(stage.WindowUnbounded, stage.WindowCurrent)),
+			got: stage.SetWindowFields(
+				"$account", bson.D{{Key: "date", Value: 1}},
+				stage.WindowField(
+					"running_total", expr.Sum(expr.Field("amount")),
+					stage.WindowDocuments(stage.WindowUnbounded, stage.WindowCurrent),
+				),
 			),
-			want: bson.D{{Key: "$setWindowFields", Value: bson.D{
-				{Key: "partitionBy", Value: "$account"},
-				{Key: "sortBy", Value: bson.D{{Key: "date", Value: 1}}},
-				{Key: "output", Value: bson.D{{Key: "running_total", Value: bson.D{
-					{Key: "$sum", Value: "$amount"},
-					{Key: "window", Value: bson.D{
-						{Key: "documents", Value: bson.A{"unbounded", "current"}},
-					}},
-				}}}},
-			}}},
+			want: bson.D{
+				{
+					Key: "$setWindowFields",
+					Value: bson.D{
+						{Key: "partitionBy", Value: "$account"},
+						{Key: "sortBy", Value: bson.D{{Key: "date", Value: 1}}},
+						{
+							Key: "output",
+							Value: bson.D{
+								{
+									Key: "running_total",
+									Value: bson.D{
+										{Key: "$sum", Value: "$amount"},
+										{
+											Key: "window",
+											Value: bson.D{
+												{Key: "documents", Value: bson.A{"unbounded", "current"}},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
 		},
 		{
 			name: "a nil partition leaves the key out",
-			got: stage.SetWindowFields(nil, bson.D{{Key: "date", Value: 1}},
+			got: stage.SetWindowFields(
+				nil, bson.D{{Key: "date", Value: 1}},
 				stage.WindowField("rank", expr.Rank()),
 			),
-			want: bson.D{{Key: "$setWindowFields", Value: bson.D{
-				{Key: "sortBy", Value: bson.D{{Key: "date", Value: 1}}},
-				{Key: "output", Value: bson.D{{Key: "rank", Value: bson.D{
-					{Key: "$rank", Value: bson.D{}},
-				}}}},
-			}}},
+			want: bson.D{
+				{
+					Key: "$setWindowFields",
+					Value: bson.D{
+						{Key: "sortBy", Value: bson.D{{Key: "date", Value: 1}}},
+						{
+							Key: "output",
+							Value: bson.D{
+								{
+									Key: "rank",
+									Value: bson.D{
+										{Key: "$rank", Value: bson.D{}},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
 		},
 		{
 			name: "a nil sort leaves the key out",
 			got:  stage.SetWindowFields("$account", nil, stage.WindowField("total", expr.Sum(expr.Field("amount")))),
-			want: bson.D{{Key: "$setWindowFields", Value: bson.D{
-				{Key: "partitionBy", Value: "$account"},
-				{Key: "output", Value: bson.D{{Key: "total", Value: bson.D{
-					{Key: "$sum", Value: "$amount"},
-				}}}},
-			}}},
+			want: bson.D{
+				{
+					Key: "$setWindowFields",
+					Value: bson.D{
+						{Key: "partitionBy", Value: "$account"},
+						{
+							Key: "output",
+							Value: bson.D{
+								{
+									Key: "total",
+									Value: bson.D{
+										{Key: "$sum", Value: "$amount"},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
 		},
 		{
 			name: "several output fields merge in order",
-			got: stage.SetWindowFields("$account", bson.D{{Key: "date", Value: 1}},
+			got: stage.SetWindowFields(
+				"$account", bson.D{{Key: "date", Value: 1}},
 				stage.WindowField("rank", expr.Rank()),
 				stage.WindowField("previous", expr.Shift(expr.Field("amount"), -1)),
 			),
-			want: bson.D{{Key: "$setWindowFields", Value: bson.D{
-				{Key: "partitionBy", Value: "$account"},
-				{Key: "sortBy", Value: bson.D{{Key: "date", Value: 1}}},
-				{Key: "output", Value: bson.D{
-					{Key: "rank", Value: bson.D{{Key: "$rank", Value: bson.D{}}}},
-					{Key: "previous", Value: bson.D{{Key: "$shift", Value: bson.D{
-						{Key: "output", Value: "$amount"},
-						{Key: "by", Value: -1},
-					}}}},
-				}},
-			}}},
+			want: bson.D{
+				{
+					Key: "$setWindowFields",
+					Value: bson.D{
+						{Key: "partitionBy", Value: "$account"},
+						{Key: "sortBy", Value: bson.D{{Key: "date", Value: 1}}},
+						{
+							Key: "output", Value: bson.D{
+								{Key: "rank", Value: bson.D{{Key: "$rank", Value: bson.D{}}}},
+								{
+									Key: "previous", Value: bson.D{
+										{
+											Key: "$shift", Value: bson.D{
+												{Key: "output", Value: "$amount"},
+												{Key: "by", Value: -1},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
 		},
 		{
 			name: "no output fields at all",
@@ -82,11 +142,13 @@ func TestSetWindowFields(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if !reflect.DeepEqual(tt.got, tt.want) {
-				t.Fatalf("got %v, want %v", tt.got, tt.want)
-			}
-		})
+		t.Run(
+			tt.name, func(t *testing.T) {
+				if !reflect.DeepEqual(tt.got, tt.want) {
+					t.Fatalf("got %v, want %v", tt.got, tt.want)
+				}
+			},
+		)
 	}
 }
 
@@ -104,22 +166,34 @@ func TestWindowField(t *testing.T) {
 		{
 			name: "a moving window of four documents",
 			got:  stage.WindowField("moving", expr.Avg(expr.Field("price")), stage.WindowDocuments(-3, 0)),
-			want: bson.D{{Key: "moving", Value: bson.D{
-				{Key: "$avg", Value: "$price"},
-				{Key: "window", Value: bson.D{{Key: "documents", Value: bson.A{-3, 0}}}},
-			}}},
+			want: bson.D{
+				{
+					Key: "moving", Value: bson.D{
+						{Key: "$avg", Value: "$price"},
+						{Key: "window", Value: bson.D{{Key: "documents", Value: bson.A{-3, 0}}}},
+					},
+				},
+			},
 		},
 		{
 			name: "a range window with a time unit shares one window document",
-			got: stage.WindowField("last_hour", expr.Sum(expr.Field("amount")),
-				stage.WindowRange(-1, 0), stage.WindowUnit("hour")),
-			want: bson.D{{Key: "last_hour", Value: bson.D{
-				{Key: "$sum", Value: "$amount"},
-				{Key: "window", Value: bson.D{
-					{Key: "range", Value: bson.A{-1, 0}},
-					{Key: "unit", Value: "hour"},
-				}},
-			}}},
+			got: stage.WindowField(
+				"last_hour", expr.Sum(expr.Field("amount")),
+				stage.WindowRange(-1, 0), stage.WindowUnit("hour"),
+			),
+			want: bson.D{
+				{
+					Key: "last_hour", Value: bson.D{
+						{Key: "$sum", Value: "$amount"},
+						{
+							Key: "window", Value: bson.D{
+								{Key: "range", Value: bson.A{-1, 0}},
+								{Key: "unit", Value: "hour"},
+							},
+						},
+					},
+				},
+			},
 		},
 		{
 			name: "a dotted output path",
@@ -129,11 +203,13 @@ func TestWindowField(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if !reflect.DeepEqual(tt.got, tt.want) {
-				t.Fatalf("got %v, want %v", tt.got, tt.want)
-			}
-		})
+		t.Run(
+			tt.name, func(t *testing.T) {
+				if !reflect.DeepEqual(tt.got, tt.want) {
+					t.Fatalf("got %v, want %v", tt.got, tt.want)
+				}
+			},
+		)
 	}
 }
 
@@ -150,9 +226,12 @@ func TestWindowFieldLeavesTheOperatorUntouched(t *testing.T) {
 }
 
 func ExampleSetWindowFields() {
-	s := stage.SetWindowFields("$acct", monq.Sort(monq.Asc("date")),
-		stage.WindowField("total", expr.Sum(expr.Field("amt")),
-			stage.WindowDocuments(stage.WindowUnbounded, stage.WindowCurrent)),
+	s := stage.SetWindowFields(
+		"$acct", monq.Sort(monq.Asc("date")),
+		stage.WindowField(
+			"total", expr.Sum(expr.Field("amt")),
+			stage.WindowDocuments(stage.WindowUnbounded, stage.WindowCurrent),
+		),
 	)
 
 	printStage(s)
@@ -167,8 +246,10 @@ func ExampleWindowField() {
 }
 
 func ExampleWindowDocuments() {
-	field := stage.WindowField("running_total", expr.Sum(expr.Field("amount")),
-		stage.WindowDocuments(stage.WindowUnbounded, stage.WindowCurrent))
+	field := stage.WindowField(
+		"running_total", expr.Sum(expr.Field("amount")),
+		stage.WindowDocuments(stage.WindowUnbounded, stage.WindowCurrent),
+	)
 
 	printStage(field)
 	// Output: {"running_total":{"$sum":"$amount","window":{"documents":["unbounded","current"]}}}
@@ -182,8 +263,10 @@ func ExampleWindowRange() {
 }
 
 func ExampleWindowUnit() {
-	field := stage.WindowField("last_hour", expr.Sum(expr.Field("amount")),
-		stage.WindowRange(-1, 0), stage.WindowUnit("hour"))
+	field := stage.WindowField(
+		"last_hour", expr.Sum(expr.Field("amount")),
+		stage.WindowRange(-1, 0), stage.WindowUnit("hour"),
+	)
 
 	printStage(field)
 	// Output: {"last_hour":{"$sum":"$amount","window":{"range":[-1,0],"unit":"hour"}}}

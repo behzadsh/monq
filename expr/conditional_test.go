@@ -18,11 +18,16 @@ func TestConditionalExpressions(t *testing.T) {
 		{
 			name: "Cond emits the named form",
 			got:  expr.Cond(expr.Gte(expr.Field("score"), 60), "pass", "fail"),
-			want: bson.D{{Key: "$cond", Value: bson.D{
-				{Key: "if", Value: bson.D{{Key: "$gte", Value: bson.A{"$score", 60}}}},
-				{Key: "then", Value: "pass"},
-				{Key: "else", Value: "fail"},
-			}}},
+			want: bson.D{
+				{
+					Key: "$cond",
+					Value: bson.D{
+						{Key: "if", Value: bson.D{{Key: "$gte", Value: bson.A{"$score", 60}}}},
+						{Key: "then", Value: "pass"},
+						{Key: "else", Value: "fail"},
+					},
+				},
+			},
 		},
 		{
 			name: "IfNull with a single fallback",
@@ -41,28 +46,43 @@ func TestConditionalExpressions(t *testing.T) {
 				expr.Branch(expr.Gte(expr.Field("score"), 80), "B"),
 				expr.DefaultCase("F"),
 			),
-			want: bson.D{{Key: "$switch", Value: bson.D{
-				{Key: "branches", Value: bson.A{
-					bson.D{
-						{Key: "case", Value: bson.D{{Key: "$gte", Value: bson.A{"$score", 90}}}},
-						{Key: "then", Value: "A"},
+			want: bson.D{
+				{
+					Key: "$switch",
+					Value: bson.D{
+						{
+							Key: "branches",
+							Value: bson.A{
+								bson.D{
+									{Key: "case", Value: bson.D{{Key: "$gte", Value: bson.A{"$score", 90}}}},
+									{Key: "then", Value: "A"},
+								},
+								bson.D{
+									{Key: "case", Value: bson.D{{Key: "$gte", Value: bson.A{"$score", 80}}}},
+									{Key: "then", Value: "B"},
+								},
+							},
+						},
+						{Key: "default", Value: "F"},
 					},
-					bson.D{
-						{Key: "case", Value: bson.D{{Key: "$gte", Value: bson.A{"$score", 80}}}},
-						{Key: "then", Value: "B"},
-					},
-				}},
-				{Key: "default", Value: "F"},
-			}}},
+				},
+			},
 		},
 		{
 			name: "Switch without a default",
 			got:  expr.Switch(expr.Branch(expr.Field("staff"), "internal")),
-			want: bson.D{{Key: "$switch", Value: bson.D{
-				{Key: "branches", Value: bson.A{
-					bson.D{{Key: "case", Value: "$staff"}, {Key: "then", Value: "internal"}},
-				}},
-			}}},
+			want: bson.D{
+				{
+					Key: "$switch",
+					Value: bson.D{
+						{
+							Key: "branches", Value: bson.A{
+								bson.D{{Key: "case", Value: "$staff"}, {Key: "then", Value: "internal"}},
+							},
+						},
+					},
+				},
+			},
 		},
 		{
 			name: "Switch with no branches at all",
@@ -72,19 +92,26 @@ func TestConditionalExpressions(t *testing.T) {
 		{
 			name: "Switch with only a default",
 			got:  expr.Switch(expr.DefaultCase("F")),
-			want: bson.D{{Key: "$switch", Value: bson.D{
-				{Key: "branches", Value: bson.A{}},
-				{Key: "default", Value: "F"},
-			}}},
+			want: bson.D{
+				{
+					Key: "$switch",
+					Value: bson.D{
+						{Key: "branches", Value: bson.A{}},
+						{Key: "default", Value: "F"},
+					},
+				},
+			},
 		},
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if !reflect.DeepEqual(tt.got, tt.want) {
-				t.Fatalf("got %v, want %v", tt.got, tt.want)
-			}
-		})
+		t.Run(
+			tt.name, func(t *testing.T) {
+				if !reflect.DeepEqual(tt.got, tt.want) {
+					t.Fatalf("got %v, want %v", tt.got, tt.want)
+				}
+			},
+		)
 	}
 }
 

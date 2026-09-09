@@ -42,24 +42,24 @@ type Audit struct {
 
 // User covers the whole rule set in one struct.
 type User struct {
-	ID        bson.ObjectID     `bson:"_id"`
-	Email     string            `bson:"email"`
-	Nickname  string            // no tag: the key is the field name lowercased
-	Ignored   string            `bson:"-"`
-	unexposed string            //nolint:unused // unexported fields never reach the document
-	Address   Address           `bson:"address"`
-	Billing   *Address          `bson:"billing"`
-	Tags      []string          `bson:"tags"`
-	Items     []Item            `bson:"items"`
-	Avatar    []byte            `bson:"avatar"`
-	Anything  []any             `bson:"anything"`
-	Labels    map[string]string `bson:"labels"`
-	Timestamps                  // embedded and not inlined: nests under "timestamps"
-	Audit     `bson:",inline"`  // inlined: version and actor belong to User
-	Extra     bson.M            `bson:",inline"`
-	Tree      Node              `bson:"tree"`
-	Joined    time.Time         `bson:"joined"`
-	Balance   bson.Decimal128   `bson:"balance"`
+	ID         bson.ObjectID     `bson:"_id"`
+	Email      string            `bson:"email"`
+	Nickname   string            // no tag: the key is the field name lowercased
+	Ignored    string            `bson:"-"`
+	unexposed  string            //nolint:unused // unexported fields never reach the document
+	Address    Address           `bson:"address"`
+	Billing    *Address          `bson:"billing"`
+	Tags       []string          `bson:"tags"`
+	Items      []Item            `bson:"items"`
+	Avatar     []byte            `bson:"avatar"`
+	Anything   []any             `bson:"anything"`
+	Labels     map[string]string `bson:"labels"`
+	Timestamps                   // embedded and not inlined: nests under "timestamps"
+	Audit      `bson:",inline"`  // inlined: version and actor belong to User
+	Extra      bson.M            `bson:",inline"`
+	Tree       Node              `bson:"tree"`
+	Joined     time.Time         `bson:"joined"`
+	Balance    bson.Decimal128   `bson:"balance"`
 }
 
 // Marshaled has a marshaler of its own, so the document it produces has nothing to do with its fields and the walk

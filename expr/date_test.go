@@ -18,63 +18,97 @@ func TestDateExpressions(t *testing.T) {
 		{
 			name: "DateAdd",
 			got:  expr.DateAdd(expr.Field("created_at"), "day", 30),
-			want: bson.D{{Key: "$dateAdd", Value: bson.D{
-				{Key: "startDate", Value: "$created_at"},
-				{Key: "unit", Value: "day"},
-				{Key: "amount", Value: 30},
-			}}},
+			want: bson.D{
+				{
+					Key: "$dateAdd",
+					Value: bson.D{
+						{Key: "startDate", Value: "$created_at"},
+						{Key: "unit", Value: "day"},
+						{Key: "amount", Value: 30},
+					},
+				},
+			},
 		},
 		{
 			name: "DateAdd in a time zone",
 			got:  expr.DateAdd(expr.Field("created_at"), "day", 30, expr.Timezone("America/New_York")),
-			want: bson.D{{Key: "$dateAdd", Value: bson.D{
-				{Key: "startDate", Value: "$created_at"},
-				{Key: "unit", Value: "day"},
-				{Key: "amount", Value: 30},
-				{Key: "timezone", Value: "America/New_York"},
-			}}},
+			want: bson.D{
+				{
+					Key: "$dateAdd",
+					Value: bson.D{
+						{Key: "startDate", Value: "$created_at"},
+						{Key: "unit", Value: "day"},
+						{Key: "amount", Value: 30},
+						{Key: "timezone", Value: "America/New_York"},
+					},
+				},
+			},
 		},
 		{
 			name: "DateSubtract",
 			got:  expr.DateSubtract(expr.Field("expires_at"), "day", 7),
-			want: bson.D{{Key: "$dateSubtract", Value: bson.D{
-				{Key: "startDate", Value: "$expires_at"},
-				{Key: "unit", Value: "day"},
-				{Key: "amount", Value: 7},
-			}}},
+			want: bson.D{
+				{
+					Key: "$dateSubtract",
+					Value: bson.D{
+						{Key: "startDate", Value: "$expires_at"},
+						{Key: "unit", Value: "day"},
+						{Key: "amount", Value: 7},
+					},
+				},
+			},
 		},
 		{
 			name: "DateDiff",
 			got:  expr.DateDiff(expr.Field("created_at"), expr.Field("shipped_at"), "day"),
-			want: bson.D{{Key: "$dateDiff", Value: bson.D{
-				{Key: "startDate", Value: "$created_at"},
-				{Key: "endDate", Value: "$shipped_at"},
-				{Key: "unit", Value: "day"},
-			}}},
+			want: bson.D{
+				{
+					Key: "$dateDiff",
+					Value: bson.D{
+						{Key: "startDate", Value: "$created_at"},
+						{Key: "endDate", Value: "$shipped_at"},
+						{Key: "unit", Value: "day"},
+					},
+				},
+			},
 		},
 		{
 			name: "DateDiff in weeks from Monday",
-			got: expr.DateDiff(expr.Field("created_at"), expr.Field("shipped_at"), "week",
-				expr.StartOfWeek("monday")),
-			want: bson.D{{Key: "$dateDiff", Value: bson.D{
-				{Key: "startDate", Value: "$created_at"},
-				{Key: "endDate", Value: "$shipped_at"},
-				{Key: "unit", Value: "week"},
-				{Key: "startOfWeek", Value: "monday"},
-			}}},
+			got: expr.DateDiff(
+				expr.Field("created_at"), expr.Field("shipped_at"), "week",
+				expr.StartOfWeek("monday"),
+			),
+			want: bson.D{
+				{
+					Key: "$dateDiff",
+					Value: bson.D{
+						{Key: "startDate", Value: "$created_at"},
+						{Key: "endDate", Value: "$shipped_at"},
+						{Key: "unit", Value: "week"},
+						{Key: "startOfWeek", Value: "monday"},
+					},
+				},
+			},
 		},
 		{
 			name: "DateFromParts passes its parts through",
-			got: expr.DateFromParts(bson.D{
-				{Key: "year", Value: 2026},
-				{Key: "month", Value: 8},
-				{Key: "day", Value: 1},
-			}),
-			want: bson.D{{Key: "$dateFromParts", Value: bson.D{
-				{Key: "year", Value: 2026},
-				{Key: "month", Value: 8},
-				{Key: "day", Value: 1},
-			}}},
+			got: expr.DateFromParts(
+				bson.D{
+					{Key: "year", Value: 2026},
+					{Key: "month", Value: 8},
+					{Key: "day", Value: 1},
+				},
+			),
+			want: bson.D{
+				{
+					Key: "$dateFromParts",
+					Value: bson.D{
+						{Key: "year", Value: 2026},
+						{Key: "month", Value: 8},
+						{Key: "day", Value: 1},
+					},
+				},
+			},
 		},
 		{
 			name: "DateToParts",
@@ -84,36 +118,58 @@ func TestDateExpressions(t *testing.T) {
 		{
 			name: "DateToParts with ISO fields",
 			got:  expr.DateToParts(expr.Field("created_at"), expr.ISO8601()),
-			want: bson.D{{Key: "$dateToParts", Value: bson.D{
-				{Key: "date", Value: "$created_at"},
-				{Key: "iso8601", Value: true},
-			}}},
+			want: bson.D{
+				{
+					Key: "$dateToParts",
+					Value: bson.D{
+						{Key: "date", Value: "$created_at"},
+						{Key: "iso8601", Value: true},
+					},
+				},
+			},
 		},
 		{
 			name: "DateFromString with a format and a fallback",
-			got: expr.DateFromString(expr.Field("created_on"),
-				expr.DateFormat("%Y-%m-%d"), expr.DateOnError(nil)),
-			want: bson.D{{Key: "$dateFromString", Value: bson.D{
-				{Key: "dateString", Value: "$created_on"},
-				{Key: "format", Value: "%Y-%m-%d"},
-				{Key: "onError", Value: nil},
-			}}},
+			got: expr.DateFromString(
+				expr.Field("created_on"),
+				expr.DateFormat("%Y-%m-%d"), expr.DateOnError(nil),
+			),
+			want: bson.D{
+				{
+					Key: "$dateFromString",
+					Value: bson.D{
+						{Key: "dateString", Value: "$created_on"},
+						{Key: "format", Value: "%Y-%m-%d"},
+						{Key: "onError", Value: nil},
+					},
+				},
+			},
 		},
 		{
 			name: "DateToString with a format",
 			got:  expr.DateToString(expr.Field("created_at"), expr.DateFormat("%Y-%m-%d")),
-			want: bson.D{{Key: "$dateToString", Value: bson.D{
-				{Key: "date", Value: "$created_at"},
-				{Key: "format", Value: "%Y-%m-%d"},
-			}}},
+			want: bson.D{
+				{
+					Key: "$dateToString",
+					Value: bson.D{
+						{Key: "date", Value: "$created_at"},
+						{Key: "format", Value: "%Y-%m-%d"},
+					},
+				},
+			},
 		},
 		{
 			name: "DateToString with a fallback for null",
 			got:  expr.DateToString(expr.Field("created_at"), expr.DateOnNull("unknown")),
-			want: bson.D{{Key: "$dateToString", Value: bson.D{
-				{Key: "date", Value: "$created_at"},
-				{Key: "onNull", Value: "unknown"},
-			}}},
+			want: bson.D{
+				{
+					Key: "$dateToString",
+					Value: bson.D{
+						{Key: "date", Value: "$created_at"},
+						{Key: "onNull", Value: "unknown"},
+					},
+				},
+			},
 		},
 		{
 			name: "Year takes the date on its own",
@@ -123,10 +179,15 @@ func TestDateExpressions(t *testing.T) {
 		{
 			name: "Year in a time zone switches to the document form",
 			got:  expr.Year(expr.Field("created_at"), expr.Timezone("America/New_York")),
-			want: bson.D{{Key: "$year", Value: bson.D{
-				{Key: "date", Value: "$created_at"},
-				{Key: "timezone", Value: "America/New_York"},
-			}}},
+			want: bson.D{
+				{
+					Key: "$year",
+					Value: bson.D{
+						{Key: "date", Value: "$created_at"},
+						{Key: "timezone", Value: "America/New_York"},
+					},
+				},
+			},
 		},
 		{
 			name: "Month",
@@ -151,10 +212,15 @@ func TestDateExpressions(t *testing.T) {
 		{
 			name: "Hour in a time zone",
 			got:  expr.Hour(expr.Field("created_at"), expr.Timezone("America/New_York")),
-			want: bson.D{{Key: "$hour", Value: bson.D{
-				{Key: "date", Value: "$created_at"},
-				{Key: "timezone", Value: "America/New_York"},
-			}}},
+			want: bson.D{
+				{
+					Key: "$hour",
+					Value: bson.D{
+						{Key: "date", Value: "$created_at"},
+						{Key: "timezone", Value: "America/New_York"},
+					},
+				},
+			},
 		},
 		{
 			name: "Minute",
@@ -194,11 +260,13 @@ func TestDateExpressions(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if !reflect.DeepEqual(tt.got, tt.want) {
-				t.Fatalf("got %v, want %v", tt.got, tt.want)
-			}
-		})
+		t.Run(
+			tt.name, func(t *testing.T) {
+				if !reflect.DeepEqual(tt.got, tt.want) {
+					t.Fatalf("got %v, want %v", tt.got, tt.want)
+				}
+			},
+		)
 	}
 }
 
@@ -393,39 +461,58 @@ func TestDateTrunc(t *testing.T) {
 		{
 			name: "truncates to a whole unit",
 			got:  expr.DateTrunc(expr.Field("created_at"), "day"),
-			want: bson.D{{Key: "$dateTrunc", Value: bson.D{
-				{Key: "date", Value: "$created_at"},
-				{Key: "unit", Value: "day"},
-			}}},
+			want: bson.D{
+				{
+					Key: "$dateTrunc",
+					Value: bson.D{
+						{Key: "date", Value: "$created_at"},
+						{Key: "unit", Value: "day"},
+					},
+				},
+			},
 		},
 		{
 			name: "bins several units at a time",
 			got:  expr.DateTrunc(expr.Field("created_at"), "minute", expr.BinSize(15)),
-			want: bson.D{{Key: "$dateTrunc", Value: bson.D{
-				{Key: "date", Value: "$created_at"},
-				{Key: "unit", Value: "minute"},
-				{Key: "binSize", Value: 15},
-			}}},
+			want: bson.D{
+				{
+					Key: "$dateTrunc",
+					Value: bson.D{
+						{Key: "date", Value: "$created_at"},
+						{Key: "unit", Value: "minute"},
+						{Key: "binSize", Value: 15},
+					},
+				},
+			},
 		},
 		{
 			name: "weeks take a starting day and a time zone",
-			got: expr.DateTrunc(expr.Field("created_at"), "week",
-				expr.StartOfWeek("monday"), expr.Timezone("America/New_York")),
-			want: bson.D{{Key: "$dateTrunc", Value: bson.D{
-				{Key: "date", Value: "$created_at"},
-				{Key: "unit", Value: "week"},
-				{Key: "startOfWeek", Value: "monday"},
-				{Key: "timezone", Value: "America/New_York"},
-			}}},
+			got: expr.DateTrunc(
+				expr.Field("created_at"), "week",
+				expr.StartOfWeek("monday"), expr.Timezone("America/New_York"),
+			),
+			want: bson.D{
+				{
+					Key: "$dateTrunc",
+					Value: bson.D{
+						{Key: "date", Value: "$created_at"},
+						{Key: "unit", Value: "week"},
+						{Key: "startOfWeek", Value: "monday"},
+						{Key: "timezone", Value: "America/New_York"},
+					},
+				},
+			},
 		},
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if !reflect.DeepEqual(tt.got, tt.want) {
-				t.Fatalf("got %v, want %v", tt.got, tt.want)
-			}
-		})
+		t.Run(
+			tt.name, func(t *testing.T) {
+				if !reflect.DeepEqual(tt.got, tt.want) {
+					t.Fatalf("got %v, want %v", tt.got, tt.want)
+				}
+			},
+		)
 	}
 }
 

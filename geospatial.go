@@ -52,9 +52,17 @@ func Point(lon, lat float64) bson.D {
 // Example:
 //
 //	monq.Polygon([][2]float64{{0, 0}, {3, 0}, {3, 3}, {0, 3}, {0, 0}})
-//	// bson.D{{Key: "type", Value: "Polygon"}, {Key: "coordinates", Value: bson.A{bson.A{
-//	//     bson.A{0.0, 0.0}, bson.A{3.0, 0.0}, bson.A{3.0, 3.0}, bson.A{0.0, 3.0}, bson.A{0.0, 0.0},
-//	// }}}}
+//	// bson.D{
+//	//     {Key: "type", Value: "Polygon"},
+//	//     {
+//	//         Key: "coordinates",
+//	//         Value: bson.A{
+//	//             bson.A{
+//	//                 bson.A{0.0, 0.0}, bson.A{3.0, 0.0}, bson.A{3.0, 3.0}, bson.A{0.0, 3.0}, bson.A{0.0, 0.0},
+//	//             },
+//	//         },
+//	//     },
+//	// }
 //
 // MongoDB docs: https://www.mongodb.com/docs/manual/reference/geojson/#polygon
 func Polygon(rings ...[][2]float64) bson.D {
@@ -81,9 +89,14 @@ func Polygon(rings ...[][2]float64) bson.D {
 // Example:
 //
 //	monq.Geometry(monq.Point(-73.97, 40.77))
-//	// bson.D{{Key: "$geometry", Value: bson.D{
-//	//     {Key: "type", Value: "Point"}, {Key: "coordinates", Value: bson.A{-73.97, 40.77}},
-//	// }}}
+//	// bson.D{
+//	//     {
+//	//         Key: "$geometry",
+//	//         Value: bson.D{
+//	//             {Key: "type", Value: "Point"}, {Key: "coordinates", Value: bson.A{-73.97, 40.77}},
+//	//         },
+//	//     },
+//	// }
 //
 // MongoDB docs: https://www.mongodb.com/docs/manual/reference/operator/query/geometry/
 func Geometry(geoJSON bson.D) bson.D {
@@ -208,9 +221,19 @@ func MinDistance(meters float64) NearOption {
 // Example:
 //
 //	monq.Near("loc", monq.Geometry(monq.Point(-73.97, 40.77)), monq.MaxDistance(1000))
-//	// bson.D{{Key: "loc", Value: bson.D{{Key: "$near", Value: bson.D{
-//	//     {Key: "$geometry", Value: ...}, {Key: "$maxDistance", Value: 1000.0},
-//	// }}}}}
+//	// bson.D{
+//	//     {
+//	//         Key: "loc",
+//	//         Value: bson.D{
+//	//             {
+//	//                 Key: "$near",
+//	//                 Value: bson.D{
+//	//                     {Key: "$geometry", Value: ...}, {Key: "$maxDistance", Value: 1000.0},
+//	//                 },
+//	//             },
+//	//         },
+//	//     },
+//	// }
 //
 // MongoDB docs: https://www.mongodb.com/docs/manual/reference/operator/query/near/
 func Near(field FieldPath, geometry bson.D, opts ...NearOption) bson.D {
@@ -226,9 +249,19 @@ func Near(field FieldPath, geometry bson.D, opts ...NearOption) bson.D {
 // Example:
 //
 //	monq.NearSphere("loc", monq.Geometry(monq.Point(-73.97, 40.77)), monq.MaxDistance(1000))
-//	// bson.D{{Key: "loc", Value: bson.D{{Key: "$nearSphere", Value: bson.D{
-//	//     {Key: "$geometry", Value: ...}, {Key: "$maxDistance", Value: 1000.0},
-//	// }}}}}
+//	// bson.D{
+//	//     {
+//	//         Key: "loc",
+//	//         Value: bson.D{
+//	//             {
+//	//                 Key: "$nearSphere",
+//	//                 Value: bson.D{
+//	//                     {Key: "$geometry", Value: ...}, {Key: "$maxDistance", Value: 1000.0},
+//	//                 },
+//	//             },
+//	//         },
+//	//     },
+//	// }
 //
 // MongoDB docs: https://www.mongodb.com/docs/manual/reference/operator/query/nearSphere/
 func NearSphere(field FieldPath, geometry bson.D, opts ...NearOption) bson.D {

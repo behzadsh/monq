@@ -18,10 +18,15 @@ func TestBooleanExpressions(t *testing.T) {
 		{
 			name: "And with two conditions",
 			got:  expr.And(expr.Gte(expr.Field("age"), 18), expr.Eq(expr.Field("status"), "active")),
-			want: bson.D{{Key: "$and", Value: bson.A{
-				bson.D{{Key: "$gte", Value: bson.A{"$age", 18}}},
-				bson.D{{Key: "$eq", Value: bson.A{"$status", "active"}}},
-			}}},
+			want: bson.D{
+				{
+					Key: "$and",
+					Value: bson.A{
+						bson.D{{Key: "$gte", Value: bson.A{"$age", 18}}},
+						bson.D{{Key: "$eq", Value: bson.A{"$status", "active"}}},
+					},
+				},
+			},
 		},
 		{
 			name: "And with none",
@@ -31,17 +36,27 @@ func TestBooleanExpressions(t *testing.T) {
 		{
 			name: "Or with two conditions",
 			got:  expr.Or(expr.Gte(expr.Field("score"), 90), expr.Eq(expr.Field("staff"), true)),
-			want: bson.D{{Key: "$or", Value: bson.A{
-				bson.D{{Key: "$gte", Value: bson.A{"$score", 90}}},
-				bson.D{{Key: "$eq", Value: bson.A{"$staff", true}}},
-			}}},
+			want: bson.D{
+				{
+					Key: "$or",
+					Value: bson.A{
+						bson.D{{Key: "$gte", Value: bson.A{"$score", 90}}},
+						bson.D{{Key: "$eq", Value: bson.A{"$staff", true}}},
+					},
+				},
+			},
 		},
 		{
 			name: "Not wraps a single expression in an array",
 			got:  expr.Not(expr.Eq(expr.Field("status"), "banned")),
-			want: bson.D{{Key: "$not", Value: bson.A{
-				bson.D{{Key: "$eq", Value: bson.A{"$status", "banned"}}},
-			}}},
+			want: bson.D{
+				{
+					Key: "$not",
+					Value: bson.A{
+						bson.D{{Key: "$eq", Value: bson.A{"$status", "banned"}}},
+					},
+				},
+			},
 		},
 		{
 			name: "Not over a bare field reference",
@@ -51,11 +66,13 @@ func TestBooleanExpressions(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if !reflect.DeepEqual(tt.got, tt.want) {
-				t.Fatalf("got %v, want %v", tt.got, tt.want)
-			}
-		})
+		t.Run(
+			tt.name, func(t *testing.T) {
+				if !reflect.DeepEqual(tt.got, tt.want) {
+					t.Fatalf("got %v, want %v", tt.got, tt.want)
+				}
+			},
+		)
 	}
 }
 

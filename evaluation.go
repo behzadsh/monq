@@ -137,11 +137,16 @@ func DiacriticSensitive() TextOption {
 // Example:
 //
 //	monq.Text("coffee shop", monq.Language("en"), monq.CaseSensitive())
-//	// bson.D{{Key: "$text", Value: bson.D{
-//	//     {Key: "$search", Value: "coffee shop"},
-//	//     {Key: "$language", Value: "en"},
-//	//     {Key: "$caseSensitive", Value: true},
-//	// }}}
+//	// bson.D{
+//	//     {
+//	//         Key: "$text",
+//	//         Value: bson.D{
+//	//             {Key: "$search", Value: "coffee shop"},
+//	//             {Key: "$language", Value: "en"},
+//	//             {Key: "$caseSensitive", Value: true},
+//	//         },
+//	//     },
+//	// }
 //
 // MongoDB docs: https://www.mongodb.com/docs/manual/reference/operator/query/text/
 func Text(search string, opts ...TextOption) bson.D {

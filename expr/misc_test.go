@@ -21,12 +21,20 @@ func TestMiscExpressions(t *testing.T) {
 				bson.D{{Key: "total", Value: expr.Add(expr.Field("price"), expr.Field("tax"))}},
 				expr.Multiply("$$total", 0.9),
 			),
-			want: bson.D{{Key: "$let", Value: bson.D{
-				{Key: "vars", Value: bson.D{
-					{Key: "total", Value: bson.D{{Key: "$add", Value: bson.A{"$price", "$tax"}}}},
-				}},
-				{Key: "in", Value: bson.D{{Key: "$multiply", Value: bson.A{"$$total", 0.9}}}},
-			}}},
+			want: bson.D{
+				{
+					Key: "$let",
+					Value: bson.D{
+						{
+							Key: "vars",
+							Value: bson.D{
+								{Key: "total", Value: bson.D{{Key: "$add", Value: bson.A{"$price", "$tax"}}}},
+							},
+						},
+						{Key: "in", Value: bson.D{{Key: "$multiply", Value: bson.A{"$$total", 0.9}}}},
+					},
+				},
+			},
 		},
 		{
 			name: "Let with several variables",
@@ -34,10 +42,15 @@ func TestMiscExpressions(t *testing.T) {
 				bson.D{{Key: "a", Value: 1}, {Key: "b", Value: 2}},
 				expr.Add("$$a", "$$b"),
 			),
-			want: bson.D{{Key: "$let", Value: bson.D{
-				{Key: "vars", Value: bson.D{{Key: "a", Value: 1}, {Key: "b", Value: 2}}},
-				{Key: "in", Value: bson.D{{Key: "$add", Value: bson.A{"$$a", "$$b"}}}},
-			}}},
+			want: bson.D{
+				{
+					Key: "$let",
+					Value: bson.D{
+						{Key: "vars", Value: bson.D{{Key: "a", Value: 1}, {Key: "b", Value: 2}}},
+						{Key: "in", Value: bson.D{{Key: "$add", Value: bson.A{"$$a", "$$b"}}}},
+					},
+				},
+			},
 		},
 		{
 			name: "Rand takes an empty document",
@@ -67,11 +80,13 @@ func TestMiscExpressions(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if !reflect.DeepEqual(tt.got, tt.want) {
-				t.Fatalf("got %v, want %v", tt.got, tt.want)
-			}
-		})
+		t.Run(
+			tt.name, func(t *testing.T) {
+				if !reflect.DeepEqual(tt.got, tt.want) {
+					t.Fatalf("got %v, want %v", tt.got, tt.want)
+				}
+			},
+		)
 	}
 }
 

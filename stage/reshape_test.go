@@ -24,18 +24,28 @@ func TestReshapeStages(t *testing.T) {
 		{
 			name: "Project with inclusion flags",
 			got:  stage.Project(stage.Field("name", 1), stage.Field("_id", 0)),
-			want: bson.D{{Key: "$project", Value: bson.D{
-				{Key: "name", Value: 1},
-				{Key: "_id", Value: 0},
-			}}},
+			want: bson.D{
+				{
+					Key: "$project",
+					Value: bson.D{
+						{Key: "name", Value: 1},
+						{Key: "_id", Value: 0},
+					},
+				},
+			},
 		},
 		{
 			name: "Project takes a hand-written document too",
 			got:  stage.Project(bson.D{{Key: "name", Value: 1}, {Key: "email", Value: 1}}),
-			want: bson.D{{Key: "$project", Value: bson.D{
-				{Key: "name", Value: 1},
-				{Key: "email", Value: 1},
-			}}},
+			want: bson.D{
+				{
+					Key: "$project",
+					Value: bson.D{
+						{Key: "name", Value: 1},
+						{Key: "email", Value: 1},
+					},
+				},
+			},
 		},
 		{
 			name: "Project keeps the last of two fields sharing a name",
@@ -80,11 +90,13 @@ func TestReshapeStages(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if !reflect.DeepEqual(tt.got, tt.want) {
-				t.Fatalf("got %v, want %v", tt.got, tt.want)
-			}
-		})
+		t.Run(
+			tt.name, func(t *testing.T) {
+				if !reflect.DeepEqual(tt.got, tt.want) {
+					t.Fatalf("got %v, want %v", tt.got, tt.want)
+				}
+			},
+		)
 	}
 }
 

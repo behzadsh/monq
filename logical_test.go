@@ -39,14 +39,16 @@ func TestAnd(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got := monq.And(tt.filters...)
+		t.Run(
+			tt.name, func(t *testing.T) {
+				got := monq.And(tt.filters...)
 
-			inner, ok := got[0].Value.(bson.A)
-			if !ok || got[0].Key != "$and" || len(inner) != tt.want {
-				t.Fatalf("And() = %v, want %d filters under $and", got, tt.want)
-			}
-		})
+				inner, ok := got[0].Value.(bson.A)
+				if !ok || got[0].Key != "$and" || len(inner) != tt.want {
+					t.Fatalf("And() = %v, want %d filters under $and", got, tt.want)
+				}
+			},
+		)
 	}
 }
 
@@ -79,14 +81,16 @@ func TestOr(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got := monq.Or(tt.filters...)
+		t.Run(
+			tt.name, func(t *testing.T) {
+				got := monq.Or(tt.filters...)
 
-			inner, ok := got[0].Value.(bson.A)
-			if !ok || got[0].Key != "$or" || len(inner) != tt.want {
-				t.Fatalf("Or() = %v, want %d filters under $or", got, tt.want)
-			}
-		})
+				inner, ok := got[0].Value.(bson.A)
+				if !ok || got[0].Key != "$or" || len(inner) != tt.want {
+					t.Fatalf("Or() = %v, want %d filters under $or", got, tt.want)
+				}
+			},
+		)
 	}
 }
 
@@ -119,14 +123,16 @@ func TestNor(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got := monq.Nor(tt.filters...)
+		t.Run(
+			tt.name, func(t *testing.T) {
+				got := monq.Nor(tt.filters...)
 
-			inner, ok := got[0].Value.(bson.A)
-			if !ok || got[0].Key != "$nor" || len(inner) != tt.want {
-				t.Fatalf("Nor() = %v, want %d filters under $nor", got, tt.want)
-			}
-		})
+				inner, ok := got[0].Value.(bson.A)
+				if !ok || got[0].Key != "$nor" || len(inner) != tt.want {
+					t.Fatalf("Nor() = %v, want %d filters under $nor", got, tt.want)
+				}
+			},
+		)
 	}
 }
 
@@ -159,23 +165,25 @@ func TestNot(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got := monq.Not(tt.expr)
+		t.Run(
+			tt.name, func(t *testing.T) {
+				got := monq.Not(tt.expr)
 
-			if got[0].Key != tt.field {
-				t.Fatalf("Not() field = %q, want %q", got[0].Key, tt.field)
-			}
+				if got[0].Key != tt.field {
+					t.Fatalf("Not() field = %q, want %q", got[0].Key, tt.field)
+				}
 
-			outer, ok := got[0].Value.(bson.D)
-			if !ok || outer[0].Key != "$not" {
-				t.Fatalf("Not() = %v, want a $not operator document", got)
-			}
+				outer, ok := got[0].Value.(bson.D)
+				if !ok || outer[0].Key != "$not" {
+					t.Fatalf("Not() = %v, want a $not operator document", got)
+				}
 
-			innerOp, ok := outer[0].Value.(bson.D)
-			if !ok || innerOp[0].Key != tt.op {
-				t.Fatalf("Not() inner operator = %v, want %q", outer[0].Value, tt.op)
-			}
-		})
+				innerOp, ok := outer[0].Value.(bson.D)
+				if !ok || innerOp[0].Key != tt.op {
+					t.Fatalf("Not() inner operator = %v, want %q", outer[0].Value, tt.op)
+				}
+			},
+		)
 	}
 }
 

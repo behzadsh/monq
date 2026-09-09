@@ -93,11 +93,16 @@ func Timezone(tz any) DateOption {
 // Example:
 //
 //	expr.DateAdd(expr.Field("created_at"), "day", 30)
-//	// bson.D{{Key: "$dateAdd", Value: bson.D{
-//	//     {Key: "startDate", Value: "$created_at"},
-//	//     {Key: "unit", Value: "day"},
-//	//     {Key: "amount", Value: 30},
-//	// }}}
+//	// bson.D{
+//	//     {
+//	//         Key: "$dateAdd",
+//	//         Value: bson.D{
+//	//             {Key: "startDate", Value: "$created_at"},
+//	//             {Key: "unit", Value: "day"},
+//	//             {Key: "amount", Value: 30},
+//	//         },
+//	//     },
+//	// }
 //
 // MongoDB docs: https://www.mongodb.com/docs/manual/reference/operator/aggregation/dateAdd/
 func DateAdd(startDate, unit, amount any, opts ...DateOption) bson.D {
@@ -114,11 +119,16 @@ func DateAdd(startDate, unit, amount any, opts ...DateOption) bson.D {
 // Example:
 //
 //	expr.DateDiff(expr.Field("created_at"), expr.Field("shipped_at"), "day")
-//	// bson.D{{Key: "$dateDiff", Value: bson.D{
-//	//     {Key: "startDate", Value: "$created_at"},
-//	//     {Key: "endDate", Value: "$shipped_at"},
-//	//     {Key: "unit", Value: "day"},
-//	// }}}
+//	// bson.D{
+//	//     {
+//	//         Key: "$dateDiff",
+//	//         Value: bson.D{
+//	//             {Key: "startDate", Value: "$created_at"},
+//	//             {Key: "endDate", Value: "$shipped_at"},
+//	//             {Key: "unit", Value: "day"},
+//	//         },
+//	//     },
+//	// }
 //
 // MongoDB docs: https://www.mongodb.com/docs/manual/reference/operator/aggregation/dateDiff/
 func DateDiff(startDate, endDate, unit any, opts ...DateOption) bson.D {
@@ -145,9 +155,14 @@ func DateDiff(startDate, endDate, unit any, opts ...DateOption) bson.D {
 // Example:
 //
 //	expr.DateFromParts(bson.D{{Key: "year", Value: 2026}, {Key: "month", Value: 8}, {Key: "day", Value: 1}})
-//	// bson.D{{Key: "$dateFromParts", Value: bson.D{
-//	//     {Key: "year", Value: 2026}, {Key: "month", Value: 8}, {Key: "day", Value: 1},
-//	// }}}
+//	// bson.D{
+//	//     {
+//	//         Key: "$dateFromParts",
+//	//         Value: bson.D{
+//	//             {Key: "year", Value: 2026}, {Key: "month", Value: 8}, {Key: "day", Value: 1},
+//	//         },
+//	//     },
+//	// }
 //
 // MongoDB docs: https://www.mongodb.com/docs/manual/reference/operator/aggregation/dateFromParts/
 func DateFromParts(parts bson.D) bson.D {
@@ -163,10 +178,15 @@ func DateFromParts(parts bson.D) bson.D {
 // Example:
 //
 //	expr.DateFromString(expr.Field("created_on"), expr.DateFormat("%Y-%m-%d"))
-//	// bson.D{{Key: "$dateFromString", Value: bson.D{
-//	//     {Key: "dateString", Value: "$created_on"},
-//	//     {Key: "format", Value: "%Y-%m-%d"},
-//	// }}}
+//	// bson.D{
+//	//     {
+//	//         Key: "$dateFromString",
+//	//         Value: bson.D{
+//	//             {Key: "dateString", Value: "$created_on"},
+//	//             {Key: "format", Value: "%Y-%m-%d"},
+//	//         },
+//	//     },
+//	// }
 //
 // MongoDB docs: https://www.mongodb.com/docs/manual/reference/operator/aggregation/dateFromString/
 func DateFromString(dateString any, opts ...DateOption) bson.D {
@@ -183,11 +203,16 @@ func DateFromString(dateString any, opts ...DateOption) bson.D {
 // Example:
 //
 //	expr.DateSubtract(expr.Field("expires_at"), "day", 7)
-//	// bson.D{{Key: "$dateSubtract", Value: bson.D{
-//	//     {Key: "startDate", Value: "$expires_at"},
-//	//     {Key: "unit", Value: "day"},
-//	//     {Key: "amount", Value: 7},
-//	// }}}
+//	// bson.D{
+//	//     {
+//	//         Key: "$dateSubtract",
+//	//         Value: bson.D{
+//	//             {Key: "startDate", Value: "$expires_at"},
+//	//             {Key: "unit", Value: "day"},
+//	//             {Key: "amount", Value: 7},
+//	//         },
+//	//     },
+//	// }
 //
 // MongoDB docs: https://www.mongodb.com/docs/manual/reference/operator/aggregation/dateSubtract/
 func DateSubtract(startDate, unit, amount any, opts ...DateOption) bson.D {
@@ -221,10 +246,15 @@ func DateToParts(date any, opts ...DateOption) bson.D {
 // Example:
 //
 //	expr.DateToString(expr.Field("created_at"), expr.DateFormat("%Y-%m-%d"))
-//	// bson.D{{Key: "$dateToString", Value: bson.D{
-//	//     {Key: "date", Value: "$created_at"},
-//	//     {Key: "format", Value: "%Y-%m-%d"},
-//	// }}}
+//	// bson.D{
+//	//     {
+//	//         Key: "$dateToString",
+//	//         Value: bson.D{
+//	//             {Key: "date", Value: "$created_at"},
+//	//             {Key: "format", Value: "%Y-%m-%d"},
+//	//         },
+//	//     },
+//	// }
 //
 // MongoDB docs: https://www.mongodb.com/docs/manual/reference/operator/aggregation/dateToString/
 func DateToString(date any, opts ...DateOption) bson.D {
@@ -246,11 +276,16 @@ func DateToString(date any, opts ...DateOption) bson.D {
 // Example:
 //
 //	expr.DateTrunc(expr.Field("created_at"), "minute", expr.BinSize(15))
-//	// bson.D{{Key: "$dateTrunc", Value: bson.D{
-//	//     {Key: "date", Value: "$created_at"},
-//	//     {Key: "unit", Value: "minute"},
-//	//     {Key: "binSize", Value: 15},
-//	// }}}
+//	// bson.D{
+//	//     {
+//	//         Key: "$dateTrunc",
+//	//         Value: bson.D{
+//	//             {Key: "date", Value: "$created_at"},
+//	//             {Key: "unit", Value: "minute"},
+//	//             {Key: "binSize", Value: 15},
+//	//         },
+//	//     },
+//	// }
 //
 // MongoDB docs: https://www.mongodb.com/docs/manual/reference/operator/aggregation/dateTrunc/
 func DateTrunc(date, unit any, opts ...DateOption) bson.D {
@@ -309,10 +344,15 @@ func DayOfYear(date any, opts ...DateOption) bson.D {
 // Example:
 //
 //	expr.Hour(expr.Field("created_at"), expr.Timezone("America/New_York"))
-//	// bson.D{{Key: "$hour", Value: bson.D{
-//	//     {Key: "date", Value: "$created_at"},
-//	//     {Key: "timezone", Value: "America/New_York"},
-//	// }}}
+//	// bson.D{
+//	//     {
+//	//         Key: "$hour",
+//	//         Value: bson.D{
+//	//             {Key: "date", Value: "$created_at"},
+//	//             {Key: "timezone", Value: "America/New_York"},
+//	//         },
+//	//     },
+//	// }
 //
 // MongoDB docs: https://www.mongodb.com/docs/manual/reference/operator/aggregation/hour/
 func Hour(date any, opts ...DateOption) bson.D {

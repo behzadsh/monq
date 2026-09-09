@@ -100,7 +100,10 @@ formatters:
           replacement: 'a[b:]'
     gofumpt:
       module-path: github.com/behzadsh/monq
-      extra-rules: true
+      extra:
+        group-params: true
+        clothe-returns: true
+        balance-calls: true
     golines:
       max-len: 160
 issues:

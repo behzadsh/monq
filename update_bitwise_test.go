@@ -48,15 +48,17 @@ func TestUpdateBitwiseOperators(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			// The sub-operator key is bare, "and" rather than "$and", which is how MongoDB spells it.
-			sub := bson.D{{Key: tt.subOp, Value: tt.operand}}
-			want := bson.D{{Key: "$bit", Value: bson.D{{Key: string(tt.field), Value: sub}}}}
+		t.Run(
+			tt.name, func(t *testing.T) {
+				// The sub-operator key is bare, "and" rather than "$and", which is how MongoDB spells it.
+				sub := bson.D{{Key: tt.subOp, Value: tt.operand}}
+				want := bson.D{{Key: "$bit", Value: bson.D{{Key: string(tt.field), Value: sub}}}}
 
-			if !reflect.DeepEqual(tt.got, want) {
-				t.Fatalf("got %v, want %v", tt.got, want)
-			}
-		})
+				if !reflect.DeepEqual(tt.got, want) {
+					t.Fatalf("got %v, want %v", tt.got, want)
+				}
+			},
+		)
 	}
 }
 

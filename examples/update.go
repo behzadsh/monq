@@ -15,7 +15,8 @@ import (
 // what puts several together: two $set documents concatenated by hand would be a duplicate key that MongoDB does
 // not merge, so Update merges the ones sharing an operator.
 func runUpdate(ctx context.Context, db *mongo.Database) error {
-	return runParts(ctx, db.Collection(productsColl),
+	return runParts(
+		ctx, db.Collection(productsColl),
 		updateFields,
 		updateUpsert,
 		updateArrays,
@@ -45,8 +46,10 @@ func updateFields(ctx context.Context, coll *mongo.Collection) error {
 		monq.Set(ProductPaths.Name, "Wireless Keyboard Mk II"),
 		monq.CurrentDate(ProductPaths.CreatedAt),
 	)
-	if err := showUpdate(ctx, coll, "monq.Update(monq.Set(category, ...), monq.Inc(stock, -5), monq.Set(name, ...), monq.CurrentDate(created_at))",
-		bySKU("kbd-001"), both); err != nil {
+	if err := showUpdate(
+		ctx, coll, "monq.Update(monq.Set(category, ...), monq.Inc(stock, -5), monq.Set(name, ...), monq.CurrentDate(created_at))",
+		bySKU("kbd-001"), both,
+	); err != nil {
 		return err
 	}
 
@@ -85,8 +88,10 @@ func updateUpsert(ctx context.Context, coll *mongo.Collection) error {
 		monq.SetOnInsert(ProductPaths.Category, "peripherals"),
 		monq.SetOnInsert(ProductPaths.Price, 149.0),
 	)
-	if err := showUpdate(ctx, coll, "monq.Update(monq.Set(stock, 100), monq.SetOnInsert(name, ...), ...) with SetUpsert(true)",
-		bySKU("kbd-999"), create, options.UpdateMany().SetUpsert(true)); err != nil {
+	if err := showUpdate(
+		ctx, coll, "monq.Update(monq.Set(stock, 100), monq.SetOnInsert(name, ...), ...) with SetUpsert(true)",
+		bySKU("kbd-999"), create, options.UpdateMany().SetUpsert(true),
+	); err != nil {
 		return err
 	}
 
@@ -121,13 +126,16 @@ func updateArrays(ctx context.Context, coll *mongo.Collection) error {
 
 	step("PushEach is its own function because $position, $slice, and $sort only exist in the $each form")
 
-	capped := monq.PushEach(ProductPaths.Ratings.Path,
+	capped := monq.PushEach(
+		ProductPaths.Ratings.Path,
 		[]any{Rating{User: "ada", Score: 2}, Rating{User: "grace", Score: 5}},
 		monq.PushSort(monq.Sort(monq.Desc("score"))),
 		monq.PushSlice(3),
 	)
-	if err := showUpdate(ctx, coll, "monq.PushEach(ratings, values, monq.PushSort(monq.Sort(monq.Desc(score))), monq.PushSlice(3))",
-		bySKU("mse-002"), capped); err != nil {
+	if err := showUpdate(
+		ctx, coll, "monq.PushEach(ratings, values, monq.PushSort(monq.Sort(monq.Desc(score))), monq.PushSlice(3))",
+		bySKU("mse-002"), capped,
+	); err != nil {
 		return err
 	}
 
@@ -146,8 +154,10 @@ func updateArrayEnds(ctx context.Context, coll *mongo.Collection) error {
 		monq.AddToSetEach(ProductPaths.Tags.Path, []any{"wireless", "compact", "usb-c"}),
 		monq.PushEach(ProductPaths.Ratings.Path, []any{Rating{User: "hopper", Score: 4}}, monq.PushPosition(0)),
 	)
-	if err := showUpdate(ctx, coll, "monq.Update(monq.AddToSetEach(tags, values), monq.PushEach(ratings, values, monq.PushPosition(0)))",
-		bySKU("mse-002"), several); err != nil {
+	if err := showUpdate(
+		ctx, coll, "monq.Update(monq.AddToSetEach(tags, values), monq.PushEach(ratings, values, monq.PushPosition(0)))",
+		bySKU("mse-002"), several,
+	); err != nil {
 		return err
 	}
 
@@ -181,16 +191,20 @@ func updateArrayPositions(ctx context.Context, coll *mongo.Collection) error {
 	step(`"$" is the element the filter matched, so the filter has to contain a condition on the array`)
 
 	matched := monq.And(bySKU("mon-003"), monq.Eq(ProductPaths.Ratings.User, "ada"))
-	if err := showUpdate(ctx, coll, "monq.Set(ProductPaths.Ratings.Positional().Score, 1) // ratings.$.score",
-		matched, monq.Set(ProductPaths.Ratings.Positional().Score, 1)); err != nil {
+	if err := showUpdate(
+		ctx, coll, "monq.Set(ProductPaths.Ratings.Positional().Score, 1) // ratings.$.score",
+		matched, monq.Set(ProductPaths.Ratings.Positional().Score, 1),
+	); err != nil {
 		return err
 	}
 
 	step(`"$[name]" picks the elements an array filter matches, and the filter is given to the driver, not to monq`)
 
 	arrayFilters := options.UpdateMany().SetArrayFilters([]any{monq.Lt("low.score", 4)})
-	if err := showUpdate(ctx, coll, "monq.Set(ProductPaths.Ratings.Filtered(\"low\").Score, 3) // ratings.$[low].score",
-		bySKU("mon-003"), monq.Set(ProductPaths.Ratings.Filtered("low").Score, 3), arrayFilters); err != nil {
+	if err := showUpdate(
+		ctx, coll, "monq.Set(ProductPaths.Ratings.Filtered(\"low\").Score, 3) // ratings.$[low].score",
+		bySKU("mon-003"), monq.Set(ProductPaths.Ratings.Filtered("low").Score, 3), arrayFilters,
+	); err != nil {
 		return err
 	}
 

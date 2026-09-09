@@ -41,10 +41,15 @@ func PreserveNullAndEmptyArrays() UnwindOption {
 // Example:
 //
 //	stage.Unwind("$items", stage.PreserveNullAndEmptyArrays())
-//	// bson.D{{Key: "$unwind", Value: bson.D{
-//	//     {Key: "path", Value: "$items"},
-//	//     {Key: "preserveNullAndEmptyArrays", Value: true},
-//	// }}}
+//	// bson.D{
+//	//     {
+//	//         Key: "$unwind",
+//	//         Value: bson.D{
+//	//             {Key: "path", Value: "$items"},
+//	//             {Key: "preserveNullAndEmptyArrays", Value: true},
+//	//         },
+//	//     },
+//	// }
 //
 // MongoDB docs: https://www.mongodb.com/docs/manual/reference/operator/aggregation/unwind/
 func Unwind(path string, opts ...UnwindOption) bson.D {

@@ -33,19 +33,29 @@ func TestWindowExpressions(t *testing.T) {
 		{
 			name: "Shift without a default",
 			got:  expr.Shift(expr.Field("price"), -1),
-			want: bson.D{{Key: "$shift", Value: bson.D{
-				{Key: "output", Value: "$price"},
-				{Key: "by", Value: -1},
-			}}},
+			want: bson.D{
+				{
+					Key: "$shift",
+					Value: bson.D{
+						{Key: "output", Value: "$price"},
+						{Key: "by", Value: -1},
+					},
+				},
+			},
 		},
 		{
 			name: "Shift forward with a default",
 			got:  expr.Shift(expr.Field("price"), 1, expr.ShiftDefault(0)),
-			want: bson.D{{Key: "$shift", Value: bson.D{
-				{Key: "output", Value: "$price"},
-				{Key: "by", Value: 1},
-				{Key: "default", Value: 0},
-			}}},
+			want: bson.D{
+				{
+					Key: "$shift",
+					Value: bson.D{
+						{Key: "output", Value: "$price"},
+						{Key: "by", Value: 1},
+						{Key: "default", Value: 0},
+					},
+				},
+			},
 		},
 		{
 			name: "Locf takes a bare expression",
@@ -65,34 +75,54 @@ func TestWindowExpressions(t *testing.T) {
 		{
 			name: "Derivative per hour",
 			got:  expr.Derivative(expr.Field("odometer"), expr.TimeUnit("hour")),
-			want: bson.D{{Key: "$derivative", Value: bson.D{
-				{Key: "input", Value: "$odometer"},
-				{Key: "unit", Value: "hour"},
-			}}},
+			want: bson.D{
+				{
+					Key: "$derivative",
+					Value: bson.D{
+						{Key: "input", Value: "$odometer"},
+						{Key: "unit", Value: "hour"},
+					},
+				},
+			},
 		},
 		{
 			name: "Integral per hour",
 			got:  expr.Integral(expr.Field("power"), expr.TimeUnit("hour")),
-			want: bson.D{{Key: "$integral", Value: bson.D{
-				{Key: "input", Value: "$power"},
-				{Key: "unit", Value: "hour"},
-			}}},
+			want: bson.D{
+				{
+					Key: "$integral",
+					Value: bson.D{
+						{Key: "input", Value: "$power"},
+						{Key: "unit", Value: "hour"},
+					},
+				},
+			},
 		},
 		{
 			name: "ExpMovingAvgN uses a capital N as MongoDB spells it",
 			got:  expr.ExpMovingAvgN(expr.Field("price"), 5),
-			want: bson.D{{Key: "$expMovingAvg", Value: bson.D{
-				{Key: "input", Value: "$price"},
-				{Key: "N", Value: 5},
-			}}},
+			want: bson.D{
+				{
+					Key: "$expMovingAvg",
+					Value: bson.D{
+						{Key: "input", Value: "$price"},
+						{Key: "N", Value: 5},
+					},
+				},
+			},
 		},
 		{
 			name: "ExpMovingAvgAlpha",
 			got:  expr.ExpMovingAvgAlpha(expr.Field("price"), 0.3),
-			want: bson.D{{Key: "$expMovingAvg", Value: bson.D{
-				{Key: "input", Value: "$price"},
-				{Key: "alpha", Value: 0.3},
-			}}},
+			want: bson.D{
+				{
+					Key: "$expMovingAvg",
+					Value: bson.D{
+						{Key: "input", Value: "$price"},
+						{Key: "alpha", Value: 0.3},
+					},
+				},
+			},
 		},
 		{
 			name: "CovariancePop",
@@ -107,11 +137,13 @@ func TestWindowExpressions(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if !reflect.DeepEqual(tt.got, tt.want) {
-				t.Fatalf("got %v, want %v", tt.got, tt.want)
-			}
-		})
+		t.Run(
+			tt.name, func(t *testing.T) {
+				if !reflect.DeepEqual(tt.got, tt.want) {
+					t.Fatalf("got %v, want %v", tt.got, tt.want)
+				}
+			},
+		)
 	}
 }
 

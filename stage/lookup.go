@@ -53,14 +53,19 @@ func RestrictSearchWithMatch(filter bson.D) GraphLookupOption {
 // Example:
 //
 //	stage.GraphLookup("employees", "$reports_to", "reports_to", "name", "chain", stage.MaxDepth(3))
-//	// bson.D{{Key: "$graphLookup", Value: bson.D{
-//	//     {Key: "from", Value: "employees"},
-//	//     {Key: "startWith", Value: "$reports_to"},
-//	//     {Key: "connectFromField", Value: "reports_to"},
-//	//     {Key: "connectToField", Value: "name"},
-//	//     {Key: "as", Value: "chain"},
-//	//     {Key: "maxDepth", Value: 3},
-//	// }}}
+//	// bson.D{
+//	//     {
+//	//         Key: "$graphLookup",
+//	//         Value: bson.D{
+//	//             {Key: "from", Value: "employees"},
+//	//             {Key: "startWith", Value: "$reports_to"},
+//	//             {Key: "connectFromField", Value: "reports_to"},
+//	//             {Key: "connectToField", Value: "name"},
+//	//             {Key: "as", Value: "chain"},
+//	//             {Key: "maxDepth", Value: 3},
+//	//         },
+//	//     },
+//	// }
 //
 // MongoDB docs: https://www.mongodb.com/docs/manual/reference/operator/aggregation/graphLookup/
 func GraphLookup(
@@ -131,13 +136,18 @@ func Let(vars bson.D) LookupOption {
 // Example:
 //
 //	stage.Lookup("orders", "_id", "customer_id", "orders", stage.SubPipeline(stage.Sort(monq.Sort(monq.Asc("placed_at")))))
-//	// bson.D{{Key: "$lookup", Value: bson.D{
-//	//     {Key: "from", Value: "orders"},
-//	//     {Key: "localField", Value: "_id"},
-//	//     {Key: "foreignField", Value: "customer_id"},
-//	//     {Key: "as", Value: "orders"},
-//	//     {Key: "pipeline", Value: bson.A{...}},
-//	// }}}
+//	// bson.D{
+//	//     {
+//	//         Key: "$lookup",
+//	//         Value: bson.D{
+//	//             {Key: "from", Value: "orders"},
+//	//             {Key: "localField", Value: "_id"},
+//	//             {Key: "foreignField", Value: "customer_id"},
+//	//             {Key: "as", Value: "orders"},
+//	//             {Key: "pipeline", Value: bson.A{...}},
+//	//         },
+//	//     },
+//	// }
 //
 // MongoDB docs: https://www.mongodb.com/docs/manual/reference/operator/aggregation/lookup/
 func Lookup(from string, localField, foreignField monq.FieldPath, as string, opts ...LookupOption) bson.D {
@@ -173,12 +183,17 @@ func Lookup(from string, localField, foreignField monq.FieldPath, as string, opt
 //		[]bson.D{stage.Match(monq.Expr(bson.D{{Key: "$eq", Value: bson.A{"$customer_id", "$$customer"}}}))},
 //		"orders",
 //	)
-//	// bson.D{{Key: "$lookup", Value: bson.D{
-//	//     {Key: "from", Value: "orders"},
-//	//     {Key: "let", Value: bson.D{{Key: "customer", Value: "$_id"}}},
-//	//     {Key: "pipeline", Value: bson.A{...}},
-//	//     {Key: "as", Value: "orders"},
-//	// }}}
+//	// bson.D{
+//	//     {
+//	//         Key: "$lookup",
+//	//         Value: bson.D{
+//	//             {Key: "from", Value: "orders"},
+//	//             {Key: "let", Value: bson.D{{Key: "customer", Value: "$_id"}}},
+//	//             {Key: "pipeline", Value: bson.A{...}},
+//	//             {Key: "as", Value: "orders"},
+//	//         },
+//	//     },
+//	// }
 //
 // MongoDB docs: https://www.mongodb.com/docs/manual/reference/operator/aggregation/lookup/
 func LookupPipeline(from string, let bson.D, pipeline []bson.D, as string) bson.D {
@@ -187,7 +202,8 @@ func LookupPipeline(from string, let bson.D, pipeline []bson.D, as string) bson.
 		spec = append(spec, bson.E{Key: "let", Value: let})
 	}
 
-	spec = append(spec,
+	spec = append(
+		spec,
 		bson.E{Key: "pipeline", Value: toStageArray(pipeline)},
 		bson.E{Key: "as", Value: as},
 	)
@@ -207,10 +223,15 @@ func LookupPipeline(from string, let bson.D, pipeline []bson.D, as string) bson.
 // Example:
 //
 //	stage.UnionWith("archived_orders", stage.Match(monq.Gte("created_at", "2026-01-01")))
-//	// bson.D{{Key: "$unionWith", Value: bson.D{
-//	//     {Key: "coll", Value: "archived_orders"},
-//	//     {Key: "pipeline", Value: bson.A{...}},
-//	// }}}
+//	// bson.D{
+//	//     {
+//	//         Key: "$unionWith",
+//	//         Value: bson.D{
+//	//             {Key: "coll", Value: "archived_orders"},
+//	//             {Key: "pipeline", Value: bson.A{...}},
+//	//         },
+//	//     },
+//	// }
 //
 // MongoDB docs: https://www.mongodb.com/docs/manual/reference/operator/aggregation/unionWith/
 func UnionWith(coll string, pipeline ...bson.D) bson.D {

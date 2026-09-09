@@ -16,10 +16,15 @@ import (
 // Example:
 //
 //	stage.Documents(bson.D{{Key: "x", Value: 1}}, bson.D{{Key: "x", Value: 2}})
-//	// bson.D{{Key: "$documents", Value: bson.A{
-//	//     bson.D{{Key: "x", Value: 1}},
-//	//     bson.D{{Key: "x", Value: 2}},
-//	// }}}
+//	// bson.D{
+//	//     {
+//	//         Key: "$documents",
+//	//         Value: bson.A{
+//	//             bson.D{{Key: "x", Value: 1}},
+//	//             bson.D{{Key: "x", Value: 2}},
+//	//         },
+//	//     },
+//	// }
 //
 // MongoDB docs: https://www.mongodb.com/docs/manual/reference/operator/aggregation/documents/
 func Documents(docs ...any) bson.D {
@@ -82,11 +87,16 @@ func MergeWhenNotMatched(action string) MergeOption {
 // Example:
 //
 //	stage.Merge("daily_totals", stage.MergeOn("date"), stage.MergeWhenMatched("replace"))
-//	// bson.D{{Key: "$merge", Value: bson.D{
-//	//     {Key: "into", Value: "daily_totals"},
-//	//     {Key: "on", Value: "date"},
-//	//     {Key: "whenMatched", Value: "replace"},
-//	// }}}
+//	// bson.D{
+//	//     {
+//	//         Key: "$merge",
+//	//         Value: bson.D{
+//	//             {Key: "into", Value: "daily_totals"},
+//	//             {Key: "on", Value: "date"},
+//	//             {Key: "whenMatched", Value: "replace"},
+//	//         },
+//	//     },
+//	// }
 //
 // MongoDB docs: https://www.mongodb.com/docs/manual/reference/operator/aggregation/merge/
 func Merge(into any, opts ...MergeOption) bson.D {

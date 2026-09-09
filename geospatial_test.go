@@ -36,9 +36,13 @@ func TestGeometryConstructors(t *testing.T) {
 			got:  monq.Polygon([][2]float64{{0, 0}, {3, 0}, {3, 3}, {0, 0}}),
 			want: bson.D{
 				{Key: "type", Value: "Polygon"},
-				{Key: "coordinates", Value: bson.A{bson.A{
-					bson.A{0.0, 0.0}, bson.A{3.0, 0.0}, bson.A{3.0, 3.0}, bson.A{0.0, 0.0},
-				}}},
+				{
+					Key: "coordinates", Value: bson.A{
+						bson.A{
+							bson.A{0.0, 0.0}, bson.A{3.0, 0.0}, bson.A{3.0, 3.0}, bson.A{0.0, 0.0},
+						},
+					},
+				},
 			},
 		},
 		{
@@ -49,19 +53,25 @@ func TestGeometryConstructors(t *testing.T) {
 			),
 			want: bson.D{
 				{Key: "type", Value: "Polygon"},
-				{Key: "coordinates", Value: bson.A{
-					bson.A{bson.A{0.0, 0.0}, bson.A{4.0, 0.0}, bson.A{4.0, 4.0}, bson.A{0.0, 0.0}},
-					bson.A{bson.A{1.0, 1.0}, bson.A{2.0, 1.0}, bson.A{2.0, 2.0}, bson.A{1.0, 1.0}},
-				}},
+				{
+					Key: "coordinates", Value: bson.A{
+						bson.A{bson.A{0.0, 0.0}, bson.A{4.0, 0.0}, bson.A{4.0, 4.0}, bson.A{0.0, 0.0}},
+						bson.A{bson.A{1.0, 1.0}, bson.A{2.0, 1.0}, bson.A{2.0, 2.0}, bson.A{1.0, 1.0}},
+					},
+				},
 			},
 		},
 		{
 			name: "Geometry wraps a bare object",
 			got:  monq.Geometry(monq.Point(-73.97, 40.77)),
-			want: bson.D{{Key: "$geometry", Value: bson.D{
-				{Key: "type", Value: "Point"},
-				{Key: "coordinates", Value: bson.A{-73.97, 40.77}},
-			}}},
+			want: bson.D{
+				{
+					Key: "$geometry", Value: bson.D{
+						{Key: "type", Value: "Point"},
+						{Key: "coordinates", Value: bson.A{-73.97, 40.77}},
+					},
+				},
+			},
 		},
 		{
 			name: "Box holds both corners",
@@ -81,11 +91,13 @@ func TestGeometryConstructors(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if !reflect.DeepEqual(tt.got, tt.want) {
-				t.Fatalf("got %v, want %v", tt.got, tt.want)
-			}
-		})
+		t.Run(
+			tt.name, func(t *testing.T) {
+				if !reflect.DeepEqual(tt.got, tt.want) {
+					t.Fatalf("got %v, want %v", tt.got, tt.want)
+				}
+			},
+		)
 	}
 }
 
@@ -127,11 +139,14 @@ func TestGeoOperators(t *testing.T) {
 		},
 		{
 			name: "Near with both distance bounds",
-			got: monq.Near("loc", monq.Geometry(monq.Point(-73.97, 40.77)),
-				monq.MaxDistance(1000), monq.MinDistance(10)),
+			got: monq.Near(
+				"loc", monq.Geometry(monq.Point(-73.97, 40.77)),
+				monq.MaxDistance(1000), monq.MinDistance(10),
+			),
 			field: "loc",
 			op:    "$near",
-			want: append(monq.Geometry(monq.Point(-73.97, 40.77)),
+			want: append(
+				monq.Geometry(monq.Point(-73.97, 40.77)),
 				bson.E{Key: "$maxDistance", Value: 1000.0},
 				bson.E{Key: "$minDistance", Value: 10.0},
 			),
@@ -141,27 +156,30 @@ func TestGeoOperators(t *testing.T) {
 			got:   monq.NearSphere("loc", monq.Geometry(monq.Point(-73.97, 40.77)), monq.MaxDistance(1000)),
 			field: "loc",
 			op:    "$nearSphere",
-			want: append(monq.Geometry(monq.Point(-73.97, 40.77)),
+			want: append(
+				monq.Geometry(monq.Point(-73.97, 40.77)),
 				bson.E{Key: "$maxDistance", Value: 1000.0},
 			),
 		},
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if tt.got[0].Key != string(tt.field) {
-				t.Fatalf("field = %q, want %q", tt.got[0].Key, tt.field)
-			}
+		t.Run(
+			tt.name, func(t *testing.T) {
+				if tt.got[0].Key != string(tt.field) {
+					t.Fatalf("field = %q, want %q", tt.got[0].Key, tt.field)
+				}
 
-			inner, ok := tt.got[0].Value.(bson.D)
-			if !ok || inner[0].Key != tt.op {
-				t.Fatalf("got %v, want a %s operator document", tt.got, tt.op)
-			}
+				inner, ok := tt.got[0].Value.(bson.D)
+				if !ok || inner[0].Key != tt.op {
+					t.Fatalf("got %v, want a %s operator document", tt.got, tt.op)
+				}
 
-			if !reflect.DeepEqual(inner[0].Value, tt.want) {
-				t.Fatalf("%s argument = %v, want %v", tt.op, inner[0].Value, tt.want)
-			}
-		})
+				if !reflect.DeepEqual(inner[0].Value, tt.want) {
+					t.Fatalf("%s argument = %v, want %v", tt.op, inner[0].Value, tt.want)
+				}
+			},
+		)
 	}
 }
 
@@ -195,19 +213,21 @@ func TestGeoOperatorsComposeWithNot(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got := monq.Not(tt.expr)
+		t.Run(
+			tt.name, func(t *testing.T) {
+				got := monq.Not(tt.expr)
 
-			outer, ok := got[0].Value.(bson.D)
-			if !ok || outer[0].Key != "$not" {
-				t.Fatalf("Not() = %v, want a $not operator document", got)
-			}
+				outer, ok := got[0].Value.(bson.D)
+				if !ok || outer[0].Key != "$not" {
+					t.Fatalf("Not() = %v, want a $not operator document", got)
+				}
 
-			inner, ok := outer[0].Value.(bson.D)
-			if !ok || inner[0].Key != tt.op {
-				t.Fatalf("Not() inner operator = %v, want %q", outer[0].Value, tt.op)
-			}
-		})
+				inner, ok := outer[0].Value.(bson.D)
+				if !ok || inner[0].Key != tt.op {
+					t.Fatalf("Not() inner operator = %v, want %q", outer[0].Value, tt.op)
+				}
+			},
+		)
 	}
 }
 

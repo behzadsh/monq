@@ -93,18 +93,25 @@ func TestTrigonometryExpressions(t *testing.T) {
 		{
 			name: "degrees convert on the way in",
 			got:  expr.Sin(expr.DegreesToRadians(expr.Field("angle"))),
-			want: bson.D{{Key: "$sin", Value: bson.D{
-				{Key: "$degreesToRadians", Value: "$angle"},
-			}}},
+			want: bson.D{
+				{
+					Key: "$sin",
+					Value: bson.D{
+						{Key: "$degreesToRadians", Value: "$angle"},
+					},
+				},
+			},
 		},
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if !reflect.DeepEqual(tt.got, tt.want) {
-				t.Fatalf("got %v, want %v", tt.got, tt.want)
-			}
-		})
+		t.Run(
+			tt.name, func(t *testing.T) {
+				if !reflect.DeepEqual(tt.got, tt.want) {
+					t.Fatalf("got %v, want %v", tt.got, tt.want)
+				}
+			},
+		)
 	}
 }
 

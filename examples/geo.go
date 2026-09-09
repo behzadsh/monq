@@ -15,7 +15,8 @@ import (
 // Every position is [longitude, latitude], the reverse of the order coordinates are usually quoted in, and the
 // queries need the 2dsphere index the seed created.
 func runGeo(ctx context.Context, db *mongo.Database) error {
-	return runParts(ctx, db.Collection(productsColl),
+	return runParts(
+		ctx, db.Collection(productsColl),
 		geoNear,
 		geoWithin,
 		geoStage,
@@ -35,8 +36,10 @@ func geoNear(ctx context.Context, coll *mongo.Collection) error {
 	query("monq.Point(-73.98, 40.75)", manhattan)
 
 	near := monq.Near(warehousePath, monq.Geometry(manhattan), monq.MaxDistance(20000))
-	if err := showFind(ctx, coll, "monq.Near(warehouse, monq.Geometry(point), monq.MaxDistance(20000))", near,
-		options.Find().SetProjection(geoOnly)); err != nil {
+	if err := showFind(
+		ctx, coll, "monq.Near(warehouse, monq.Geometry(point), monq.MaxDistance(20000))", near,
+		options.Find().SetProjection(geoOnly),
+	); err != nil {
 		return err
 	}
 
@@ -44,41 +47,53 @@ func geoNear(ctx context.Context, coll *mongo.Collection) error {
 
 	sphere := monq.NearSphere(warehousePath, monq.Geometry(manhattan), monq.MinDistance(500_000))
 
-	return showFind(ctx, coll, "monq.NearSphere(warehouse, monq.Geometry(point), monq.MinDistance(500000))", sphere,
-		options.Find().SetProjection(geoOnly))
+	return showFind(
+		ctx, coll, "monq.NearSphere(warehouse, monq.Geometry(point), monq.MinDistance(500000))", sphere,
+		options.Find().SetProjection(geoOnly),
+	)
 }
 
 // geoWithin shows the containment queries and the shapes they take.
 func geoWithin(ctx context.Context, coll *mongo.Collection) error {
 	step("Polygon takes its rings as [longitude, latitude] pairs and closes nothing for you: the last must repeat the first")
 
-	midwest := monq.Polygon([][2]float64{
-		{-95.0, 36.0},
-		{-80.0, 36.0},
-		{-80.0, 45.0},
-		{-95.0, 45.0},
-		{-95.0, 36.0},
-	})
+	midwest := monq.Polygon(
+		[][2]float64{
+			{-95.0, 36.0},
+			{-80.0, 36.0},
+			{-80.0, 45.0},
+			{-95.0, 45.0},
+			{-95.0, 36.0},
+		},
+	)
 	query("monq.Polygon(ring)", midwest)
 
-	if err := showFind(ctx, coll, "monq.GeoWithin(warehouse, monq.Geometry(polygon))", monq.GeoWithin(warehousePath, monq.Geometry(midwest)),
-		options.Find().SetProjection(geoOnly)); err != nil {
+	if err := showFind(
+		ctx, coll, "monq.GeoWithin(warehouse, monq.Geometry(polygon))", monq.GeoWithin(warehousePath, monq.Geometry(midwest)),
+		options.Find().SetProjection(geoOnly),
+	); err != nil {
 		return err
 	}
 
 	step("$geoIntersects asks whether the shapes touch at all, and GeoJSON builds the types Polygon and Point do not cover")
 
-	westCoast := monq.GeoJSON("Polygon", [][][2]float64{{
-		{-125.0, 45.0},
-		{-118.0, 45.0},
-		{-118.0, 49.0},
-		{-125.0, 49.0},
-		{-125.0, 45.0},
-	}})
+	westCoast := monq.GeoJSON(
+		"Polygon", [][][2]float64{
+			{
+				{-125.0, 45.0},
+				{-118.0, 45.0},
+				{-118.0, 49.0},
+				{-125.0, 49.0},
+				{-125.0, 45.0},
+			},
+		},
+	)
 	query(`monq.GeoJSON("Polygon", rings)`, westCoast)
 
-	if err := showFind(ctx, coll, "monq.GeoIntersects(warehouse, monq.Geometry(shape))", monq.GeoIntersects(warehousePath, monq.Geometry(westCoast)),
-		options.Find().SetProjection(geoOnly)); err != nil {
+	if err := showFind(
+		ctx, coll, "monq.GeoIntersects(warehouse, monq.Geometry(shape))", monq.GeoIntersects(warehousePath, monq.Geometry(westCoast)),
+		options.Find().SetProjection(geoOnly),
+	); err != nil {
 		return err
 	}
 
@@ -99,7 +114,8 @@ func geoStage(ctx context.Context, coll *mongo.Collection) error {
 	step("$geoNear takes the same geometry constructors, which is why they return bare GeoJSON")
 
 	stages := stage.Pipeline(
-		stage.GeoNear(manhattan, "metersAway",
+		stage.GeoNear(
+			manhattan, "metersAway",
 			stage.Spherical(),
 			stage.MaxDistance(2_000_000),
 			stage.GeoNearQuery(monq.Gt(ProductPaths.Price, 20)),

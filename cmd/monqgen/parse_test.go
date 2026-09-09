@@ -69,15 +69,17 @@ func TestParseFieldKinds(t *testing.T) {
 	kinds := map[string]Kind{}
 	recursive := map[string]bool{}
 
-	model.Walk(func(path []string, field Field) {
-		key := path[len(path)-1]
-		if len(path) > 1 {
-			key = path[0] + "." + key
-		}
+	model.Walk(
+		func(path []string, field Field) {
+			key := path[len(path)-1]
+			if len(path) > 1 {
+				key = path[0] + "." + key
+			}
 
-		kinds[key] = field.Kind
-		recursive[key] = field.Recursive
-	})
+			kinds[key] = field.Kind
+			recursive[key] = field.Recursive
+		},
+	)
 
 	tests := []struct {
 		path string
@@ -105,11 +107,13 @@ func TestParseFieldKinds(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.path, func(t *testing.T) {
-			if got, ok := kinds[tt.path]; !ok || got != tt.want {
-				t.Fatalf("kind of %q = %v, want %v", tt.path, got, tt.want)
-			}
-		})
+		t.Run(
+			tt.path, func(t *testing.T) {
+				if got, ok := kinds[tt.path]; !ok || got != tt.want {
+					t.Fatalf("kind of %q = %v, want %v", tt.path, got, tt.want)
+				}
+			},
+		)
 	}
 
 	if !recursive["tree.children"] {
@@ -160,11 +164,13 @@ func TestParseErrors(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if _, err := Parse(pkg, tt.typeName); err == nil {
-				t.Fatalf("Parse(%q) error = nil, want an error", tt.typeName)
-			}
-		})
+		t.Run(
+			tt.name, func(t *testing.T) {
+				if _, err := Parse(pkg, tt.typeName); err == nil {
+					t.Fatalf("Parse(%q) error = nil, want an error", tt.typeName)
+				}
+			},
+		)
 	}
 }
 
@@ -220,11 +226,13 @@ func TestParseTag(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := parseTag(tt.goName, tt.raw); got != tt.want {
-				t.Fatalf("parseTag(%q, %q) = %+v, want %+v", tt.goName, tt.raw, got, tt.want)
-			}
-		})
+		t.Run(
+			tt.name, func(t *testing.T) {
+				if got := parseTag(tt.goName, tt.raw); got != tt.want {
+					t.Fatalf("parseTag(%q, %q) = %+v, want %+v", tt.goName, tt.raw, got, tt.want)
+				}
+			},
+		)
 	}
 }
 
@@ -241,10 +249,12 @@ func TestKindString(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.want, func(t *testing.T) {
-			if got := tt.kind.String(); got != tt.want {
-				t.Fatalf("Kind.String() = %q, want %q", got, tt.want)
-			}
-		})
+		t.Run(
+			tt.want, func(t *testing.T) {
+				if got := tt.kind.String(); got != tt.want {
+					t.Fatalf("Kind.String() = %q, want %q", got, tt.want)
+				}
+			},
+		)
 	}
 }

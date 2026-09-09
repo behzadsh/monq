@@ -44,18 +44,21 @@ func TestGeneratedPaths(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if tt.got != tt.want {
-				t.Fatalf("got %q, want %q", tt.got, tt.want)
-			}
-		})
+		t.Run(
+			tt.name, func(t *testing.T) {
+				if tt.got != tt.want {
+					t.Fatalf("got %q, want %q", tt.got, tt.want)
+				}
+			},
+		)
 	}
 }
 
 func TestGeneratedPathsBuildAFilter(t *testing.T) {
 	filter := monq.And(
 		monq.Eq(example.UserPaths.Email, "ada@example.com"),
-		monq.ElemMatch(example.UserPaths.Items.Path,
+		monq.ElemMatch(
+			example.UserPaths.Items.Path,
 			monq.Eq(example.UserPaths.Items.SKU, "abc"),
 		),
 	)
@@ -82,7 +85,8 @@ func TestGeneratedPathsBuildAPipeline(t *testing.T) {
 	pipeline := stage.Pipeline(
 		stage.Match(monq.Gte(example.UserPaths.CreatedAt, "2026-01-01")),
 		stage.Unwind(expr.Field(example.UserPaths.Items.Path)),
-		stage.Group(expr.Field(example.UserPaths.Items.SKU),
+		stage.Group(
+			expr.Field(example.UserPaths.Items.SKU),
 			stage.Accumulator("revenue", expr.Sum(expr.Field(example.UserPaths.Items.Price))),
 		),
 		stage.Sort(monq.Sort(monq.Desc("revenue"))),

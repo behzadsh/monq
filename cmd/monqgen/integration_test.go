@@ -24,28 +24,30 @@ func TestGeneratedFileIsUpToDate(t *testing.T) {
 	}
 
 	for _, typeName := range []string{"User", "sessionDoc"} {
-		t.Run(typeName, func(t *testing.T) {
-			model, err := Parse(pkg, typeName)
-			if err != nil {
-				t.Fatalf("Parse() error = %v", err)
-			}
+		t.Run(
+			typeName, func(t *testing.T) {
+				model, err := Parse(pkg, typeName)
+				if err != nil {
+					t.Fatalf("Parse() error = %v", err)
+				}
 
-			got, err := Generate(model, pkg.Name, "")
-			if err != nil {
-				t.Fatalf("Generate() error = %v", err)
-			}
+				got, err := Generate(model, pkg.Name, "")
+				if err != nil {
+					t.Fatalf("Generate() error = %v", err)
+				}
 
-			path := filepath.Join("internal", "example", outputName(typeName, ""))
+				path := filepath.Join("internal", "example", outputName(typeName, ""))
 
-			want, err := os.ReadFile(path) //nolint:gosec // a fixed path inside the package being tested
-			if err != nil {
-				t.Fatalf("reading %s: %v", path, err)
-			}
+				want, err := os.ReadFile(path) //nolint:gosec // a fixed path inside the package being tested
+				if err != nil {
+					t.Fatalf("reading %s: %v", path, err)
+				}
 
-			if string(got) != string(want) {
-				t.Errorf("%s is out of date; run go generate ./... to rewrite it", path)
-			}
-		})
+				if string(got) != string(want) {
+					t.Errorf("%s is out of date; run go generate ./... to rewrite it", path)
+				}
+			},
+		)
 	}
 }
 

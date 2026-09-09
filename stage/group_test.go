@@ -27,18 +27,28 @@ func TestGroupingStages(t *testing.T) {
 		{
 			name: "Group with a field reference and one accumulator",
 			got:  stage.Group("$category", stage.Accumulator("total", sumOf("$amount"))),
-			want: bson.D{{Key: "$group", Value: bson.D{
-				{Key: "_id", Value: "$category"},
-				{Key: "total", Value: bson.D{{Key: "$sum", Value: "$amount"}}},
-			}}},
+			want: bson.D{
+				{
+					Key: "$group",
+					Value: bson.D{
+						{Key: "_id", Value: "$category"},
+						{Key: "total", Value: bson.D{{Key: "$sum", Value: "$amount"}}},
+					},
+				},
+			},
 		},
 		{
 			name: "Group over everything with a nil key",
 			got:  stage.Group(nil, stage.Accumulator("total", sumOf("$amount"))),
-			want: bson.D{{Key: "$group", Value: bson.D{
-				{Key: "_id", Value: nil},
-				{Key: "total", Value: bson.D{{Key: "$sum", Value: "$amount"}}},
-			}}},
+			want: bson.D{
+				{
+					Key: "$group",
+					Value: bson.D{
+						{Key: "_id", Value: nil},
+						{Key: "total", Value: bson.D{{Key: "$sum", Value: "$amount"}}},
+					},
+				},
+			},
 		},
 		{
 			name: "Group without accumulators keeps only the key",
@@ -47,45 +57,69 @@ func TestGroupingStages(t *testing.T) {
 		},
 		{
 			name: "Group keeps the last of two accumulators sharing a name",
-			got: stage.Group("$category",
+			got: stage.Group(
+				"$category",
 				stage.Accumulator("total", sumOf("$amount")),
 				stage.Accumulator("total", sumOf("$net")),
 			),
-			want: bson.D{{Key: "$group", Value: bson.D{
-				{Key: "_id", Value: "$category"},
-				{Key: "total", Value: bson.D{{Key: "$sum", Value: "$net"}}},
-			}}},
+			want: bson.D{
+				{
+					Key: "$group",
+					Value: bson.D{
+						{Key: "_id", Value: "$category"},
+						{Key: "total", Value: bson.D{{Key: "$sum", Value: "$net"}}},
+					},
+				},
+			},
 		},
 		{
 			name: "Bucket with a default bucket",
 			got:  stage.Bucket("$price", []any{0, 50, 100}, stage.BucketDefault("other")),
-			want: bson.D{{Key: "$bucket", Value: bson.D{
-				{Key: "groupBy", Value: "$price"},
-				{Key: "boundaries", Value: bson.A{0, 50, 100}},
-				{Key: "default", Value: "other"},
-			}}},
+			want: bson.D{
+				{
+					Key: "$bucket",
+					Value: bson.D{
+						{Key: "groupBy", Value: "$price"},
+						{Key: "boundaries", Value: bson.A{0, 50, 100}},
+						{Key: "default", Value: "other"},
+					},
+				},
+			},
 		},
 		{
 			name: "Bucket with output fields",
-			got: stage.Bucket("$price", []any{0, 100},
+			got: stage.Bucket(
+				"$price", []any{0, 100},
 				stage.BucketOutput(stage.Accumulator("total", sumOf("$amount"))),
 			),
-			want: bson.D{{Key: "$bucket", Value: bson.D{
-				{Key: "groupBy", Value: "$price"},
-				{Key: "boundaries", Value: bson.A{0, 100}},
-				{Key: "output", Value: bson.D{
-					{Key: "total", Value: bson.D{{Key: "$sum", Value: "$amount"}}},
-				}},
-			}}},
+			want: bson.D{
+				{
+					Key: "$bucket",
+					Value: bson.D{
+						{Key: "groupBy", Value: "$price"},
+						{Key: "boundaries", Value: bson.A{0, 100}},
+						{
+							Key: "output",
+							Value: bson.D{
+								{Key: "total", Value: bson.D{{Key: "$sum", Value: "$amount"}}},
+							},
+						},
+					},
+				},
+			},
 		},
 		{
 			name: "BucketAuto with a granularity",
 			got:  stage.BucketAuto("$price", 4, stage.BucketGranularity("R20")),
-			want: bson.D{{Key: "$bucketAuto", Value: bson.D{
-				{Key: "groupBy", Value: "$price"},
-				{Key: "buckets", Value: 4},
-				{Key: "granularity", Value: "R20"},
-			}}},
+			want: bson.D{
+				{
+					Key: "$bucketAuto", Value: bson.D{
+						{Key: "groupBy", Value: "$price"},
+						{Key: "buckets", Value: 4},
+						{Key: "granularity", Value: "R20"},
+					},
+				},
+			},
 		},
 		{
 			name: "SortByCount",
@@ -95,9 +129,13 @@ func TestGroupingStages(t *testing.T) {
 		{
 			name: "FacetPipeline holds its stages as an array",
 			got:  stage.FacetPipeline("total", stage.Count("n")),
-			want: bson.D{{Key: "total", Value: bson.A{
-				bson.D{{Key: "$count", Value: "n"}},
-			}}},
+			want: bson.D{
+				{
+					Key: "total", Value: bson.A{
+						bson.D{{Key: "$count", Value: "n"}},
+					},
+				},
+			},
 		},
 		{
 			name: "Facet merges its sub-pipelines",
@@ -105,10 +143,14 @@ func TestGroupingStages(t *testing.T) {
 				stage.FacetPipeline("newest", stage.Limit(5)),
 				stage.FacetPipeline("total", stage.Count("n")),
 			),
-			want: bson.D{{Key: "$facet", Value: bson.D{
-				{Key: "newest", Value: bson.A{bson.D{{Key: "$limit", Value: int64(5)}}}},
-				{Key: "total", Value: bson.A{bson.D{{Key: "$count", Value: "n"}}}},
-			}}},
+			want: bson.D{
+				{
+					Key: "$facet", Value: bson.D{
+						{Key: "newest", Value: bson.A{bson.D{{Key: "$limit", Value: int64(5)}}}},
+						{Key: "total", Value: bson.A{bson.D{{Key: "$count", Value: "n"}}}},
+					},
+				},
+			},
 		},
 		{
 			name: "Facet keeps the last of two sub-pipelines sharing a name",
@@ -116,18 +158,24 @@ func TestGroupingStages(t *testing.T) {
 				stage.FacetPipeline("summary", stage.Limit(5)),
 				stage.FacetPipeline("summary", stage.Count("n")),
 			),
-			want: bson.D{{Key: "$facet", Value: bson.D{
-				{Key: "summary", Value: bson.A{bson.D{{Key: "$count", Value: "n"}}}},
-			}}},
+			want: bson.D{
+				{
+					Key: "$facet", Value: bson.D{
+						{Key: "summary", Value: bson.A{bson.D{{Key: "$count", Value: "n"}}}},
+					},
+				},
+			},
 		},
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if !reflect.DeepEqual(tt.got, tt.want) {
-				t.Fatalf("got %v, want %v", tt.got, tt.want)
-			}
-		})
+		t.Run(
+			tt.name, func(t *testing.T) {
+				if !reflect.DeepEqual(tt.got, tt.want) {
+					t.Fatalf("got %v, want %v", tt.got, tt.want)
+				}
+			},
+		)
 	}
 }
 
@@ -198,7 +246,8 @@ func ExampleBucketGranularity() {
 }
 
 func ExampleBucketOutput() {
-	s := stage.Bucket("$price", []any{0, 100},
+	s := stage.Bucket(
+		"$price", []any{0, 100},
 		stage.BucketOutput(stage.Accumulator("total", bson.D{{Key: "$sum", Value: "$amount"}})),
 	)
 

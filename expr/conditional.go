@@ -11,19 +11,29 @@ import "go.mongodb.org/mongo-driver/v2/bson"
 // Example:
 //
 //	expr.Cond(expr.Gte(expr.Field("score"), 60), "pass", "fail")
-//	// bson.D{{Key: "$cond", Value: bson.D{
-//	//     {Key: "if", Value: bson.D{{Key: "$gte", Value: bson.A{"$score", 60}}}},
-//	//     {Key: "then", Value: "pass"},
-//	//     {Key: "else", Value: "fail"},
-//	// }}}
+//	// bson.D{
+//	//     {
+//	//         Key: "$cond",
+//	//         Value: bson.D{
+//	//             {Key: "if", Value: bson.D{{Key: "$gte", Value: bson.A{"$score", 60}}}},
+//	//             {Key: "then", Value: "pass"},
+//	//             {Key: "else", Value: "fail"},
+//	//         },
+//	//     },
+//	// }
 //
 // MongoDB docs: https://www.mongodb.com/docs/manual/reference/operator/aggregation/cond/
 func Cond(ifExpr, thenExpr, elseExpr any) bson.D {
-	return bson.D{{Key: "$cond", Value: bson.D{
-		{Key: "if", Value: ifExpr},
-		{Key: "then", Value: thenExpr},
-		{Key: "else", Value: elseExpr},
-	}}}
+	return bson.D{
+		{
+			Key: "$cond",
+			Value: bson.D{
+				{Key: "if", Value: ifExpr},
+				{Key: "then", Value: thenExpr},
+				{Key: "else", Value: elseExpr},
+			},
+		},
+	}
 }
 
 // IfNull returns the first of expressions that is neither null nor missing.
@@ -91,13 +101,21 @@ func DefaultCase(value any) SwitchOption {
 //		expr.Branch(expr.Gte(expr.Field("score"), 80), "B"),
 //		expr.DefaultCase("F"),
 //	)
-//	// bson.D{{Key: "$switch", Value: bson.D{
-//	//     {Key: "branches", Value: bson.A{
-//	//         bson.D{{Key: "case", Value: ...}, {Key: "then", Value: "A"}},
-//	//         bson.D{{Key: "case", Value: ...}, {Key: "then", Value: "B"}},
-//	//     }},
-//	//     {Key: "default", Value: "F"},
-//	// }}}
+//	// bson.D{
+//	//     {
+//	//         Key: "$switch",
+//	//         Value: bson.D{
+//	//             {
+//	//                 Key: "branches",
+//	//                 Value: bson.A{
+//	//                     bson.D{{Key: "case", Value: ...}, {Key: "then", Value: "A"}},
+//	//                     bson.D{{Key: "case", Value: ...}, {Key: "then", Value: "B"}},
+//	//                 },
+//	//             },
+//	//             {Key: "default", Value: "F"},
+//	//         },
+//	//     },
+//	// }
 //
 // MongoDB docs: https://www.mongodb.com/docs/manual/reference/operator/aggregation/switch/
 func Switch(opts ...SwitchOption) bson.D {

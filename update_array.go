@@ -33,9 +33,14 @@ func AddToSet(field FieldPath, value any) bson.D {
 // Example:
 //
 //	monq.AddToSetEach("tags", []any{"go", "mongodb"})
-//	// bson.D{{Key: "$addToSet", Value: bson.D{
-//	//     {Key: "tags", Value: bson.D{{Key: "$each", Value: bson.A{"go", "mongodb"}}}},
-//	// }}}
+//	// bson.D{
+//	//     {
+//	//         Key: "$addToSet",
+//	//         Value: bson.D{
+//	//             {Key: "tags", Value: bson.D{{Key: "$each", Value: bson.A{"go", "mongodb"}}}},
+//	//         },
+//	//     },
+//	// }
 //
 // MongoDB docs: https://www.mongodb.com/docs/manual/reference/operator/update/addToSet/#each-modifier
 func AddToSetEach(field FieldPath, values []any) bson.D {
@@ -92,9 +97,14 @@ func PopLast(field FieldPath) bson.D {
 // Example:
 //
 //	monq.Pull("items", monq.Eq("sku", "abc"))
-//	// bson.D{{Key: "$pull", Value: bson.D{
-//	//     {Key: "items", Value: bson.D{{Key: "sku", Value: bson.D{{Key: "$eq", Value: "abc"}}}}},
-//	// }}}
+//	// bson.D{
+//	//     {
+//	//         Key: "$pull",
+//	//         Value: bson.D{
+//	//             {Key: "items", Value: bson.D{{Key: "sku", Value: bson.D{{Key: "$eq", Value: "abc"}}}}},
+//	//         },
+//	//     },
+//	// }
 //
 // MongoDB docs: https://www.mongodb.com/docs/manual/reference/operator/update/pull/
 func Pull(field FieldPath, condition any) bson.D {
@@ -184,11 +194,21 @@ func PushSort(spec any) PushOption {
 // Example:
 //
 //	monq.PushEach("scores", []any{90, 80}, monq.PushSort(-1), monq.PushSlice(3))
-//	// bson.D{{Key: "$push", Value: bson.D{{Key: "scores", Value: bson.D{
-//	//     {Key: "$each", Value: bson.A{90, 80}},
-//	//     {Key: "$sort", Value: -1},
-//	//     {Key: "$slice", Value: 3},
-//	// }}}}}
+//	// bson.D{
+//	//     {
+//	//         Key: "$push",
+//	//         Value: bson.D{
+//	//             {
+//	//                 Key: "scores",
+//	//                 Value: bson.D{
+//	//                     {Key: "$each", Value: bson.A{90, 80}},
+//	//                     {Key: "$sort", Value: -1},
+//	//                     {Key: "$slice", Value: 3},
+//	//                 },
+//	//             },
+//	//         },
+//	//     },
+//	// }
 //
 // MongoDB docs: https://www.mongodb.com/docs/manual/reference/operator/update/push/#each-modifier
 func PushEach(field FieldPath, values []any, opts ...PushOption) bson.D {

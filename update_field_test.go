@@ -104,20 +104,22 @@ func TestUpdateFieldOperators(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if len(tt.got) != 1 || tt.got[0].Key != tt.op {
-				t.Fatalf("got %v, want a %s update document", tt.got, tt.op)
-			}
+		t.Run(
+			tt.name, func(t *testing.T) {
+				if len(tt.got) != 1 || tt.got[0].Key != tt.op {
+					t.Fatalf("got %v, want a %s update document", tt.got, tt.op)
+				}
 
-			fields, ok := tt.got[0].Value.(bson.D)
-			if !ok || len(fields) != 1 || fields[0].Key != string(tt.field) {
-				t.Fatalf("got %v, want %s to hold %q", tt.got, tt.op, tt.field)
-			}
+				fields, ok := tt.got[0].Value.(bson.D)
+				if !ok || len(fields) != 1 || fields[0].Key != string(tt.field) {
+					t.Fatalf("got %v, want %s to hold %q", tt.got, tt.op, tt.field)
+				}
 
-			if !reflect.DeepEqual(fields[0].Value, tt.value) {
-				t.Fatalf("value = %v, want %v", fields[0].Value, tt.value)
-			}
-		})
+				if !reflect.DeepEqual(fields[0].Value, tt.value) {
+					t.Fatalf("value = %v, want %v", fields[0].Value, tt.value)
+				}
+			},
+		)
 	}
 }
 

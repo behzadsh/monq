@@ -28,44 +28,66 @@ func TestObjectExpressions(t *testing.T) {
 		{
 			name: "GetField reads from the current document",
 			got:  expr.GetField("price.usd", "$$CURRENT"),
-			want: bson.D{{Key: "$getField", Value: bson.D{
-				{Key: "field", Value: "price.usd"},
-				{Key: "input", Value: "$$CURRENT"},
-			}}},
+			want: bson.D{
+				{
+					Key: "$getField",
+					Value: bson.D{
+						{Key: "field", Value: "price.usd"},
+						{Key: "input", Value: "$$CURRENT"},
+					},
+				},
+			},
 		},
 		{
 			name: "GetField reads from another document",
 			got:  expr.GetField("usd", expr.Field("price")),
-			want: bson.D{{Key: "$getField", Value: bson.D{
-				{Key: "field", Value: "usd"},
-				{Key: "input", Value: "$price"},
-			}}},
+			want: bson.D{
+				{
+					Key: "$getField",
+					Value: bson.D{
+						{Key: "field", Value: "usd"},
+						{Key: "input", Value: "$price"},
+					},
+				},
+			},
 		},
 		{
 			name: "SetField",
 			got:  expr.SetField("price.usd", "$$CURRENT", 42),
-			want: bson.D{{Key: "$setField", Value: bson.D{
-				{Key: "field", Value: "price.usd"},
-				{Key: "input", Value: "$$CURRENT"},
-				{Key: "value", Value: 42},
-			}}},
+			want: bson.D{
+				{
+					Key: "$setField",
+					Value: bson.D{
+						{Key: "field", Value: "price.usd"},
+						{Key: "input", Value: "$$CURRENT"},
+						{Key: "value", Value: 42},
+					},
+				},
+			},
 		},
 		{
 			name: "UnsetField",
 			got:  expr.UnsetField("price.usd", "$$CURRENT"),
-			want: bson.D{{Key: "$unsetField", Value: bson.D{
-				{Key: "field", Value: "price.usd"},
-				{Key: "input", Value: "$$CURRENT"},
-			}}},
+			want: bson.D{
+				{
+					Key: "$unsetField",
+					Value: bson.D{
+						{Key: "field", Value: "price.usd"},
+						{Key: "input", Value: "$$CURRENT"},
+					},
+				},
+			},
 		},
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if !reflect.DeepEqual(tt.got, tt.want) {
-				t.Fatalf("got %v, want %v", tt.got, tt.want)
-			}
-		})
+		t.Run(
+			tt.name, func(t *testing.T) {
+				if !reflect.DeepEqual(tt.got, tt.want) {
+					t.Fatalf("got %v, want %v", tt.got, tt.want)
+				}
+			},
+		)
 	}
 }
 

@@ -15,17 +15,27 @@ import "go.mongodb.org/mongo-driver/v2/bson"
 // Example:
 //
 //	expr.GetField("price.usd", "$$CURRENT")
-//	// bson.D{{Key: "$getField", Value: bson.D{
-//	//     {Key: "field", Value: "price.usd"},
-//	//     {Key: "input", Value: "$$CURRENT"},
-//	// }}}
+//	// bson.D{
+//	//     {
+//	//         Key: "$getField",
+//	//         Value: bson.D{
+//	//             {Key: "field", Value: "price.usd"},
+//	//             {Key: "input", Value: "$$CURRENT"},
+//	//         },
+//	//     },
+//	// }
 //
 // MongoDB docs: https://www.mongodb.com/docs/manual/reference/operator/aggregation/getField/
 func GetField(field, input any) bson.D {
-	return bson.D{{Key: "$getField", Value: bson.D{
-		{Key: "field", Value: field},
-		{Key: "input", Value: input},
-	}}}
+	return bson.D{
+		{
+			Key: "$getField",
+			Value: bson.D{
+				{Key: "field", Value: field},
+				{Key: "input", Value: input},
+			},
+		},
+	}
 }
 
 // MergeObjects returns an expression combining documents into one.
@@ -54,19 +64,29 @@ func MergeObjects(documents ...any) bson.D {
 // Example:
 //
 //	expr.SetField("price.usd", "$$CURRENT", 42)
-//	// bson.D{{Key: "$setField", Value: bson.D{
-//	//     {Key: "field", Value: "price.usd"},
-//	//     {Key: "input", Value: "$$CURRENT"},
-//	//     {Key: "value", Value: 42},
-//	// }}}
+//	// bson.D{
+//	//     {
+//	//         Key: "$setField",
+//	//         Value: bson.D{
+//	//             {Key: "field", Value: "price.usd"},
+//	//             {Key: "input", Value: "$$CURRENT"},
+//	//             {Key: "value", Value: 42},
+//	//         },
+//	//     },
+//	// }
 //
 // MongoDB docs: https://www.mongodb.com/docs/manual/reference/operator/aggregation/setField/
 func SetField(field, input, value any) bson.D {
-	return bson.D{{Key: "$setField", Value: bson.D{
-		{Key: "field", Value: field},
-		{Key: "input", Value: input},
-		{Key: "value", Value: value},
-	}}}
+	return bson.D{
+		{
+			Key: "$setField",
+			Value: bson.D{
+				{Key: "field", Value: field},
+				{Key: "input", Value: input},
+				{Key: "value", Value: value},
+			},
+		},
+	}
 }
 
 // UnsetField returns an expression removing a field from a document.
@@ -77,15 +97,25 @@ func SetField(field, input, value any) bson.D {
 // Example:
 //
 //	expr.UnsetField("price.usd", "$$CURRENT")
-//	// bson.D{{Key: "$unsetField", Value: bson.D{
-//	//     {Key: "field", Value: "price.usd"},
-//	//     {Key: "input", Value: "$$CURRENT"},
-//	// }}}
+//	// bson.D{
+//	//     {
+//	//         Key: "$unsetField",
+//	//         Value: bson.D{
+//	//             {Key: "field", Value: "price.usd"},
+//	//             {Key: "input", Value: "$$CURRENT"},
+//	//         },
+//	//     },
+//	// }
 //
 // MongoDB docs: https://www.mongodb.com/docs/manual/reference/operator/aggregation/unsetField/
 func UnsetField(field, input any) bson.D {
-	return bson.D{{Key: "$unsetField", Value: bson.D{
-		{Key: "field", Value: field},
-		{Key: "input", Value: input},
-	}}}
+	return bson.D{
+		{
+			Key: "$unsetField",
+			Value: bson.D{
+				{Key: "field", Value: field},
+				{Key: "input", Value: input},
+			},
+		},
+	}
 }

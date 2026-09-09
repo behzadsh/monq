@@ -29,9 +29,14 @@ func CurrentDate(field FieldPath) bson.D {
 // Example:
 //
 //	monq.CurrentDateTimestamp("synced_at")
-//	// bson.D{{Key: "$currentDate", Value: bson.D{
-//	//     {Key: "synced_at", Value: bson.D{{Key: "$type", Value: "timestamp"}}},
-//	// }}}
+//	// bson.D{
+//	//     {
+//	//         Key: "$currentDate",
+//	//         Value: bson.D{
+//	//             {Key: "synced_at", Value: bson.D{{Key: "$type", Value: "timestamp"}}},
+//	//         },
+//	//     },
+//	// }
 //
 // MongoDB docs: https://www.mongodb.com/docs/manual/reference/operator/update/currentDate/
 func CurrentDateTimestamp(field FieldPath) bson.D {

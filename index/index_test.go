@@ -82,13 +82,15 @@ func TestNewKeys(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got := index.New(tt.opts...)
+		t.Run(
+			tt.name, func(t *testing.T) {
+				got := index.New(tt.opts...)
 
-			if !reflect.DeepEqual(got.Keys, tt.want) {
-				t.Fatalf("Keys = %v, want %v", got.Keys, tt.want)
-			}
-		})
+				if !reflect.DeepEqual(got.Keys, tt.want) {
+					t.Fatalf("Keys = %v, want %v", got.Keys, tt.want)
+				}
+			},
+		)
 	}
 }
 
@@ -144,13 +146,15 @@ func TestTTLTruncatesToWholeSeconds(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			opts := resolve(t, index.New(index.Asc("created_at"), index.TTL(tt.ttl)).Options)
+		t.Run(
+			tt.name, func(t *testing.T) {
+				opts := resolve(t, index.New(index.Asc("created_at"), index.TTL(tt.ttl)).Options)
 
-			if opts.ExpireAfterSeconds == nil || *opts.ExpireAfterSeconds != tt.want {
-				t.Fatalf("ExpireAfterSeconds = %v, want %d", opts.ExpireAfterSeconds, tt.want)
-			}
-		})
+				if opts.ExpireAfterSeconds == nil || *opts.ExpireAfterSeconds != tt.want {
+					t.Fatalf("ExpireAfterSeconds = %v, want %d", opts.ExpireAfterSeconds, tt.want)
+				}
+			},
+		)
 	}
 }
 

@@ -19,108 +19,176 @@ func TestJoinStages(t *testing.T) {
 		{
 			name: "Lookup on equality",
 			got:  stage.Lookup("orders", "_id", "customer_id", "orders"),
-			want: bson.D{{Key: "$lookup", Value: bson.D{
-				{Key: "from", Value: "orders"},
-				{Key: "localField", Value: "_id"},
-				{Key: "foreignField", Value: "customer_id"},
-				{Key: "as", Value: "orders"},
-			}}},
+			want: bson.D{
+				{
+					Key: "$lookup", Value: bson.D{
+						{Key: "from", Value: "orders"},
+						{Key: "localField", Value: "_id"},
+						{Key: "foreignField", Value: "customer_id"},
+						{Key: "as", Value: "orders"},
+					},
+				},
+			},
 		},
 		{
 			name: "Lookup with a sub-pipeline",
-			got: stage.Lookup("orders", "_id", "customer_id", "orders",
+			got: stage.Lookup(
+				"orders", "_id", "customer_id", "orders",
 				stage.SubPipeline(stage.Sort(monq.Sort(monq.Asc("placed_at")))),
 			),
-			want: bson.D{{Key: "$lookup", Value: bson.D{
-				{Key: "from", Value: "orders"},
-				{Key: "localField", Value: "_id"},
-				{Key: "foreignField", Value: "customer_id"},
-				{Key: "as", Value: "orders"},
-				{Key: "pipeline", Value: bson.A{
-					bson.D{{Key: "$sort", Value: bson.D{{Key: "placed_at", Value: 1}}}},
-				}},
-			}}},
+			want: bson.D{
+				{
+					Key: "$lookup", Value: bson.D{
+						{Key: "from", Value: "orders"},
+						{Key: "localField", Value: "_id"},
+						{Key: "foreignField", Value: "customer_id"},
+						{Key: "as", Value: "orders"},
+						{
+							Key: "pipeline", Value: bson.A{
+								bson.D{{Key: "$sort", Value: bson.D{{Key: "placed_at", Value: 1}}}},
+							},
+						},
+					},
+				},
+			},
 		},
 		{
 			name: "Lookup with variables and a sub-pipeline",
-			got: stage.Lookup("orders", "_id", "customer_id", "orders",
+			got: stage.Lookup(
+				"orders", "_id", "customer_id", "orders",
 				stage.Let(bson.D{{Key: "region", Value: "$region"}}),
-				stage.SubPipeline(stage.Match(monq.Expr(bson.D{
-					{Key: "$eq", Value: bson.A{"$region", "$$region"}},
-				}))),
+				stage.SubPipeline(
+					stage.Match(
+						monq.Expr(
+							bson.D{
+								{Key: "$eq", Value: bson.A{"$region", "$$region"}},
+							},
+						),
+					),
+				),
 			),
-			want: bson.D{{Key: "$lookup", Value: bson.D{
-				{Key: "from", Value: "orders"},
-				{Key: "localField", Value: "_id"},
-				{Key: "foreignField", Value: "customer_id"},
-				{Key: "as", Value: "orders"},
-				{Key: "let", Value: bson.D{{Key: "region", Value: "$region"}}},
-				{Key: "pipeline", Value: bson.A{
-					bson.D{{Key: "$match", Value: bson.D{{Key: "$expr", Value: bson.D{
-						{Key: "$eq", Value: bson.A{"$region", "$$region"}},
-					}}}}},
-				}},
-			}}},
+			want: bson.D{
+				{
+					Key: "$lookup", Value: bson.D{
+						{Key: "from", Value: "orders"},
+						{Key: "localField", Value: "_id"},
+						{Key: "foreignField", Value: "customer_id"},
+						{Key: "as", Value: "orders"},
+						{Key: "let", Value: bson.D{{Key: "region", Value: "$region"}}},
+						{
+							Key: "pipeline", Value: bson.A{
+								bson.D{
+									{
+										Key: "$match", Value: bson.D{
+											{
+												Key: "$expr", Value: bson.D{
+													{Key: "$eq", Value: bson.A{"$region", "$$region"}},
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
 		},
 		{
 			name: "LookupPipeline with variables",
-			got: stage.LookupPipeline("orders",
+			got: stage.LookupPipeline(
+				"orders",
 				bson.D{{Key: "customer", Value: "$_id"}},
-				[]bson.D{stage.Match(monq.Expr(bson.D{
-					{Key: "$eq", Value: bson.A{"$customer_id", "$$customer"}},
-				}))},
+				[]bson.D{
+					stage.Match(
+						monq.Expr(
+							bson.D{
+								{Key: "$eq", Value: bson.A{"$customer_id", "$$customer"}},
+							},
+						),
+					),
+				},
 				"orders",
 			),
-			want: bson.D{{Key: "$lookup", Value: bson.D{
-				{Key: "from", Value: "orders"},
-				{Key: "let", Value: bson.D{{Key: "customer", Value: "$_id"}}},
-				{Key: "pipeline", Value: bson.A{
-					bson.D{{Key: "$match", Value: bson.D{{Key: "$expr", Value: bson.D{
-						{Key: "$eq", Value: bson.A{"$customer_id", "$$customer"}},
-					}}}}},
-				}},
-				{Key: "as", Value: "orders"},
-			}}},
+			want: bson.D{
+				{
+					Key: "$lookup", Value: bson.D{
+						{Key: "from", Value: "orders"},
+						{Key: "let", Value: bson.D{{Key: "customer", Value: "$_id"}}},
+						{
+							Key: "pipeline", Value: bson.A{
+								bson.D{
+									{
+										Key: "$match", Value: bson.D{
+											{
+												Key: "$expr", Value: bson.D{
+													{Key: "$eq", Value: bson.A{"$customer_id", "$$customer"}},
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+						{Key: "as", Value: "orders"},
+					},
+				},
+			},
 		},
 		{
 			name: "LookupPipeline without variables leaves out let",
 			got:  stage.LookupPipeline("orders", nil, []bson.D{stage.Limit(5)}, "orders"),
-			want: bson.D{{Key: "$lookup", Value: bson.D{
-				{Key: "from", Value: "orders"},
-				{Key: "pipeline", Value: bson.A{bson.D{{Key: "$limit", Value: int64(5)}}}},
-				{Key: "as", Value: "orders"},
-			}}},
+			want: bson.D{
+				{
+					Key: "$lookup", Value: bson.D{
+						{Key: "from", Value: "orders"},
+						{Key: "pipeline", Value: bson.A{bson.D{{Key: "$limit", Value: int64(5)}}}},
+						{Key: "as", Value: "orders"},
+					},
+				},
+			},
 		},
 		{
 			name: "GraphLookup with its required fields",
 			got:  stage.GraphLookup("employees", "$reports_to", "reports_to", "name", "chain"),
-			want: bson.D{{Key: "$graphLookup", Value: bson.D{
-				{Key: "from", Value: "employees"},
-				{Key: "startWith", Value: "$reports_to"},
-				{Key: "connectFromField", Value: "reports_to"},
-				{Key: "connectToField", Value: "name"},
-				{Key: "as", Value: "chain"},
-			}}},
+			want: bson.D{
+				{
+					Key: "$graphLookup", Value: bson.D{
+						{Key: "from", Value: "employees"},
+						{Key: "startWith", Value: "$reports_to"},
+						{Key: "connectFromField", Value: "reports_to"},
+						{Key: "connectToField", Value: "name"},
+						{Key: "as", Value: "chain"},
+					},
+				},
+			},
 		},
 		{
 			name: "GraphLookup with every option",
-			got: stage.GraphLookup("employees", "$reports_to", "reports_to", "name", "chain",
+			got: stage.GraphLookup(
+				"employees", "$reports_to", "reports_to", "name", "chain",
 				stage.MaxDepth(3),
 				stage.DepthField("level"),
 				stage.RestrictSearchWithMatch(monq.Eq("active", true)),
 			),
-			want: bson.D{{Key: "$graphLookup", Value: bson.D{
-				{Key: "from", Value: "employees"},
-				{Key: "startWith", Value: "$reports_to"},
-				{Key: "connectFromField", Value: "reports_to"},
-				{Key: "connectToField", Value: "name"},
-				{Key: "as", Value: "chain"},
-				{Key: "maxDepth", Value: 3},
-				{Key: "depthField", Value: "level"},
-				{Key: "restrictSearchWithMatch", Value: bson.D{
-					{Key: "active", Value: bson.D{{Key: "$eq", Value: true}}},
-				}},
-			}}},
+			want: bson.D{
+				{
+					Key: "$graphLookup", Value: bson.D{
+						{Key: "from", Value: "employees"},
+						{Key: "startWith", Value: "$reports_to"},
+						{Key: "connectFromField", Value: "reports_to"},
+						{Key: "connectToField", Value: "name"},
+						{Key: "as", Value: "chain"},
+						{Key: "maxDepth", Value: 3},
+						{Key: "depthField", Value: "level"},
+						{
+							Key: "restrictSearchWithMatch", Value: bson.D{
+								{Key: "active", Value: bson.D{{Key: "$eq", Value: true}}},
+							},
+						},
+					},
+				},
+			},
 		},
 		{
 			name: "UnionWith a whole collection",
@@ -130,28 +198,41 @@ func TestJoinStages(t *testing.T) {
 		{
 			name: "UnionWith a sub-pipeline",
 			got:  stage.UnionWith("archived_orders", stage.Match(monq.Eq("region", "eu"))),
-			want: bson.D{{Key: "$unionWith", Value: bson.D{
-				{Key: "coll", Value: "archived_orders"},
-				{Key: "pipeline", Value: bson.A{
-					bson.D{{Key: "$match", Value: bson.D{
-						{Key: "region", Value: bson.D{{Key: "$eq", Value: "eu"}}},
-					}}},
-				}},
-			}}},
+			want: bson.D{
+				{
+					Key: "$unionWith", Value: bson.D{
+						{Key: "coll", Value: "archived_orders"},
+						{
+							Key: "pipeline", Value: bson.A{
+								bson.D{
+									{
+										Key: "$match", Value: bson.D{
+											{Key: "region", Value: bson.D{{Key: "$eq", Value: "eu"}}},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
 		},
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if !reflect.DeepEqual(tt.got, tt.want) {
-				t.Fatalf("got %v, want %v", tt.got, tt.want)
-			}
-		})
+		t.Run(
+			tt.name, func(t *testing.T) {
+				if !reflect.DeepEqual(tt.got, tt.want) {
+					t.Fatalf("got %v, want %v", tt.got, tt.want)
+				}
+			},
+		)
 	}
 }
 
 func ExampleLookup() {
-	s := stage.Lookup("orders", "_id", "customer_id", "orders",
+	s := stage.Lookup(
+		"orders", "_id", "customer_id", "orders",
 		stage.SubPipeline(stage.Sort(monq.Sort(monq.Asc("placed_at")))),
 	)
 
@@ -160,7 +241,8 @@ func ExampleLookup() {
 }
 
 func ExampleLookupPipeline() {
-	s := stage.LookupPipeline("orders",
+	s := stage.LookupPipeline(
+		"orders",
 		bson.D{{Key: "customer", Value: "$_id"}},
 		[]bson.D{stage.Match(monq.Expr(bson.D{{Key: "$eq", Value: bson.A{"$customer_id", "$$customer"}}}))},
 		"orders",

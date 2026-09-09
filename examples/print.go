@@ -122,7 +122,8 @@ func showDBAggregate(ctx context.Context, db *mongo.Database, label string, stag
 
 // showUpdate prints an update document, applies it to every matching document, and reports the counts the driver
 // returned.
-func showUpdate(ctx context.Context, coll *mongo.Collection, label string, filter, update bson.D,
+func showUpdate(
+	ctx context.Context, coll *mongo.Collection, label string, filter, update bson.D,
 	opts ...options.Lister[options.UpdateManyOptions],
 ) error {
 	query(label, update)

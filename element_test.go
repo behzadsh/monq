@@ -32,14 +32,16 @@ func TestExists(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got := monq.Exists(tt.field, tt.exists)
+		t.Run(
+			tt.name, func(t *testing.T) {
+				got := monq.Exists(tt.field, tt.exists)
 
-			inner, ok := got[0].Value.(bson.D)
-			if !ok || inner[0].Key != "$exists" || inner[0].Value != tt.exists {
-				t.Fatalf("Exists() = %v, want %v", got, tt.want)
-			}
-		})
+				inner, ok := got[0].Value.(bson.D)
+				if !ok || inner[0].Key != "$exists" || inner[0].Value != tt.exists {
+					t.Fatalf("Exists() = %v, want %v", got, tt.want)
+				}
+			},
+		)
 	}
 }
 
@@ -90,18 +92,20 @@ func TestType(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got := monq.Type(tt.field, tt.types...)
+		t.Run(
+			tt.name, func(t *testing.T) {
+				got := monq.Type(tt.field, tt.types...)
 
-			inner, ok := got[0].Value.(bson.D)
-			if !ok || got[0].Key != string(tt.field) || inner[0].Key != "$type" {
-				t.Fatalf("Type() = %v, want a $type operator document on %q", got, tt.field)
-			}
+				inner, ok := got[0].Value.(bson.D)
+				if !ok || got[0].Key != string(tt.field) || inner[0].Key != "$type" {
+					t.Fatalf("Type() = %v, want a $type operator document on %q", got, tt.field)
+				}
 
-			if !reflect.DeepEqual(inner[0].Value, tt.want) {
-				t.Fatalf("Type() value = %v, want %v", inner[0].Value, tt.want)
-			}
-		})
+				if !reflect.DeepEqual(inner[0].Value, tt.want) {
+					t.Fatalf("Type() value = %v, want %v", inner[0].Value, tt.want)
+				}
+			},
+		)
 	}
 }
 

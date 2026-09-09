@@ -53,18 +53,28 @@ func TestStringExpressions(t *testing.T) {
 		{
 			name: "Trim with a character set",
 			got:  expr.Trim(expr.Field("name"), expr.TrimChars(" \t")),
-			want: bson.D{{Key: "$trim", Value: bson.D{
-				{Key: "input", Value: "$name"},
-				{Key: "chars", Value: " \t"},
-			}}},
+			want: bson.D{
+				{
+					Key: "$trim",
+					Value: bson.D{
+						{Key: "input", Value: "$name"},
+						{Key: "chars", Value: " \t"},
+					},
+				},
+			},
 		},
 		{
 			name: "Ltrim with a character set",
 			got:  expr.Ltrim(expr.Field("code"), expr.TrimChars("0")),
-			want: bson.D{{Key: "$ltrim", Value: bson.D{
-				{Key: "input", Value: "$code"},
-				{Key: "chars", Value: "0"},
-			}}},
+			want: bson.D{
+				{
+					Key: "$ltrim",
+					Value: bson.D{
+						{Key: "input", Value: "$code"},
+						{Key: "chars", Value: "0"},
+					},
+				},
+			},
 		},
 		{
 			name: "Rtrim without a character set",
@@ -74,61 +84,96 @@ func TestStringExpressions(t *testing.T) {
 		{
 			name: "RegexFind without flags",
 			got:  expr.RegexFind(expr.Field("email"), "^[^@]+"),
-			want: bson.D{{Key: "$regexFind", Value: bson.D{
-				{Key: "input", Value: "$email"},
-				{Key: "regex", Value: "^[^@]+"},
-			}}},
+			want: bson.D{
+				{
+					Key: "$regexFind",
+					Value: bson.D{
+						{Key: "input", Value: "$email"},
+						{Key: "regex", Value: "^[^@]+"},
+					},
+				},
+			},
 		},
 		{
 			name: "RegexFind with flags",
 			got:  expr.RegexFind(expr.Field("email"), "^[^@]+", expr.RegexOptions("i")),
-			want: bson.D{{Key: "$regexFind", Value: bson.D{
-				{Key: "input", Value: "$email"},
-				{Key: "regex", Value: "^[^@]+"},
-				{Key: "options", Value: "i"},
-			}}},
+			want: bson.D{
+				{
+					Key: "$regexFind",
+					Value: bson.D{
+						{Key: "input", Value: "$email"},
+						{Key: "regex", Value: "^[^@]+"},
+						{Key: "options", Value: "i"},
+					},
+				},
+			},
 		},
 		{
 			name: "RegexFindAll",
 			got:  expr.RegexFindAll(expr.Field("body"), `#\w+`),
-			want: bson.D{{Key: "$regexFindAll", Value: bson.D{
-				{Key: "input", Value: "$body"},
-				{Key: "regex", Value: `#\w+`},
-			}}},
+			want: bson.D{
+				{
+					Key: "$regexFindAll",
+					Value: bson.D{
+						{Key: "input", Value: "$body"},
+						{Key: "regex", Value: `#\w+`},
+					},
+				},
+			},
 		},
 		{
 			name: "RegexMatch",
 			got:  expr.RegexMatch(expr.Field("email"), `@example\.com$`),
-			want: bson.D{{Key: "$regexMatch", Value: bson.D{
-				{Key: "input", Value: "$email"},
-				{Key: "regex", Value: `@example\.com$`},
-			}}},
+			want: bson.D{
+				{
+					Key: "$regexMatch",
+					Value: bson.D{
+						{Key: "input", Value: "$email"},
+						{Key: "regex", Value: `@example\.com$`},
+					},
+				},
+			},
 		},
 		{
 			name: "RegexMatch with a driver regex value",
 			got:  expr.RegexMatch(expr.Field("email"), bson.Regex{Pattern: "^a", Options: "i"}),
-			want: bson.D{{Key: "$regexMatch", Value: bson.D{
-				{Key: "input", Value: "$email"},
-				{Key: "regex", Value: bson.Regex{Pattern: "^a", Options: "i"}},
-			}}},
+			want: bson.D{
+				{
+					Key: "$regexMatch",
+					Value: bson.D{
+						{Key: "input", Value: "$email"},
+						{Key: "regex", Value: bson.Regex{Pattern: "^a", Options: "i"}},
+					},
+				},
+			},
 		},
 		{
 			name: "ReplaceOne",
 			got:  expr.ReplaceOne(expr.Field("title"), "draft ", ""),
-			want: bson.D{{Key: "$replaceOne", Value: bson.D{
-				{Key: "input", Value: "$title"},
-				{Key: "find", Value: "draft "},
-				{Key: "replacement", Value: ""},
-			}}},
+			want: bson.D{
+				{
+					Key: "$replaceOne",
+					Value: bson.D{
+						{Key: "input", Value: "$title"},
+						{Key: "find", Value: "draft "},
+						{Key: "replacement", Value: ""},
+					},
+				},
+			},
 		},
 		{
 			name: "ReplaceAll",
 			got:  expr.ReplaceAll(expr.Field("phone"), "-", ""),
-			want: bson.D{{Key: "$replaceAll", Value: bson.D{
-				{Key: "input", Value: "$phone"},
-				{Key: "find", Value: "-"},
-				{Key: "replacement", Value: ""},
-			}}},
+			want: bson.D{
+				{
+					Key: "$replaceAll",
+					Value: bson.D{
+						{Key: "input", Value: "$phone"},
+						{Key: "find", Value: "-"},
+						{Key: "replacement", Value: ""},
+					},
+				},
+			},
 		},
 		{
 			name: "Split",
@@ -173,18 +218,25 @@ func TestStringExpressions(t *testing.T) {
 		{
 			name: "operators nest",
 			got:  expr.ToUpper(expr.SubstrCP(expr.Field("country"), 0, 2)),
-			want: bson.D{{Key: "$toUpper", Value: bson.D{
-				{Key: "$substrCP", Value: bson.A{"$country", 0, 2}},
-			}}},
+			want: bson.D{
+				{
+					Key: "$toUpper",
+					Value: bson.D{
+						{Key: "$substrCP", Value: bson.A{"$country", 0, 2}},
+					},
+				},
+			},
 		},
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if !reflect.DeepEqual(tt.got, tt.want) {
-				t.Fatalf("got %v, want %v", tt.got, tt.want)
-			}
-		})
+		t.Run(
+			tt.name, func(t *testing.T) {
+				if !reflect.DeepEqual(tt.got, tt.want) {
+					t.Fatalf("got %v, want %v", tt.got, tt.want)
+				}
+			},
+		)
 	}
 }
 

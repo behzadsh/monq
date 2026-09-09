@@ -16,7 +16,8 @@ import (
 // query that quietly matches nothing; the generated constants make that a compile error instead. Everything else
 // in this program already uses them, so this demo is about what they are rather than what they do.
 func runPaths(ctx context.Context, db *mongo.Database) error {
-	return runParts(ctx, db.Collection(productsColl),
+	return runParts(
+		ctx, db.Collection(productsColl),
 		pathConstants,
 		pathPositions,
 		pathsInQueries,
@@ -67,8 +68,10 @@ func pathsInQueries(ctx context.Context, coll *mongo.Collection) error {
 		monq.Eq(ProductPaths.Category, "accessories"),
 		monq.Gte(ProductPaths.Ratings.Score, 1),
 	)
-	if err := showFind(ctx, coll, "monq.And(monq.Eq(ProductPaths.Category, ...), monq.Gte(ProductPaths.Ratings.Score, 1))", filter,
-		options.Find().SetProjection(monq.Projection(monq.Include(ProductPaths.SKU, ProductPaths.Ratings.Path), monq.Exclude(ProductPaths.ID)))); err != nil {
+	if err := showFind(
+		ctx, coll, "monq.And(monq.Eq(ProductPaths.Category, ...), monq.Gte(ProductPaths.Ratings.Score, 1))", filter,
+		options.Find().SetProjection(monq.Projection(monq.Include(ProductPaths.SKU, ProductPaths.Ratings.Path), monq.Exclude(ProductPaths.ID))),
+	); err != nil {
 		return err
 	}
 
@@ -76,7 +79,8 @@ func pathsInQueries(ctx context.Context, coll *mongo.Collection) error {
 
 	stages := stage.Pipeline(
 		stage.Match(monq.Exists(ProductPaths.Ratings.Path, true)),
-		stage.Group(expr.Field(ProductPaths.Category),
+		stage.Group(
+			expr.Field(ProductPaths.Category),
 			stage.Accumulator("ratings", expr.Sum(expr.Size(expr.Field(ProductPaths.Ratings.Path)))),
 		),
 		stage.Sort(monq.Sort(monq.Desc("ratings"))),

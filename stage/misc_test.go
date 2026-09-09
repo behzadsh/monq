@@ -20,11 +20,21 @@ func TestMiscStages(t *testing.T) {
 		{
 			name: "Redact takes an expression",
 			got:  stage.Redact(expr.Cond(expr.Eq(expr.Field("level"), "public"), "$$DESCEND", "$$PRUNE")),
-			want: bson.D{{Key: "$redact", Value: bson.D{{Key: "$cond", Value: bson.D{
-				{Key: "if", Value: bson.D{{Key: "$eq", Value: bson.A{"$level", "public"}}}},
-				{Key: "then", Value: "$$DESCEND"},
-				{Key: "else", Value: "$$PRUNE"},
-			}}}}},
+			want: bson.D{
+				{
+					Key: "$redact",
+					Value: bson.D{
+						{
+							Key: "$cond",
+							Value: bson.D{
+								{Key: "if", Value: bson.D{{Key: "$eq", Value: bson.A{"$level", "public"}}}},
+								{Key: "then", Value: "$$DESCEND"},
+								{Key: "else", Value: "$$PRUNE"},
+							},
+						},
+					},
+				},
+			},
 		},
 		{
 			name: "DensifyRange without a unit",
@@ -48,41 +58,64 @@ func TestMiscStages(t *testing.T) {
 		{
 			name: "Densify over one series",
 			got:  stage.Densify("timestamp", stage.DensifyRange(1, stage.DensifyFull, "hour")),
-			want: bson.D{{Key: "$densify", Value: bson.D{
-				{Key: "field", Value: "timestamp"},
-				{Key: "range", Value: bson.D{
-					{Key: "step", Value: 1},
-					{Key: "bounds", Value: "full"},
-					{Key: "unit", Value: "hour"},
-				}},
-			}}},
+			want: bson.D{
+				{
+					Key: "$densify",
+					Value: bson.D{
+						{Key: "field", Value: "timestamp"},
+						{
+							Key: "range", Value: bson.D{
+								{Key: "step", Value: 1},
+								{Key: "bounds", Value: "full"},
+								{Key: "unit", Value: "hour"},
+							},
+						},
+					},
+				},
+			},
 		},
 		{
 			name: "Densify per partition",
-			got: stage.Densify("timestamp", stage.DensifyRange(1, stage.DensifyPartition, "hour"),
-				stage.DensifyPartitionByFields("sensor_id")),
-			want: bson.D{{Key: "$densify", Value: bson.D{
-				{Key: "field", Value: "timestamp"},
-				{Key: "partitionByFields", Value: "sensor_id"},
-				{Key: "range", Value: bson.D{
-					{Key: "step", Value: 1},
-					{Key: "bounds", Value: "partition"},
-					{Key: "unit", Value: "hour"},
-				}},
-			}}},
+			got: stage.Densify(
+				"timestamp", stage.DensifyRange(1, stage.DensifyPartition, "hour"),
+				stage.DensifyPartitionByFields("sensor_id"),
+			),
+			want: bson.D{
+				{
+					Key: "$densify", Value: bson.D{
+						{Key: "field", Value: "timestamp"},
+						{Key: "partitionByFields", Value: "sensor_id"},
+						{
+							Key: "range", Value: bson.D{
+								{Key: "step", Value: 1},
+								{Key: "bounds", Value: "partition"},
+								{Key: "unit", Value: "hour"},
+							},
+						},
+					},
+				},
+			},
 		},
 		{
 			name: "Densify partitioned by several fields",
-			got: stage.Densify("timestamp", stage.DensifyRange(1, stage.DensifyPartition),
-				stage.DensifyPartitionByFields("sensor_id", "site")),
-			want: bson.D{{Key: "$densify", Value: bson.D{
-				{Key: "field", Value: "timestamp"},
-				{Key: "partitionByFields", Value: bson.A{"sensor_id", "site"}},
-				{Key: "range", Value: bson.D{
-					{Key: "step", Value: 1},
-					{Key: "bounds", Value: "partition"},
-				}},
-			}}},
+			got: stage.Densify(
+				"timestamp", stage.DensifyRange(1, stage.DensifyPartition),
+				stage.DensifyPartitionByFields("sensor_id", "site"),
+			),
+			want: bson.D{
+				{
+					Key: "$densify", Value: bson.D{
+						{Key: "field", Value: "timestamp"},
+						{Key: "partitionByFields", Value: bson.A{"sensor_id", "site"}},
+						{
+							Key: "range", Value: bson.D{
+								{Key: "step", Value: 1},
+								{Key: "bounds", Value: "partition"},
+							},
+						},
+					},
+				},
+			},
 		},
 		{
 			name: "FillValue",
@@ -97,47 +130,71 @@ func TestMiscStages(t *testing.T) {
 		{
 			name: "Fill with a constant and no options",
 			got:  stage.Fill([]bson.D{stage.FillValue("price", 0)}),
-			want: bson.D{{Key: "$fill", Value: bson.D{
-				{Key: "output", Value: bson.D{{Key: "price", Value: bson.D{{Key: "value", Value: 0}}}}},
-			}}},
+			want: bson.D{
+				{
+					Key: "$fill", Value: bson.D{
+						{Key: "output", Value: bson.D{{Key: "price", Value: bson.D{{Key: "value", Value: 0}}}}},
+					},
+				},
+			},
 		},
 		{
 			name: "Fill by carrying the last value forward",
-			got: stage.Fill([]bson.D{stage.FillMethod("price", "locf")},
-				stage.FillSortBy(monq.Sort(monq.Asc("date")))),
-			want: bson.D{{Key: "$fill", Value: bson.D{
-				{Key: "sortBy", Value: bson.D{{Key: "date", Value: 1}}},
-				{Key: "output", Value: bson.D{{Key: "price", Value: bson.D{{Key: "method", Value: "locf"}}}}},
-			}}},
+			got: stage.Fill(
+				[]bson.D{stage.FillMethod("price", "locf")},
+				stage.FillSortBy(monq.Sort(monq.Asc("date"))),
+			),
+			want: bson.D{
+				{
+					Key: "$fill", Value: bson.D{
+						{Key: "sortBy", Value: bson.D{{Key: "date", Value: 1}}},
+						{Key: "output", Value: bson.D{{Key: "price", Value: bson.D{{Key: "method", Value: "locf"}}}}},
+					},
+				},
+			},
 		},
 		{
 			name: "Fill within partitions",
-			got: stage.Fill([]bson.D{stage.FillMethod("price", "linear")},
+			got: stage.Fill(
+				[]bson.D{stage.FillMethod("price", "linear")},
 				stage.FillPartitionByFields("symbol"),
-				stage.FillSortBy(monq.Sort(monq.Asc("date")))),
-			want: bson.D{{Key: "$fill", Value: bson.D{
-				{Key: "partitionByFields", Value: "symbol"},
-				{Key: "sortBy", Value: bson.D{{Key: "date", Value: 1}}},
-				{Key: "output", Value: bson.D{{Key: "price", Value: bson.D{{Key: "method", Value: "linear"}}}}},
-			}}},
+				stage.FillSortBy(monq.Sort(monq.Asc("date"))),
+			),
+			want: bson.D{
+				{
+					Key: "$fill", Value: bson.D{
+						{Key: "partitionByFields", Value: "symbol"},
+						{Key: "sortBy", Value: bson.D{{Key: "date", Value: 1}}},
+						{Key: "output", Value: bson.D{{Key: "price", Value: bson.D{{Key: "method", Value: "linear"}}}}},
+					},
+				},
+			},
 		},
 		{
 			name: "Fill partitioned by an expression",
-			got: stage.Fill([]bson.D{stage.FillValue("price", 0)},
-				stage.FillPartitionBy(expr.Field("symbol"))),
-			want: bson.D{{Key: "$fill", Value: bson.D{
-				{Key: "partitionBy", Value: "$symbol"},
-				{Key: "output", Value: bson.D{{Key: "price", Value: bson.D{{Key: "value", Value: 0}}}}},
-			}}},
+			got: stage.Fill(
+				[]bson.D{stage.FillValue("price", 0)},
+				stage.FillPartitionBy(expr.Field("symbol")),
+			),
+			want: bson.D{
+				{
+					Key: "$fill", Value: bson.D{
+						{Key: "partitionBy", Value: "$symbol"},
+						{Key: "output", Value: bson.D{{Key: "price", Value: bson.D{{Key: "value", Value: 0}}}}},
+					},
+				},
+			},
 		},
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if !reflect.DeepEqual(tt.got, tt.want) {
-				t.Fatalf("got %v, want %v", tt.got, tt.want)
-			}
-		})
+		t.Run(
+			tt.name, func(t *testing.T) {
+				if !reflect.DeepEqual(tt.got, tt.want) {
+					t.Fatalf("got %v, want %v", tt.got, tt.want)
+				}
+			},
+		)
 	}
 }
 
@@ -163,8 +220,10 @@ func ExampleDensifyRange() {
 }
 
 func ExampleDensifyPartitionByFields() {
-	s := stage.Densify("timestamp", stage.DensifyRange(1, stage.DensifyPartition, "hour"),
-		stage.DensifyPartitionByFields("sensor_id"))
+	s := stage.Densify(
+		"timestamp", stage.DensifyRange(1, stage.DensifyPartition, "hour"),
+		stage.DensifyPartitionByFields("sensor_id"),
+	)
 
 	printStage(s)
 	// Output: {"$densify":{"field":"timestamp","partitionByFields":"sensor_id","range":{"step":1,"bounds":"partition","unit":"hour"}}}

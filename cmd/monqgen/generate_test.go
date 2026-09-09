@@ -19,36 +19,38 @@ func goldenPath(typeName string) string {
 
 func TestGenerate(t *testing.T) {
 	for _, typeName := range []string{"User", "Custom", "unexportedDoc"} {
-		t.Run(typeName, func(t *testing.T) {
-			model, err := Parse(loadFixtures(t), typeName)
-			if err != nil {
-				t.Fatalf("Parse() error = %v", err)
-			}
-
-			got, err := Generate(model, "fixtures", "")
-			if err != nil {
-				t.Fatalf("Generate() error = %v", err)
-			}
-
-			golden := goldenPath(typeName)
-
-			if *update {
-				if writeErr := os.WriteFile(golden, got, 0o600); writeErr != nil {
-					t.Fatalf("writing %s: %v", golden, writeErr)
+		t.Run(
+			typeName, func(t *testing.T) {
+				model, err := Parse(loadFixtures(t), typeName)
+				if err != nil {
+					t.Fatalf("Parse() error = %v", err)
 				}
 
-				return
-			}
+				got, err := Generate(model, "fixtures", "")
+				if err != nil {
+					t.Fatalf("Generate() error = %v", err)
+				}
 
-			want, err := os.ReadFile(golden) //nolint:gosec // the path is built from a fixed test directory
-			if err != nil {
-				t.Fatalf("reading %s: %v (run go test ./cmd/monqgen -update to create it)", golden, err)
-			}
+				golden := goldenPath(typeName)
 
-			if string(got) != string(want) {
-				t.Errorf("generated source differs from %s\n--- got ---\n%s", golden, got)
-			}
-		})
+				if *update {
+					if writeErr := os.WriteFile(golden, got, 0o600); writeErr != nil {
+						t.Fatalf("writing %s: %v", golden, writeErr)
+					}
+
+					return
+				}
+
+				want, err := os.ReadFile(golden) //nolint:gosec // the path is built from a fixed test directory
+				if err != nil {
+					t.Fatalf("reading %s: %v (run go test ./cmd/monqgen -update to create it)", golden, err)
+				}
+
+				if string(got) != string(want) {
+					t.Errorf("generated source differs from %s\n--- got ---\n%s", golden, got)
+				}
+			},
+		)
 	}
 }
 
@@ -145,16 +147,18 @@ func TestCheckVarName(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			err := checkVarName(tt.varName)
-			if tt.wantError && err == nil {
-				t.Fatalf("checkVarName(%q) error = nil, want a refusal", tt.varName)
-			}
+		t.Run(
+			tt.name, func(t *testing.T) {
+				err := checkVarName(tt.varName)
+				if tt.wantError && err == nil {
+					t.Fatalf("checkVarName(%q) error = nil, want a refusal", tt.varName)
+				}
 
-			if !tt.wantError && err != nil {
-				t.Fatalf("checkVarName(%q) error = %v, want nil", tt.varName, err)
-			}
-		})
+				if !tt.wantError && err != nil {
+					t.Fatalf("checkVarName(%q) error = %v, want nil", tt.varName, err)
+				}
+			},
+		)
 	}
 }
 
@@ -172,11 +176,13 @@ func TestTypeNamesDoNotCollide(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.want, func(t *testing.T) {
-			if got := g.typeName(tt.base); got != tt.want {
-				t.Fatalf("typeName(%q) = %q, want %q", tt.base, got, tt.want)
-			}
-		})
+		t.Run(
+			tt.want, func(t *testing.T) {
+				if got := g.typeName(tt.base); got != tt.want {
+					t.Fatalf("typeName(%q) = %q, want %q", tt.base, got, tt.want)
+				}
+			},
+		)
 	}
 }
 
@@ -195,24 +201,26 @@ func TestGuardOverwrite(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			path := filepath.Join(dir, tt.file)
+		t.Run(
+			tt.name, func(t *testing.T) {
+				path := filepath.Join(dir, tt.file)
 
-			if tt.contents != "" {
-				if err := os.WriteFile(path, []byte(tt.contents), 0o600); err != nil {
-					t.Fatalf("writing %s: %v", path, err)
+				if tt.contents != "" {
+					if err := os.WriteFile(path, []byte(tt.contents), 0o600); err != nil {
+						t.Fatalf("writing %s: %v", path, err)
+					}
 				}
-			}
 
-			err := guardOverwrite(path)
-			if tt.wantError && err == nil {
-				t.Fatal("guardOverwrite() error = nil, want a refusal")
-			}
+				err := guardOverwrite(path)
+				if tt.wantError && err == nil {
+					t.Fatal("guardOverwrite() error = nil, want a refusal")
+				}
 
-			if !tt.wantError && err != nil {
-				t.Fatalf("guardOverwrite() error = %v, want nil", err)
-			}
-		})
+				if !tt.wantError && err != nil {
+					t.Fatalf("guardOverwrite() error = %v, want nil", err)
+				}
+			},
+		)
 	}
 }
 
@@ -229,10 +237,12 @@ func TestOutputName(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := outputName(tt.typeName, tt.out); got != tt.want {
-				t.Fatalf("outputName(%q, %q) = %q, want %q", tt.typeName, tt.out, got, tt.want)
-			}
-		})
+		t.Run(
+			tt.name, func(t *testing.T) {
+				if got := outputName(tt.typeName, tt.out); got != tt.want {
+					t.Fatalf("outputName(%q, %q) = %q, want %q", tt.typeName, tt.out, got, tt.want)
+				}
+			},
+		)
 	}
 }

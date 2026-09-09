@@ -13,7 +13,8 @@ import (
 // which fields come back, and the sort saying in what order. Both are built from entries that keep the order they
 // were given in, which matters for the sort and reads better in the projection.
 func runProject(ctx context.Context, db *mongo.Database) error {
-	return runParts(ctx, db.Collection(productsColl),
+	return runParts(
+		ctx, db.Collection(productsColl),
 		projectFields,
 		projectArrays,
 		projectSort,
@@ -31,8 +32,10 @@ func projectFields(ctx context.Context, coll *mongo.Collection) error {
 	)
 	query("monq.Projection(monq.Include(sku, name, price), monq.Exclude(_id))", keep)
 
-	if err := showFind(ctx, coll, "products under 30, projected", monq.Lt(ProductPaths.Price, 30),
-		options.Find().SetProjection(keep).SetSort(monq.Sort(monq.Asc(ProductPaths.SKU)))); err != nil {
+	if err := showFind(
+		ctx, coll, "products under 30, projected", monq.Lt(ProductPaths.Price, 30),
+		options.Find().SetProjection(keep).SetSort(monq.Sort(monq.Asc(ProductPaths.SKU))),
+	); err != nil {
 		return err
 	}
 

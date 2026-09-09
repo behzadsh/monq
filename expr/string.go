@@ -83,11 +83,16 @@ func Ltrim(input any, opts ...TrimOption) bson.D {
 // Example:
 //
 //	expr.RegexFind(expr.Field("email"), "^[^@]+", expr.RegexOptions("i"))
-//	// bson.D{{Key: "$regexFind", Value: bson.D{
-//	//     {Key: "input", Value: "$email"},
-//	//     {Key: "regex", Value: "^[^@]+"},
-//	//     {Key: "options", Value: "i"},
-//	// }}}
+//	// bson.D{
+//	//     {
+//	//         Key: "$regexFind",
+//	//         Value: bson.D{
+//	//             {Key: "input", Value: "$email"},
+//	//             {Key: "regex", Value: "^[^@]+"},
+//	//             {Key: "options", Value: "i"},
+//	//         },
+//	//     },
+//	// }
 //
 // MongoDB docs: https://www.mongodb.com/docs/manual/reference/operator/aggregation/regexFind/
 func RegexFind(input, regex any, opts ...RegexOption) bson.D {
@@ -102,10 +107,15 @@ func RegexFind(input, regex any, opts ...RegexOption) bson.D {
 // Example:
 //
 //	expr.RegexFindAll(expr.Field("body"), "#\\w+")
-//	// bson.D{{Key: "$regexFindAll", Value: bson.D{
-//	//     {Key: "input", Value: "$body"},
-//	//     {Key: "regex", Value: "#\\w+"},
-//	// }}}
+//	// bson.D{
+//	//     {
+//	//         Key: "$regexFindAll",
+//	//         Value: bson.D{
+//	//             {Key: "input", Value: "$body"},
+//	//             {Key: "regex", Value: "#\\w+"},
+//	//         },
+//	//     },
+//	// }
 //
 // MongoDB docs: https://www.mongodb.com/docs/manual/reference/operator/aggregation/regexFindAll/
 func RegexFindAll(input, regex any, opts ...RegexOption) bson.D {
@@ -120,10 +130,15 @@ func RegexFindAll(input, regex any, opts ...RegexOption) bson.D {
 // Example:
 //
 //	expr.RegexMatch(expr.Field("email"), "@example\\.com$")
-//	// bson.D{{Key: "$regexMatch", Value: bson.D{
-//	//     {Key: "input", Value: "$email"},
-//	//     {Key: "regex", Value: "@example\\.com$"},
-//	// }}}
+//	// bson.D{
+//	//     {
+//	//         Key: "$regexMatch",
+//	//         Value: bson.D{
+//	//             {Key: "input", Value: "$email"},
+//	//             {Key: "regex", Value: "@example\\.com$"},
+//	//         },
+//	//     },
+//	// }
 //
 // MongoDB docs: https://www.mongodb.com/docs/manual/reference/operator/aggregation/regexMatch/
 func RegexMatch(input, regex any, opts ...RegexOption) bson.D {
@@ -152,11 +167,16 @@ func RegexOptions(flags string) RegexOption {
 // Example:
 //
 //	expr.ReplaceAll(expr.Field("phone"), "-", "")
-//	// bson.D{{Key: "$replaceAll", Value: bson.D{
-//	//     {Key: "input", Value: "$phone"},
-//	//     {Key: "find", Value: "-"},
-//	//     {Key: "replacement", Value: ""},
-//	// }}}
+//	// bson.D{
+//	//     {
+//	//         Key: "$replaceAll",
+//	//         Value: bson.D{
+//	//             {Key: "input", Value: "$phone"},
+//	//             {Key: "find", Value: "-"},
+//	//             {Key: "replacement", Value: ""},
+//	//         },
+//	//     },
+//	// }
 //
 // MongoDB docs: https://www.mongodb.com/docs/manual/reference/operator/aggregation/replaceAll/
 func ReplaceAll(input, find, replacement any) bson.D {
@@ -171,11 +191,16 @@ func ReplaceAll(input, find, replacement any) bson.D {
 // Example:
 //
 //	expr.ReplaceOne(expr.Field("title"), "draft ", "")
-//	// bson.D{{Key: "$replaceOne", Value: bson.D{
-//	//     {Key: "input", Value: "$title"},
-//	//     {Key: "find", Value: "draft "},
-//	//     {Key: "replacement", Value: ""},
-//	// }}}
+//	// bson.D{
+//	//     {
+//	//         Key: "$replaceOne",
+//	//         Value: bson.D{
+//	//             {Key: "input", Value: "$title"},
+//	//             {Key: "find", Value: "draft "},
+//	//             {Key: "replacement", Value: ""},
+//	//         },
+//	//     },
+//	// }
 //
 // MongoDB docs: https://www.mongodb.com/docs/manual/reference/operator/aggregation/replaceOne/
 func ReplaceOne(input, find, replacement any) bson.D {

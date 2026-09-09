@@ -33,19 +33,21 @@ func TestRaw(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got := monq.Raw(tt.in)
+		t.Run(
+			tt.name, func(t *testing.T) {
+				got := monq.Raw(tt.in)
 
-			if len(got) != len(tt.want) {
-				t.Fatalf("Raw() = %v, want %v", got, tt.want)
-			}
-
-			for i := range got {
-				if got[i].Key != tt.want[i].Key {
-					t.Errorf("Raw()[%d].Key = %q, want %q", i, got[i].Key, tt.want[i].Key)
+				if len(got) != len(tt.want) {
+					t.Fatalf("Raw() = %v, want %v", got, tt.want)
 				}
-			}
-		})
+
+				for i := range got {
+					if got[i].Key != tt.want[i].Key {
+						t.Errorf("Raw()[%d].Key = %q, want %q", i, got[i].Key, tt.want[i].Key)
+					}
+				}
+			},
+		)
 	}
 }
 

@@ -94,10 +94,15 @@ func DenseRank() bson.D {
 // Example:
 //
 //	expr.Derivative(expr.Field("odometer"), expr.TimeUnit("hour"))
-//	// bson.D{{Key: "$derivative", Value: bson.D{
-//	//     {Key: "input", Value: "$odometer"},
-//	//     {Key: "unit", Value: "hour"},
-//	// }}}
+//	// bson.D{
+//	//     {
+//	//         Key: "$derivative",
+//	//         Value: bson.D{
+//	//             {Key: "input", Value: "$odometer"},
+//	//             {Key: "unit", Value: "hour"},
+//	//         },
+//	//     },
+//	// }
 //
 // MongoDB docs: https://www.mongodb.com/docs/manual/reference/operator/aggregation/derivative/
 func Derivative(input any, opts ...WindowOption) bson.D {
@@ -132,17 +137,27 @@ func DocumentNumber() bson.D {
 // Example:
 //
 //	expr.ExpMovingAvgAlpha(expr.Field("price"), 0.3)
-//	// bson.D{{Key: "$expMovingAvg", Value: bson.D{
-//	//     {Key: "input", Value: "$price"},
-//	//     {Key: "alpha", Value: 0.3},
-//	// }}}
+//	// bson.D{
+//	//     {
+//	//         Key: "$expMovingAvg",
+//	//         Value: bson.D{
+//	//             {Key: "input", Value: "$price"},
+//	//             {Key: "alpha", Value: 0.3},
+//	//         },
+//	//     },
+//	// }
 //
 // MongoDB docs: https://www.mongodb.com/docs/manual/reference/operator/aggregation/expMovingAvg/
 func ExpMovingAvgAlpha(input any, alpha float64) bson.D {
-	return bson.D{{Key: "$expMovingAvg", Value: bson.D{
-		{Key: "input", Value: input},
-		{Key: "alpha", Value: alpha},
-	}}}
+	return bson.D{
+		{
+			Key: "$expMovingAvg",
+			Value: bson.D{
+				{Key: "input", Value: input},
+				{Key: "alpha", Value: alpha},
+			},
+		},
+	}
 }
 
 // ExpMovingAvgN returns a window operator yielding an exponential moving average over n documents.
@@ -156,17 +171,27 @@ func ExpMovingAvgAlpha(input any, alpha float64) bson.D {
 // Example:
 //
 //	expr.ExpMovingAvgN(expr.Field("price"), 5)
-//	// bson.D{{Key: "$expMovingAvg", Value: bson.D{
-//	//     {Key: "input", Value: "$price"},
-//	//     {Key: "N", Value: 5},
-//	// }}}
+//	// bson.D{
+//	//     {
+//	//         Key: "$expMovingAvg",
+//	//         Value: bson.D{
+//	//             {Key: "input", Value: "$price"},
+//	//             {Key: "N", Value: 5},
+//	//         },
+//	//     },
+//	// }
 //
 // MongoDB docs: https://www.mongodb.com/docs/manual/reference/operator/aggregation/expMovingAvg/
 func ExpMovingAvgN(input any, n int) bson.D {
-	return bson.D{{Key: "$expMovingAvg", Value: bson.D{
-		{Key: "input", Value: input},
-		{Key: "N", Value: n},
-	}}}
+	return bson.D{
+		{
+			Key: "$expMovingAvg",
+			Value: bson.D{
+				{Key: "input", Value: input},
+				{Key: "N", Value: n},
+			},
+		},
+	}
 }
 
 // Integral returns a window operator yielding the area under the curve of a value over a window.
@@ -180,10 +205,15 @@ func ExpMovingAvgN(input any, n int) bson.D {
 // Example:
 //
 //	expr.Integral(expr.Field("power"), expr.TimeUnit("hour"))
-//	// bson.D{{Key: "$integral", Value: bson.D{
-//	//     {Key: "input", Value: "$power"},
-//	//     {Key: "unit", Value: "hour"},
-//	// }}}
+//	// bson.D{
+//	//     {
+//	//         Key: "$integral",
+//	//         Value: bson.D{
+//	//             {Key: "input", Value: "$power"},
+//	//             {Key: "unit", Value: "hour"},
+//	//         },
+//	//     },
+//	// }
 //
 // MongoDB docs: https://www.mongodb.com/docs/manual/reference/operator/aggregation/integral/
 func Integral(input any, opts ...WindowOption) bson.D {
@@ -256,11 +286,16 @@ func Rank() bson.D {
 // Example:
 //
 //	expr.Shift(expr.Field("price"), -1, expr.ShiftDefault(0))
-//	// bson.D{{Key: "$shift", Value: bson.D{
-//	//     {Key: "output", Value: "$price"},
-//	//     {Key: "by", Value: -1},
-//	//     {Key: "default", Value: 0},
-//	// }}}
+//	// bson.D{
+//	//     {
+//	//         Key: "$shift",
+//	//         Value: bson.D{
+//	//             {Key: "output", Value: "$price"},
+//	//             {Key: "by", Value: -1},
+//	//             {Key: "default", Value: 0},
+//	//         },
+//	//     },
+//	// }
 //
 // MongoDB docs: https://www.mongodb.com/docs/manual/reference/operator/aggregation/shift/
 func Shift(output any, by int, opts ...WindowOption) bson.D {

@@ -31,13 +31,15 @@ func TestEq(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got := monq.Eq(tt.field, tt.value)
+		t.Run(
+			tt.name, func(t *testing.T) {
+				got := monq.Eq(tt.field, tt.value)
 
-			if len(got) != len(tt.want) || got[0].Key != tt.want[0].Key {
-				t.Fatalf("Eq() = %v, want %v", got, tt.want)
-			}
-		})
+				if len(got) != len(tt.want) || got[0].Key != tt.want[0].Key {
+					t.Fatalf("Eq() = %v, want %v", got, tt.want)
+				}
+			},
+		)
 	}
 }
 
@@ -70,13 +72,15 @@ func TestNe(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got := monq.Ne(tt.field, tt.value)
+		t.Run(
+			tt.name, func(t *testing.T) {
+				got := monq.Ne(tt.field, tt.value)
 
-			if len(got) != len(tt.want) || got[0].Key != tt.want[0].Key {
-				t.Fatalf("Ne() = %v, want %v", got, tt.want)
-			}
-		})
+				if len(got) != len(tt.want) || got[0].Key != tt.want[0].Key {
+					t.Fatalf("Ne() = %v, want %v", got, tt.want)
+				}
+			},
+		)
 	}
 }
 
@@ -109,13 +113,15 @@ func TestGt(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got := monq.Gt(tt.field, tt.value)
+		t.Run(
+			tt.name, func(t *testing.T) {
+				got := monq.Gt(tt.field, tt.value)
 
-			if len(got) != len(tt.want) || got[0].Key != tt.want[0].Key {
-				t.Fatalf("Gt() = %v, want %v", got, tt.want)
-			}
-		})
+				if len(got) != len(tt.want) || got[0].Key != tt.want[0].Key {
+					t.Fatalf("Gt() = %v, want %v", got, tt.want)
+				}
+			},
+		)
 	}
 }
 
@@ -148,13 +154,15 @@ func TestGte(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got := monq.Gte(tt.field, tt.value)
+		t.Run(
+			tt.name, func(t *testing.T) {
+				got := monq.Gte(tt.field, tt.value)
 
-			if len(got) != len(tt.want) || got[0].Key != tt.want[0].Key {
-				t.Fatalf("Gte() = %v, want %v", got, tt.want)
-			}
-		})
+				if len(got) != len(tt.want) || got[0].Key != tt.want[0].Key {
+					t.Fatalf("Gte() = %v, want %v", got, tt.want)
+				}
+			},
+		)
 	}
 }
 
@@ -187,13 +195,15 @@ func TestLt(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got := monq.Lt(tt.field, tt.value)
+		t.Run(
+			tt.name, func(t *testing.T) {
+				got := monq.Lt(tt.field, tt.value)
 
-			if len(got) != len(tt.want) || got[0].Key != tt.want[0].Key {
-				t.Fatalf("Lt() = %v, want %v", got, tt.want)
-			}
-		})
+				if len(got) != len(tt.want) || got[0].Key != tt.want[0].Key {
+					t.Fatalf("Lt() = %v, want %v", got, tt.want)
+				}
+			},
+		)
 	}
 }
 
@@ -226,13 +236,15 @@ func TestLte(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got := monq.Lte(tt.field, tt.value)
+		t.Run(
+			tt.name, func(t *testing.T) {
+				got := monq.Lte(tt.field, tt.value)
 
-			if len(got) != len(tt.want) || got[0].Key != tt.want[0].Key {
-				t.Fatalf("Lte() = %v, want %v", got, tt.want)
-			}
-		})
+				if len(got) != len(tt.want) || got[0].Key != tt.want[0].Key {
+					t.Fatalf("Lte() = %v, want %v", got, tt.want)
+				}
+			},
+		)
 	}
 }
 
@@ -271,31 +283,35 @@ func TestIn(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got := monq.In(tt.field, tt.values...)
+		t.Run(
+			tt.name, func(t *testing.T) {
+				got := monq.In(tt.field, tt.values...)
 
-			inner, ok := got[0].Value.(bson.D)
-			if !ok || inner[0].Key != "$in" {
-				t.Fatalf("In() = %v, want a $in operator document", got)
-			}
+				inner, ok := got[0].Value.(bson.D)
+				if !ok || inner[0].Key != "$in" {
+					t.Fatalf("In() = %v, want a $in operator document", got)
+				}
 
-			gotArr, ok := inner[0].Value.(bson.A)
-			if !ok || len(gotArr) != len(tt.want) {
-				t.Fatalf("In() = %v, want values %v", got, tt.want)
-			}
-		})
+				gotArr, ok := inner[0].Value.(bson.A)
+				if !ok || len(gotArr) != len(tt.want) {
+					t.Fatalf("In() = %v, want values %v", got, tt.want)
+				}
+			},
+		)
 	}
 
-	t.Run("un-spread slice becomes one candidate, not one per element", func(t *testing.T) {
-		ids := []string{"a", "b", "c"}
+	t.Run(
+		"un-spread slice becomes one candidate, not one per element", func(t *testing.T) {
+			ids := []string{"a", "b", "c"}
 
-		got := monq.In("status", ids)
+			got := monq.In("status", ids)
 
-		gotArr, ok := got[0].Value.(bson.D)[0].Value.(bson.A)
-		if !ok || len(gotArr) != 1 {
-			t.Fatalf("In(field, ids) without spread = %v, want exactly one candidate holding the whole slice", got)
-		}
-	})
+			gotArr, ok := got[0].Value.(bson.D)[0].Value.(bson.A)
+			if !ok || len(gotArr) != 1 {
+				t.Fatalf("In(field, ids) without spread = %v, want exactly one candidate holding the whole slice", got)
+			}
+		},
+	)
 }
 
 func ExampleIn() {
@@ -333,19 +349,21 @@ func TestNin(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got := monq.Nin(tt.field, tt.values...)
+		t.Run(
+			tt.name, func(t *testing.T) {
+				got := monq.Nin(tt.field, tt.values...)
 
-			inner, ok := got[0].Value.(bson.D)
-			if !ok || inner[0].Key != "$nin" {
-				t.Fatalf("Nin() = %v, want a $nin operator document", got)
-			}
+				inner, ok := got[0].Value.(bson.D)
+				if !ok || inner[0].Key != "$nin" {
+					t.Fatalf("Nin() = %v, want a $nin operator document", got)
+				}
 
-			gotArr, ok := inner[0].Value.(bson.A)
-			if !ok || len(gotArr) != len(tt.want) {
-				t.Fatalf("Nin() = %v, want values %v", got, tt.want)
-			}
-		})
+				gotArr, ok := inner[0].Value.(bson.A)
+				if !ok || len(gotArr) != len(tt.want) {
+					t.Fatalf("Nin() = %v, want values %v", got, tt.want)
+				}
+			},
+		)
 	}
 }
 

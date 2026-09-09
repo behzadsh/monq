@@ -18,21 +18,33 @@ func TestConvertExpressions(t *testing.T) {
 		{
 			name: "Convert without fallbacks",
 			got:  expr.Convert(expr.Field("legacy_id"), "objectId"),
-			want: bson.D{{Key: "$convert", Value: bson.D{
-				{Key: "input", Value: "$legacy_id"},
-				{Key: "to", Value: "objectId"},
-			}}},
+			want: bson.D{
+				{
+					Key: "$convert",
+					Value: bson.D{
+						{Key: "input", Value: "$legacy_id"},
+						{Key: "to", Value: "objectId"},
+					},
+				},
+			},
 		},
 		{
 			name: "Convert with both fallbacks",
-			got: expr.Convert(expr.Field("legacy_id"), "objectId",
-				expr.ConvertOnError(nil), expr.ConvertOnNull(nil)),
-			want: bson.D{{Key: "$convert", Value: bson.D{
-				{Key: "input", Value: "$legacy_id"},
-				{Key: "to", Value: "objectId"},
-				{Key: "onError", Value: nil},
-				{Key: "onNull", Value: nil},
-			}}},
+			got: expr.Convert(
+				expr.Field("legacy_id"), "objectId",
+				expr.ConvertOnError(nil), expr.ConvertOnNull(nil),
+			),
+			want: bson.D{
+				{
+					Key: "$convert",
+					Value: bson.D{
+						{Key: "input", Value: "$legacy_id"},
+						{Key: "to", Value: "objectId"},
+						{Key: "onError", Value: nil},
+						{Key: "onNull", Value: nil},
+					},
+				},
+			},
 		},
 		{
 			name: "IsNumber takes a bare expression",
@@ -87,11 +99,13 @@ func TestConvertExpressions(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if !reflect.DeepEqual(tt.got, tt.want) {
-				t.Fatalf("got %v, want %v", tt.got, tt.want)
-			}
-		})
+		t.Run(
+			tt.name, func(t *testing.T) {
+				if !reflect.DeepEqual(tt.got, tt.want) {
+					t.Fatalf("got %v, want %v", tt.got, tt.want)
+				}
+			},
+		)
 	}
 }
 

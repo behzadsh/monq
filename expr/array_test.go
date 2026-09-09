@@ -38,38 +38,60 @@ func TestArrayExpressions(t *testing.T) {
 		{
 			name: "Filter binds the element to $$this",
 			got:  expr.Filter(expr.Field("scores"), expr.Gte("$$this", 80)),
-			want: bson.D{{Key: "$filter", Value: bson.D{
-				{Key: "input", Value: "$scores"},
-				{Key: "cond", Value: bson.D{{Key: "$gte", Value: bson.A{"$$this", 80}}}},
-			}}},
+			want: bson.D{
+				{
+					Key: "$filter",
+					Value: bson.D{
+						{Key: "input", Value: "$scores"},
+						{Key: "cond", Value: bson.D{{Key: "$gte", Value: bson.A{"$$this", 80}}}},
+					},
+				},
+			},
 		},
 		{
 			name: "Filter with a name and a limit",
-			got: expr.Filter(expr.Field("scores"), expr.Gte("$$score", 80),
-				expr.FilterAs("score"), expr.FilterLimit(3)),
-			want: bson.D{{Key: "$filter", Value: bson.D{
-				{Key: "input", Value: "$scores"},
-				{Key: "cond", Value: bson.D{{Key: "$gte", Value: bson.A{"$$score", 80}}}},
-				{Key: "as", Value: "score"},
-				{Key: "limit", Value: 3},
-			}}},
+			got: expr.Filter(
+				expr.Field("scores"), expr.Gte("$$score", 80),
+				expr.FilterAs("score"), expr.FilterLimit(3),
+			),
+			want: bson.D{
+				{
+					Key: "$filter",
+					Value: bson.D{
+						{Key: "input", Value: "$scores"},
+						{Key: "cond", Value: bson.D{{Key: "$gte", Value: bson.A{"$$score", 80}}}},
+						{Key: "as", Value: "score"},
+						{Key: "limit", Value: 3},
+					},
+				},
+			},
 		},
 		{
 			name: "Map binds the element to $$this",
 			got:  expr.Map(expr.Field("prices"), expr.Multiply("$$this", 1.1)),
-			want: bson.D{{Key: "$map", Value: bson.D{
-				{Key: "input", Value: "$prices"},
-				{Key: "in", Value: bson.D{{Key: "$multiply", Value: bson.A{"$$this", 1.1}}}},
-			}}},
+			want: bson.D{
+				{
+					Key: "$map",
+					Value: bson.D{
+						{Key: "input", Value: "$prices"},
+						{Key: "in", Value: bson.D{{Key: "$multiply", Value: bson.A{"$$this", 1.1}}}},
+					},
+				},
+			},
 		},
 		{
 			name: "Map with a named variable keeps in last",
 			got:  expr.Map(expr.Field("prices"), expr.Multiply("$$price", 1.1), expr.MapAs("price")),
-			want: bson.D{{Key: "$map", Value: bson.D{
-				{Key: "input", Value: "$prices"},
-				{Key: "as", Value: "price"},
-				{Key: "in", Value: bson.D{{Key: "$multiply", Value: bson.A{"$$price", 1.1}}}},
-			}}},
+			want: bson.D{
+				{
+					Key: "$map",
+					Value: bson.D{
+						{Key: "input", Value: "$prices"},
+						{Key: "as", Value: "price"},
+						{Key: "in", Value: bson.D{{Key: "$multiply", Value: bson.A{"$$price", 1.1}}}},
+					},
+				},
+			},
 		},
 		{
 			name: "First takes a bare expression",
@@ -84,34 +106,54 @@ func TestArrayExpressions(t *testing.T) {
 		{
 			name: "FirstN",
 			got:  expr.FirstN(expr.Field("scores"), 3),
-			want: bson.D{{Key: "$firstN", Value: bson.D{
-				{Key: "input", Value: "$scores"},
-				{Key: "n", Value: 3},
-			}}},
+			want: bson.D{
+				{
+					Key: "$firstN",
+					Value: bson.D{
+						{Key: "input", Value: "$scores"},
+						{Key: "n", Value: 3},
+					},
+				},
+			},
 		},
 		{
 			name: "LastN",
 			got:  expr.LastN(expr.Field("scores"), 3),
-			want: bson.D{{Key: "$lastN", Value: bson.D{
-				{Key: "input", Value: "$scores"},
-				{Key: "n", Value: 3},
-			}}},
+			want: bson.D{
+				{
+					Key: "$lastN",
+					Value: bson.D{
+						{Key: "input", Value: "$scores"},
+						{Key: "n", Value: 3},
+					},
+				},
+			},
 		},
 		{
 			name: "MaxN",
 			got:  expr.MaxN(expr.Field("scores"), 3),
-			want: bson.D{{Key: "$maxN", Value: bson.D{
-				{Key: "input", Value: "$scores"},
-				{Key: "n", Value: 3},
-			}}},
+			want: bson.D{
+				{
+					Key: "$maxN",
+					Value: bson.D{
+						{Key: "input", Value: "$scores"},
+						{Key: "n", Value: 3},
+					},
+				},
+			},
 		},
 		{
 			name: "MinN",
 			got:  expr.MinN(expr.Field("scores"), 3),
-			want: bson.D{{Key: "$minN", Value: bson.D{
-				{Key: "input", Value: "$scores"},
-				{Key: "n", Value: 3},
-			}}},
+			want: bson.D{
+				{
+					Key: "$minN",
+					Value: bson.D{
+						{Key: "input", Value: "$scores"},
+						{Key: "n", Value: 3},
+					},
+				},
+			},
 		},
 		{
 			name: "In takes the value first",
@@ -146,11 +188,16 @@ func TestArrayExpressions(t *testing.T) {
 		{
 			name: "Reduce binds $$value and $$this",
 			got:  expr.Reduce(expr.Field("scores"), 0, expr.Add("$$value", "$$this")),
-			want: bson.D{{Key: "$reduce", Value: bson.D{
-				{Key: "input", Value: "$scores"},
-				{Key: "initialValue", Value: 0},
-				{Key: "in", Value: bson.D{{Key: "$add", Value: bson.A{"$$value", "$$this"}}}},
-			}}},
+			want: bson.D{
+				{
+					Key: "$reduce",
+					Value: bson.D{
+						{Key: "input", Value: "$scores"},
+						{Key: "initialValue", Value: 0},
+						{Key: "in", Value: bson.D{{Key: "$add", Value: bson.A{"$$value", "$$this"}}}},
+					},
+				},
+			},
 		},
 		{
 			name: "ReverseArray takes a bare expression",
@@ -180,44 +227,65 @@ func TestArrayExpressions(t *testing.T) {
 		{
 			name: "SortArray with a sort document",
 			got:  expr.SortArray(expr.Field("items"), bson.D{{Key: "price", Value: -1}}),
-			want: bson.D{{Key: "$sortArray", Value: bson.D{
-				{Key: "input", Value: "$items"},
-				{Key: "sortBy", Value: bson.D{{Key: "price", Value: -1}}},
-			}}},
+			want: bson.D{
+				{
+					Key: "$sortArray",
+					Value: bson.D{
+						{Key: "input", Value: "$items"},
+						{Key: "sortBy", Value: bson.D{{Key: "price", Value: -1}}},
+					},
+				},
+			},
 		},
 		{
 			name: "SortArray with a direction for scalars",
 			got:  expr.SortArray(expr.Field("scores"), 1),
-			want: bson.D{{Key: "$sortArray", Value: bson.D{
-				{Key: "input", Value: "$scores"},
-				{Key: "sortBy", Value: 1},
-			}}},
+			want: bson.D{
+				{
+					Key: "$sortArray", Value: bson.D{
+						{Key: "input", Value: "$scores"},
+						{Key: "sortBy", Value: 1},
+					},
+				},
+			},
 		},
 		{
 			name: "Zip with no options",
 			got:  expr.Zip([]any{expr.Field("names"), expr.Field("scores")}),
-			want: bson.D{{Key: "$zip", Value: bson.D{
-				{Key: "inputs", Value: bson.A{"$names", "$scores"}},
-			}}},
+			want: bson.D{
+				{
+					Key: "$zip", Value: bson.D{
+						{Key: "inputs", Value: bson.A{"$names", "$scores"}},
+					},
+				},
+			},
 		},
 		{
 			name: "Zip to the longest input with defaults",
-			got: expr.Zip([]any{expr.Field("names"), expr.Field("scores")},
-				expr.ZipUseLongestLength(), expr.ZipDefaults(bson.A{"", 0})),
-			want: bson.D{{Key: "$zip", Value: bson.D{
-				{Key: "inputs", Value: bson.A{"$names", "$scores"}},
-				{Key: "useLongestLength", Value: true},
-				{Key: "defaults", Value: bson.A{"", 0}},
-			}}},
+			got: expr.Zip(
+				[]any{expr.Field("names"), expr.Field("scores")},
+				expr.ZipUseLongestLength(), expr.ZipDefaults(bson.A{"", 0}),
+			),
+			want: bson.D{
+				{
+					Key: "$zip", Value: bson.D{
+						{Key: "inputs", Value: bson.A{"$names", "$scores"}},
+						{Key: "useLongestLength", Value: true},
+						{Key: "defaults", Value: bson.A{"", 0}},
+					},
+				},
+			},
 		},
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if !reflect.DeepEqual(tt.got, tt.want) {
-				t.Fatalf("got %v, want %v", tt.got, tt.want)
-			}
-		})
+		t.Run(
+			tt.name, func(t *testing.T) {
+				if !reflect.DeepEqual(tt.got, tt.want) {
+					t.Fatalf("got %v, want %v", tt.got, tt.want)
+				}
+			},
+		)
 	}
 }
 
@@ -411,8 +479,10 @@ func ExampleZipUseLongestLength() {
 }
 
 func ExampleZipDefaults() {
-	e := expr.Zip([]any{expr.Field("names"), expr.Field("scores")},
-		expr.ZipUseLongestLength(), expr.ZipDefaults(bson.A{"", 0}))
+	e := expr.Zip(
+		[]any{expr.Field("names"), expr.Field("scores")},
+		expr.ZipUseLongestLength(), expr.ZipDefaults(bson.A{"", 0}),
+	)
 
 	printExpr(e)
 	// Output: {"$zip":{"inputs":["$names","$scores"],"useLongestLength":true,"defaults":["",0]}}

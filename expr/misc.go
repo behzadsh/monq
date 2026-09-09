@@ -49,17 +49,27 @@ func BinarySize(value any) bson.D {
 //		bson.D{{Key: "total", Value: expr.Add(expr.Field("price"), expr.Field("tax"))}},
 //		expr.Multiply("$$total", 0.9),
 //	)
-//	// bson.D{{Key: "$let", Value: bson.D{
-//	//     {Key: "vars", Value: bson.D{{Key: "total", Value: ...}}},
-//	//     {Key: "in", Value: bson.D{{Key: "$multiply", Value: bson.A{"$$total", 0.9}}}},
-//	// }}}
+//	// bson.D{
+//	//     {
+//	//         Key: "$let",
+//	//         Value: bson.D{
+//	//             {Key: "vars", Value: bson.D{{Key: "total", Value: ...}}},
+//	//             {Key: "in", Value: bson.D{{Key: "$multiply", Value: bson.A{"$$total", 0.9}}}},
+//	//         },
+//	//     },
+//	// }
 //
 // MongoDB docs: https://www.mongodb.com/docs/manual/reference/operator/aggregation/let/
 func Let(vars bson.D, in any) bson.D {
-	return bson.D{{Key: "$let", Value: bson.D{
-		{Key: "vars", Value: vars},
-		{Key: "in", Value: in},
-	}}}
+	return bson.D{
+		{
+			Key: "$let",
+			Value: bson.D{
+				{Key: "vars", Value: vars},
+				{Key: "in", Value: in},
+			},
+		},
+	}
 }
 
 // Rand returns an expression yielding a random double between 0 and 1.

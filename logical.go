@@ -11,10 +11,15 @@ import "go.mongodb.org/mongo-driver/v2/bson"
 // Example:
 //
 //	monq.And(monq.Eq("status", "active"), monq.Gte("age", 18))
-//	// bson.D{{Key: "$and", Value: bson.A{
-//	//     bson.D{{Key: "status", Value: bson.D{{Key: "$eq", Value: "active"}}}},
-//	//     bson.D{{Key: "age", Value: bson.D{{Key: "$gte", Value: 18}}}},
-//	// }}}
+//	// bson.D{
+//	//     {
+//	//         Key: "$and",
+//	//         Value: bson.A{
+//	//             bson.D{{Key: "status", Value: bson.D{{Key: "$eq", Value: "active"}}}},
+//	//             bson.D{{Key: "age", Value: bson.D{{Key: "$gte", Value: 18}}}},
+//	//         },
+//	//     },
+//	// }
 //
 // MongoDB docs: https://www.mongodb.com/docs/manual/reference/operator/query/and/
 func And(filters ...bson.D) bson.D {
@@ -33,10 +38,15 @@ func And(filters ...bson.D) bson.D {
 // Example:
 //
 //	monq.Or(monq.Gte("stats.followers", 10000), monq.Exists("verified_at", true))
-//	// bson.D{{Key: "$or", Value: bson.A{
-//	//     bson.D{{Key: "stats.followers", Value: bson.D{{Key: "$gte", Value: 10000}}}},
-//	//     bson.D{{Key: "verified_at", Value: bson.D{{Key: "$exists", Value: true}}}},
-//	// }}}
+//	// bson.D{
+//	//     {
+//	//         Key: "$or",
+//	//         Value: bson.A{
+//	//             bson.D{{Key: "stats.followers", Value: bson.D{{Key: "$gte", Value: 10000}}}},
+//	//             bson.D{{Key: "verified_at", Value: bson.D{{Key: "$exists", Value: true}}}},
+//	//         },
+//	//     },
+//	// }
 //
 // MongoDB docs: https://www.mongodb.com/docs/manual/reference/operator/query/or/
 func Or(filters ...bson.D) bson.D {
@@ -57,10 +67,15 @@ func Or(filters ...bson.D) bson.D {
 // Example:
 //
 //	monq.Nor(monq.Eq("status", "banned"), monq.Eq("status", "suspended"))
-//	// bson.D{{Key: "$nor", Value: bson.A{
-//	//     bson.D{{Key: "status", Value: bson.D{{Key: "$eq", Value: "banned"}}}},
-//	//     bson.D{{Key: "status", Value: bson.D{{Key: "$eq", Value: "suspended"}}}},
-//	// }}}
+//	// bson.D{
+//	//     {
+//	//         Key: "$nor",
+//	//         Value: bson.A{
+//	//             bson.D{{Key: "status", Value: bson.D{{Key: "$eq", Value: "banned"}}}},
+//	//             bson.D{{Key: "status", Value: bson.D{{Key: "$eq", Value: "suspended"}}}},
+//	//         },
+//	//     },
+//	// }
 //
 // MongoDB docs: https://www.mongodb.com/docs/manual/reference/operator/query/nor/
 func Nor(filters ...bson.D) bson.D {

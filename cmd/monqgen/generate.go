@@ -50,8 +50,10 @@ func Generate(model *Struct, pkgName, varName string) ([]byte, error) {
 
 	fmt.Fprintf(&buf, "%s\n\npackage %s\n\nimport \"github.com/behzadsh/monq\"\n", header, pkgName)
 	buf.WriteString(plan.declarations())
-	fmt.Fprintf(&buf, "\n// %s holds the document paths of %s.\nvar %s = %s\n",
-		varName, model.Name, varName, plan.literal())
+	fmt.Fprintf(
+		&buf, "\n// %s holds the document paths of %s.\nvar %s = %s\n",
+		varName, model.Name, varName, plan.literal(),
+	)
 
 	src, err := format.Source(buf.Bytes())
 	if err != nil {
@@ -144,7 +146,8 @@ func (d *document) check() error {
 				if what, taken := reserved[elem.goName]; taken {
 					return fmt.Errorf(
 						"field %s.%s cannot be generated: an array of documents already uses %s for %s; rename the Go field",
-						f.child.name, elem.goName, elem.goName, what)
+						f.child.name, elem.goName, elem.goName, what,
+					)
 				}
 			}
 		}
@@ -177,8 +180,10 @@ func (d *document) declarations() string {
 			fmt.Fprintf(&fields, "\t// %s repeats a type named further up, so the paths stop here.\n", f.goName)
 			fmt.Fprintf(&fields, "\t%s monq.FieldPath\n", f.goName)
 		case f.kind == KindMap:
-			fmt.Fprintf(&fields, "\t// %s has keys that are not known ahead of time, so nothing below it is named.\n",
-				f.goName)
+			fmt.Fprintf(
+				&fields, "\t// %s has keys that are not known ahead of time, so nothing below it is named.\n",
+				f.goName,
+			)
 			fmt.Fprintf(&fields, "\t%s monq.FieldPath\n", f.goName)
 		default:
 			fmt.Fprintf(&fields, "\t%s monq.FieldPath\n", f.goName)
@@ -197,8 +202,10 @@ func (d *document) literal() string {
 	for _, f := range d.fields {
 		switch {
 		case f.kind == KindArray && f.child != nil:
-			fmt.Fprintf(&b, "\t%s: %s{Path: %q, %s: %s(%q)},\n",
-				f.goName, f.wrapper, f.path, f.child.typeName, ctor(f.child.typeName), f.path)
+			fmt.Fprintf(
+				&b, "\t%s: %s{Path: %q, %s: %s(%q)},\n",
+				f.goName, f.wrapper, f.path, f.child.typeName, ctor(f.child.typeName), f.path,
+			)
 		case f.kind == KindArray:
 			fmt.Fprintf(&b, "\t%s: monq.ArrayPath{Path: %q},\n", f.goName, f.path)
 		case f.kind == KindDocument && f.child != nil:
@@ -244,8 +251,10 @@ func (d *document) constructor() string {
 func (f field) arrayType() string {
 	var b strings.Builder
 
-	fmt.Fprintf(&b, "// %s is the %s array: its own path, the dotted paths of its elements, and the positional\n",
-		f.wrapper, f.goName)
+	fmt.Fprintf(
+		&b, "// %s is the %s array: its own path, the dotted paths of its elements, and the positional\n",
+		f.wrapper, f.goName,
+	)
 	b.WriteString("// forms for naming particular elements.\n")
 	fmt.Fprintf(&b, "type %s struct {\n\tPath monq.FieldPath\n\t%s\n}\n", f.wrapper, f.child.typeName)
 
@@ -262,10 +271,14 @@ func (f field) arrayType() string {
 	}
 
 	for _, m := range methods {
-		fmt.Fprintf(&b, "\n// %s returns the paths of %s.\nfunc (a %s) %s(%s) %s {\n",
-			m.name, m.doc, f.wrapper, m.name, m.params, f.child.typeName)
-		fmt.Fprintf(&b, "\treturn %s(string(monq.ArrayPath{Path: a.Path}.%s(%s)))\n}\n",
-			ctor(f.child.typeName), m.name, m.arguments)
+		fmt.Fprintf(
+			&b, "\n// %s returns the paths of %s.\nfunc (a %s) %s(%s) %s {\n",
+			m.name, m.doc, f.wrapper, m.name, m.params, f.child.typeName,
+		)
+		fmt.Fprintf(
+			&b, "\treturn %s(string(monq.ArrayPath{Path: a.Path}.%s(%s)))\n}\n",
+			ctor(f.child.typeName), m.name, m.arguments,
+		)
 	}
 
 	return b.String()

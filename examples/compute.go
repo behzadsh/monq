@@ -15,7 +15,8 @@ import (
 // conversions, sets, objects, statistics, and windows. They are all from monq/expr, they all go inside a stage,
 // and the ones with no fixture to run against use a $documents pipeline, which supplies its own input.
 func runCompute(ctx context.Context, db *mongo.Database) error {
-	if err := runParts(ctx, db.Collection(productsColl),
+	if err := runParts(
+		ctx, db.Collection(productsColl),
 		computeStrings,
 		computeConversions,
 		computeTrigonometry,
@@ -137,7 +138,8 @@ func computeStatistics(ctx context.Context, coll *mongo.Collection) error {
 	step("accumulators are expressions too, and the N forms take how many they should keep")
 
 	stages := stage.Pipeline(
-		stage.Group(nil,
+		stage.Group(
+			nil,
 			stage.Accumulator("count", expr.Count()),
 			stage.Accumulator("spread", expr.StdDevPop(expr.Field(ProductPaths.Price))),
 			stage.Accumulator("sample", expr.StdDevSamp(expr.Field(ProductPaths.Price))),
@@ -159,7 +161,8 @@ func computeStatistics(ctx context.Context, coll *mongo.Collection) error {
 	step("Top and Bottom take the order they mean by, so the answer does not depend on a preceding $sort")
 
 	ends := stage.Pipeline(
-		stage.Group(expr.Field(ProductPaths.Category),
+		stage.Group(
+			expr.Field(ProductPaths.Category),
 			stage.Accumulator("cheapest", expr.Bottom(monq.Sort(monq.Desc(ProductPaths.Price)), expr.Field(ProductPaths.SKU))),
 			stage.Accumulator("twoDearest", expr.TopN(2, monq.Sort(monq.Desc(ProductPaths.Price)), expr.Field(ProductPaths.SKU))),
 			stage.Accumulator("firstTwo", expr.FirstN(expr.Field(ProductPaths.SKU), 2)),
@@ -178,15 +181,18 @@ func computeWindows(ctx context.Context, coll *mongo.Collection) error {
 	step("rank operators number the documents, and Shift reaches to the one n places away")
 
 	stages := stage.Pipeline(
-		stage.SetWindowFields(nil, monq.Sort(monq.Desc(ProductPaths.Price)),
+		stage.SetWindowFields(
+			nil, monq.Sort(monq.Desc(ProductPaths.Price)),
 			stage.WindowField("rank", expr.DenseRank()),
 			stage.WindowField("row", expr.DocumentNumber()),
 			stage.WindowField("nextSKU", expr.Shift(expr.Field(ProductPaths.SKU), 1, expr.ShiftDefault("none"))),
 			stage.WindowField("smoothed", expr.ExpMovingAvgN(expr.Field(ProductPaths.Price), 3)),
 		),
-		stage.Project(stage.Field(ProductPaths.ID, 0), stage.Field(ProductPaths.SKU, 1), stage.Field(ProductPaths.Price, 1),
+		stage.Project(
+			stage.Field(ProductPaths.ID, 0), stage.Field(ProductPaths.SKU, 1), stage.Field(ProductPaths.Price, 1),
 			stage.Field("rank", 1), stage.Field("row", 1), stage.Field("nextSKU", 1),
-			stage.Field("smoothed", expr.Round(expr.Field("smoothed"), 2))),
+			stage.Field("smoothed", expr.Round(expr.Field("smoothed"), 2)),
+		),
 		stage.Limit(5),
 	)
 	if err := showAggregate(ctx, coll, "expr.DenseRank, expr.DocumentNumber, expr.Shift(..., expr.ShiftDefault(...)), expr.ExpMovingAvgN", stages); err != nil {
@@ -196,18 +202,23 @@ func computeWindows(ctx context.Context, coll *mongo.Collection) error {
 	step("the calculus ones take the unit their rate is per, and covariance takes the two series to compare")
 
 	rates := stage.Pipeline(
-		stage.SetWindowFields(nil, monq.Sort(monq.Asc(ProductPaths.CreatedAt)),
-			stage.WindowField("perDay", expr.Derivative(expr.Field(ProductPaths.Stock), expr.TimeUnit("day")),
+		stage.SetWindowFields(
+			nil, monq.Sort(monq.Asc(ProductPaths.CreatedAt)),
+			stage.WindowField(
+				"perDay", expr.Derivative(expr.Field(ProductPaths.Stock), expr.TimeUnit("day")),
 				stage.WindowRange(-1, stage.WindowCurrent),
 				stage.WindowUnit("month"),
 			),
-			stage.WindowField("priceVsStock", expr.CovariancePop(expr.Field(ProductPaths.Price), expr.Field(ProductPaths.Stock)),
+			stage.WindowField(
+				"priceVsStock", expr.CovariancePop(expr.Field(ProductPaths.Price), expr.Field(ProductPaths.Stock)),
 				stage.WindowDocuments(stage.WindowUnbounded, stage.WindowCurrent),
 			),
 		),
-		stage.Project(stage.Field(ProductPaths.ID, 0), stage.Field(ProductPaths.SKU, 1),
+		stage.Project(
+			stage.Field(ProductPaths.ID, 0), stage.Field(ProductPaths.SKU, 1),
 			stage.Field("perDay", expr.Round(expr.IfNull(expr.Field("perDay"), 0), 3)),
-			stage.Field("priceVsStock", expr.Round(expr.Field("priceVsStock"), 1))),
+			stage.Field("priceVsStock", expr.Round(expr.Field("priceVsStock"), 1)),
+		),
 		stage.Limit(5),
 	)
 
@@ -277,10 +288,12 @@ func computeSets(ctx context.Context, db *mongo.Database) error {
 	step("set operators ignore order and duplicates, while the array operators do not")
 
 	stages := stage.Pipeline(
-		stage.Documents(bson.D{
-			{Key: "a", Value: bson.A{"wireless", "rgb", "usb-c"}},
-			{Key: "b", Value: bson.A{"usb-c", "wireless"}},
-		}),
+		stage.Documents(
+			bson.D{
+				{Key: "a", Value: bson.A{"wireless", "rgb", "usb-c"}},
+				{Key: "b", Value: bson.A{"usb-c", "wireless"}},
+			},
+		),
 		stage.Project(
 			stage.Field("union", expr.SetUnion(expr.Field("a"), expr.Field("b"))),
 			stage.Field("shared", expr.SetIntersection(expr.Field("a"), expr.Field("b"))),
@@ -320,10 +333,12 @@ func computeObjects(ctx context.Context, db *mongo.Database) error {
 	step("$objectToArray and $arrayToObject are inverses, which is how a document is iterated over at all")
 
 	stages := stage.Pipeline(
-		stage.Documents(bson.D{
-			{Key: "specs", Value: bson.D{{Key: "weight", Value: 1.2}, {Key: "color", Value: "black"}}},
-			{Key: "extra", Value: bson.D{{Key: "warranty", Value: "2 years"}}},
-		}),
+		stage.Documents(
+			bson.D{
+				{Key: "specs", Value: bson.D{{Key: "weight", Value: 1.2}, {Key: "color", Value: "black"}}},
+				{Key: "extra", Value: bson.D{{Key: "warranty", Value: "2 years"}}},
+			},
+		),
 		stage.Project(
 			stage.Field("pairs", expr.ObjectToArray(expr.Field("specs"))),
 			stage.Field("rebuilt", expr.ArrayToObject(expr.ObjectToArray(expr.Field("specs")))),
@@ -342,10 +357,12 @@ func computeObjects(ctx context.Context, db *mongo.Database) error {
 	misc := stage.Pipeline(
 		stage.Documents(bson.D{{Key: "price", Value: 40.0}, {Key: "qty", Value: 3}}),
 		stage.Project(
-			stage.Field("discounted", expr.Let(
-				bson.D{{Key: "total", Value: expr.Multiply(expr.Field("price"), expr.Field("qty"))}},
-				expr.Round(expr.Multiply("$$total", 0.9), 2),
-			)),
+			stage.Field(
+				"discounted", expr.Let(
+					bson.D{{Key: "total", Value: expr.Multiply(expr.Field("price"), expr.Field("qty"))}},
+					expr.Round(expr.Multiply("$$total", 0.9), 2),
+				),
+			),
 			stage.Field("marker", expr.Literal("$price")),
 			stage.Field("coin", expr.Cond(expr.Gte(expr.Rand(), 0.5), "heads", "tails")),
 			// 1772449200000 is milliseconds since the epoch, which is what $toDate reads a number as.

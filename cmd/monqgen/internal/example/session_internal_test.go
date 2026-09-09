@@ -28,10 +28,12 @@ func TestUnexportedModelPaths(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if tt.got != tt.want {
-				t.Fatalf("got %q, want %q", tt.got, tt.want)
-			}
-		})
+		t.Run(
+			tt.name, func(t *testing.T) {
+				if tt.got != tt.want {
+					t.Fatalf("got %q, want %q", tt.got, tt.want)
+				}
+			},
+		)
 	}
 }

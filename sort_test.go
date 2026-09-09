@@ -33,11 +33,13 @@ func TestSortEntries(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if !reflect.DeepEqual(tt.got, tt.want) {
-				t.Fatalf("got %v, want %v", tt.got, tt.want)
-			}
-		})
+		t.Run(
+			tt.name, func(t *testing.T) {
+				if !reflect.DeepEqual(tt.got, tt.want) {
+					t.Fatalf("got %v, want %v", tt.got, tt.want)
+				}
+			},
+		)
 	}
 }
 
@@ -84,13 +86,15 @@ func TestSort(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got := monq.Sort(tt.entries...)
+		t.Run(
+			tt.name, func(t *testing.T) {
+				got := monq.Sort(tt.entries...)
 
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Fatalf("Sort() = %v, want %v", got, tt.want)
-			}
-		})
+				if !reflect.DeepEqual(got, tt.want) {
+					t.Fatalf("Sort() = %v, want %v", got, tt.want)
+				}
+			},
+		)
 	}
 }
 

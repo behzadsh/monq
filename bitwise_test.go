@@ -55,20 +55,22 @@ func TestBitwiseOperators(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if tt.got[0].Key != string(tt.field) {
-				t.Fatalf("field = %q, want %q", tt.got[0].Key, tt.field)
-			}
+		t.Run(
+			tt.name, func(t *testing.T) {
+				if tt.got[0].Key != string(tt.field) {
+					t.Fatalf("field = %q, want %q", tt.got[0].Key, tt.field)
+				}
 
-			inner, ok := tt.got[0].Value.(bson.D)
-			if !ok || inner[0].Key != tt.op {
-				t.Fatalf("got %v, want a %s operator document", tt.got, tt.op)
-			}
+				inner, ok := tt.got[0].Value.(bson.D)
+				if !ok || inner[0].Key != tt.op {
+					t.Fatalf("got %v, want a %s operator document", tt.got, tt.op)
+				}
 
-			if !reflect.DeepEqual(inner[0].Value, tt.mask) {
-				t.Fatalf("mask = %v, want %v", inner[0].Value, tt.mask)
-			}
-		})
+				if !reflect.DeepEqual(inner[0].Value, tt.mask) {
+					t.Fatalf("mask = %v, want %v", inner[0].Value, tt.mask)
+				}
+			},
+		)
 	}
 }
 

@@ -63,11 +63,13 @@ func TestProjectionEntries(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if !reflect.DeepEqual(tt.got, tt.want) {
-				t.Fatalf("got %v, want %v", tt.got, tt.want)
-			}
-		})
+		t.Run(
+			tt.name, func(t *testing.T) {
+				if !reflect.DeepEqual(tt.got, tt.want) {
+					t.Fatalf("got %v, want %v", tt.got, tt.want)
+				}
+			},
+		)
 	}
 }
 
@@ -108,9 +110,14 @@ func TestProjection(t *testing.T) {
 		{
 			name:    "the query operator doubles as an entry",
 			entries: []bson.D{monq.ElemMatch("items", monq.Gt("qty", 5))},
-			want: bson.D{{Key: "items", Value: bson.D{
-				{Key: "$elemMatch", Value: bson.D{{Key: "qty", Value: bson.D{{Key: "$gt", Value: 5}}}}},
-			}}},
+			want: bson.D{
+				{
+					Key: "items",
+					Value: bson.D{
+						{Key: "$elemMatch", Value: bson.D{{Key: "qty", Value: bson.D{{Key: "$gt", Value: 5}}}}},
+					},
+				},
+			},
 		},
 		{
 			name:    "a text score comes back alongside the fields",
@@ -123,13 +130,15 @@ func TestProjection(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got := monq.Projection(tt.entries...)
+		t.Run(
+			tt.name, func(t *testing.T) {
+				got := monq.Projection(tt.entries...)
 
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Fatalf("Projection() = %v, want %v", got, tt.want)
-			}
-		})
+				if !reflect.DeepEqual(got, tt.want) {
+					t.Fatalf("Projection() = %v, want %v", got, tt.want)
+				}
+			},
+		)
 	}
 }
 

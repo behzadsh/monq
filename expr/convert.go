@@ -37,11 +37,16 @@ func ConvertOnNull(value any) ConvertOption {
 // Example:
 //
 //	expr.Convert(expr.Field("legacy_id"), "objectId", expr.ConvertOnError(nil))
-//	// bson.D{{Key: "$convert", Value: bson.D{
-//	//     {Key: "input", Value: "$legacy_id"},
-//	//     {Key: "to", Value: "objectId"},
-//	//     {Key: "onError", Value: nil},
-//	// }}}
+//	// bson.D{
+//	//     {
+//	//         Key: "$convert",
+//	//         Value: bson.D{
+//	//             {Key: "input", Value: "$legacy_id"},
+//	//             {Key: "to", Value: "objectId"},
+//	//             {Key: "onError", Value: nil},
+//	//         },
+//	//     },
+//	// }
 //
 // MongoDB docs: https://www.mongodb.com/docs/manual/reference/operator/aggregation/convert/
 func Convert(input, to any, opts ...ConvertOption) bson.D {

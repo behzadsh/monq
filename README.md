@@ -381,7 +381,7 @@ so they are independent and safe to run in any order. See [`examples/README.md`]
 go get github.com/behzadsh/monq
 ```
 
-Go 1.25 or newer, matching the releases the Go team still supports.
+Go 1.26 or newer.
 
 ## License
 

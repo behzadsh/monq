@@ -68,10 +68,11 @@ func pathsInQueries(ctx context.Context, coll *mongo.Collection) error {
 		monq.Eq(ProductPaths.Category, "accessories"),
 		monq.Gte(ProductPaths.Ratings.Score, 1),
 	)
-	if err := showFind(
+	err := showFind(
 		ctx, coll, "monq.And(monq.Eq(ProductPaths.Category, ...), monq.Gte(ProductPaths.Ratings.Score, 1))", filter,
 		options.Find().SetProjection(monq.Projection(monq.Include(ProductPaths.SKU, ProductPaths.Ratings.Path), monq.Exclude(ProductPaths.ID))),
-	); err != nil {
+	)
+	if err != nil {
 		return err
 	}
 

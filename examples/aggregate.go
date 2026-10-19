@@ -16,7 +16,7 @@ import (
 // from monq/expr. The split is what keeps the names honest, since stage.Set is the $set stage while monq.Set is
 // the $set update operator, and expr.Eq compares two expressions while monq.Eq tests a field.
 func runAggregate(ctx context.Context, db *mongo.Database) error {
-	if err := runParts(
+	err := runParts(
 		ctx, db.Collection(productsColl),
 		aggBasics,
 		aggGroup,
@@ -25,16 +25,18 @@ func runAggregate(ctx context.Context, db *mongo.Database) error {
 		aggWindows,
 		aggReshape,
 		aggOutput,
-	); err != nil {
+	)
+	if err != nil {
 		return err
 	}
 
-	if err := runParts(
+	err = runParts(
 		ctx, db.Collection(ordersColl),
 		aggUnwind,
 		aggLookup,
 		aggSeries,
-	); err != nil {
+	)
+	if err != nil {
 		return err
 	}
 

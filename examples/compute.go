@@ -15,14 +15,15 @@ import (
 // conversions, sets, objects, statistics, and windows. They are all from monq/expr, they all go inside a stage,
 // and the ones with no fixture to run against use a $documents pipeline, which supplies its own input.
 func runCompute(ctx context.Context, db *mongo.Database) error {
-	if err := runParts(
+	err := runParts(
 		ctx, db.Collection(productsColl),
 		computeStrings,
 		computeConversions,
 		computeTrigonometry,
 		computeStatistics,
 		computeWindows,
-	); err != nil {
+	)
+	if err != nil {
 		return err
 	}
 

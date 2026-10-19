@@ -140,10 +140,11 @@ func findEvaluation(ctx context.Context, coll *mongo.Collection) error {
 	price := expr.Field(ProductPaths.Price)
 	stock := expr.Field(ProductPaths.Stock)
 
-	if err := showFind(
+	err := showFind(
 		ctx, coll, "monq.Expr(expr.Gt(expr.Field(price), expr.Multiply(expr.Field(stock), 10)))",
 		monq.Expr(expr.Gt(price, expr.Multiply(stock, 10))), brief(),
-	); err != nil {
+	)
+	if err != nil {
 		return err
 	}
 
@@ -190,10 +191,11 @@ func findSchemaAndSample(ctx context.Context, coll *mongo.Collection) error {
 func findArray(ctx context.Context, coll *mongo.Collection) error {
 	step("$all wants every value present, in any order")
 
-	if err := showFind(
+	err := showFind(
 		ctx, coll, `monq.All(ProductPaths.Tags.Path, "usb-c", "powered")`,
 		monq.All(ProductPaths.Tags.Path, "usb-c", "powered"), brief(),
-	); err != nil {
+	)
+	if err != nil {
 		return err
 	}
 
@@ -240,13 +242,14 @@ func findBitwise(ctx context.Context, coll *mongo.Collection) error {
 
 	step("the other two spell out the remaining combinations, and a mask can be a list of bit positions")
 
-	if err := showFind(
+	err := showFind(
 		ctx,
 		coll,
 		"monq.BitsAllClear(ProductPaths.Flags, []any{1, 2})",
 		monq.BitsAllClear(ProductPaths.Flags, []any{1, 2}),
 		brief(),
-	); err != nil {
+	)
+	if err != nil {
 		return err
 	}
 

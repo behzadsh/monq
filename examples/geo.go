@@ -36,10 +36,11 @@ func geoNear(ctx context.Context, coll *mongo.Collection) error {
 	query("monq.Point(-73.98, 40.75)", manhattan)
 
 	near := monq.Near(warehousePath, monq.Geometry(manhattan), monq.MaxDistance(20000))
-	if err := showFind(
+	err := showFind(
 		ctx, coll, "monq.Near(warehouse, monq.Geometry(point), monq.MaxDistance(20000))", near,
 		options.Find().SetProjection(geoOnly),
-	); err != nil {
+	)
+	if err != nil {
 		return err
 	}
 
@@ -68,10 +69,11 @@ func geoWithin(ctx context.Context, coll *mongo.Collection) error {
 	)
 	query("monq.Polygon(ring)", midwest)
 
-	if err := showFind(
+	err := showFind(
 		ctx, coll, "monq.GeoWithin(warehouse, monq.Geometry(polygon))", monq.GeoWithin(warehousePath, monq.Geometry(midwest)),
 		options.Find().SetProjection(geoOnly),
-	); err != nil {
+	)
+	if err != nil {
 		return err
 	}
 
@@ -90,10 +92,11 @@ func geoWithin(ctx context.Context, coll *mongo.Collection) error {
 	)
 	query(`monq.GeoJSON("Polygon", rings)`, westCoast)
 
-	if err := showFind(
+	err = showFind(
 		ctx, coll, "monq.GeoIntersects(warehouse, monq.Geometry(shape))", monq.GeoIntersects(warehousePath, monq.Geometry(westCoast)),
 		options.Find().SetProjection(geoOnly),
-	); err != nil {
+	)
+	if err != nil {
 		return err
 	}
 

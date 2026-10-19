@@ -32,10 +32,11 @@ func projectFields(ctx context.Context, coll *mongo.Collection) error {
 	)
 	query("monq.Projection(monq.Include(sku, name, price), monq.Exclude(_id))", keep)
 
-	if err := showFind(
+	err := showFind(
 		ctx, coll, "products under 30, projected", monq.Lt(ProductPaths.Price, 30),
 		options.Find().SetProjection(keep).SetSort(monq.Sort(monq.Asc(ProductPaths.SKU))),
-	); err != nil {
+	)
+	if err != nil {
 		return err
 	}
 

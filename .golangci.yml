@@ -67,6 +67,11 @@ linters:
             - "fmt.Printf"
             - "fmt.Println"
             - "fmt.Print"
+            - "fmt.Fprintf"
+            - "fmt.Fprintln"
+            - "fmt.Fprint"
+            - "strings.Builder.WriteString"
+            - "bytes.Buffer.WriteString"
     misspell:
       locale: US
     prealloc:

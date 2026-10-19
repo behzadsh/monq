@@ -4,52 +4,52 @@ package main
 
 import "github.com/behzadsh/monq"
 
-type productRatingsPaths struct {
+type _ProductRatingsPaths struct {
 	User  monq.FieldPath
 	Score monq.FieldPath
 }
 
 // newProductRatingsPaths returns the paths of one element under prefix.
-func newProductRatingsPaths(prefix string) productRatingsPaths {
-	return productRatingsPaths{
+func newProductRatingsPaths(prefix string) _ProductRatingsPaths {
+	return _ProductRatingsPaths{
 		User:  monq.FieldPath(prefix + ".user"),
 		Score: monq.FieldPath(prefix + ".score"),
 	}
 }
 
-// productRatingsPathsArray is the Ratings array: its own path, the dotted paths of its elements, and the positional
+// _ProductRatingsPathsArray is the Ratings array: its own path, the dotted paths of its elements, and the positional
 // forms for naming particular elements.
-type productRatingsPathsArray struct {
+type _ProductRatingsPathsArray struct {
 	Path monq.FieldPath
-	productRatingsPaths
+	_ProductRatingsPaths
 }
 
 // At returns the paths of the element at index i.
-func (a productRatingsPathsArray) At(i int) productRatingsPaths {
+func (a _ProductRatingsPathsArray) At(i int) _ProductRatingsPaths {
 	return newProductRatingsPaths(string(monq.ArrayPath{Path: a.Path}.At(i)))
 }
 
 // Positional returns the paths of the element a query matched.
-func (a productRatingsPathsArray) Positional() productRatingsPaths {
+func (a _ProductRatingsPathsArray) Positional() _ProductRatingsPaths {
 	return newProductRatingsPaths(string(monq.ArrayPath{Path: a.Path}.Positional()))
 }
 
 // All returns the paths of every element.
-func (a productRatingsPathsArray) All() productRatingsPaths {
+func (a _ProductRatingsPathsArray) All() _ProductRatingsPaths {
 	return newProductRatingsPaths(string(monq.ArrayPath{Path: a.Path}.All()))
 }
 
 // Filtered returns the paths of the elements an array filter picks out.
-func (a productRatingsPathsArray) Filtered(identifier string) productRatingsPaths {
+func (a _ProductRatingsPathsArray) Filtered(identifier string) _ProductRatingsPaths {
 	return newProductRatingsPaths(string(monq.ArrayPath{Path: a.Path}.Filtered(identifier)))
 }
 
-type productWarehousePaths struct {
+type _ProductWarehousePaths struct {
 	Type        monq.FieldPath
 	Coordinates monq.ArrayPath
 }
 
-type productPaths struct {
+type _ProductPaths struct {
 	ID        monq.FieldPath
 	SKU       monq.FieldPath
 	Name      monq.FieldPath
@@ -58,13 +58,13 @@ type productPaths struct {
 	Stock     monq.FieldPath
 	Flags     monq.FieldPath
 	Tags      monq.ArrayPath
-	Ratings   productRatingsPathsArray
-	Warehouse productWarehousePaths
+	Ratings   _ProductRatingsPathsArray
+	Warehouse _ProductWarehousePaths
 	CreatedAt monq.FieldPath
 }
 
 // ProductPaths holds the document paths of Product.
-var ProductPaths = productPaths{
+var ProductPaths = _ProductPaths{
 	ID:       "_id",
 	SKU:      "sku",
 	Name:     "name",
@@ -73,8 +73,8 @@ var ProductPaths = productPaths{
 	Stock:    "stock",
 	Flags:    "flags",
 	Tags:     monq.ArrayPath{Path: "tags"},
-	Ratings:  productRatingsPathsArray{Path: "ratings", productRatingsPaths: newProductRatingsPaths("ratings")},
-	Warehouse: productWarehousePaths{
+	Ratings:  _ProductRatingsPathsArray{Path: "ratings", _ProductRatingsPaths: newProductRatingsPaths("ratings")},
+	Warehouse: _ProductWarehousePaths{
 		Type:        "warehouse.type",
 		Coordinates: monq.ArrayPath{Path: "warehouse.coordinates"},
 	},

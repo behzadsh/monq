@@ -4,63 +4,63 @@ package main
 
 import "github.com/behzadsh/monq"
 
-type orderItemsPaths struct {
+type _OrderItemsPaths struct {
 	SKU      monq.FieldPath
 	Quantity monq.FieldPath
 	Price    monq.FieldPath
 }
 
 // newOrderItemsPaths returns the paths of one element under prefix.
-func newOrderItemsPaths(prefix string) orderItemsPaths {
-	return orderItemsPaths{
+func newOrderItemsPaths(prefix string) _OrderItemsPaths {
+	return _OrderItemsPaths{
 		SKU:      monq.FieldPath(prefix + ".sku"),
 		Quantity: monq.FieldPath(prefix + ".qty"),
 		Price:    monq.FieldPath(prefix + ".price"),
 	}
 }
 
-// orderItemsPathsArray is the Items array: its own path, the dotted paths of its elements, and the positional
+// _OrderItemsPathsArray is the Items array: its own path, the dotted paths of its elements, and the positional
 // forms for naming particular elements.
-type orderItemsPathsArray struct {
+type _OrderItemsPathsArray struct {
 	Path monq.FieldPath
-	orderItemsPaths
+	_OrderItemsPaths
 }
 
 // At returns the paths of the element at index i.
-func (a orderItemsPathsArray) At(i int) orderItemsPaths {
+func (a _OrderItemsPathsArray) At(i int) _OrderItemsPaths {
 	return newOrderItemsPaths(string(monq.ArrayPath{Path: a.Path}.At(i)))
 }
 
 // Positional returns the paths of the element a query matched.
-func (a orderItemsPathsArray) Positional() orderItemsPaths {
+func (a _OrderItemsPathsArray) Positional() _OrderItemsPaths {
 	return newOrderItemsPaths(string(monq.ArrayPath{Path: a.Path}.Positional()))
 }
 
 // All returns the paths of every element.
-func (a orderItemsPathsArray) All() orderItemsPaths {
+func (a _OrderItemsPathsArray) All() _OrderItemsPaths {
 	return newOrderItemsPaths(string(monq.ArrayPath{Path: a.Path}.All()))
 }
 
 // Filtered returns the paths of the elements an array filter picks out.
-func (a orderItemsPathsArray) Filtered(identifier string) orderItemsPaths {
+func (a _OrderItemsPathsArray) Filtered(identifier string) _OrderItemsPaths {
 	return newOrderItemsPaths(string(monq.ArrayPath{Path: a.Path}.Filtered(identifier)))
 }
 
-type orderPaths struct {
+type _OrderPaths struct {
 	ID       monq.FieldPath
 	Customer monq.FieldPath
 	Status   monq.FieldPath
-	Items    orderItemsPathsArray
+	Items    _OrderItemsPathsArray
 	Total    monq.FieldPath
 	PlacedAt monq.FieldPath
 }
 
 // OrderPaths holds the document paths of Order.
-var OrderPaths = orderPaths{
+var OrderPaths = _OrderPaths{
 	ID:       "_id",
 	Customer: "customer",
 	Status:   "status",
-	Items:    orderItemsPathsArray{Path: "items", orderItemsPaths: newOrderItemsPaths("items")},
+	Items:    _OrderItemsPathsArray{Path: "items", _OrderItemsPaths: newOrderItemsPaths("items")},
 	Total:    "total",
 	PlacedAt: "placed_at",
 }

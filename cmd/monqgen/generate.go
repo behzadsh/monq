@@ -226,22 +226,42 @@ func (d *document) constructor() string {
 	var b strings.Builder
 
 	fmt.Fprintf(&b, "// %s returns the paths of one element under prefix.\n", ctor(d.typeName))
-	fmt.Fprintf(&b, "func %s(prefix string) %s {\n\treturn %s{\n", ctor(d.typeName), d.typeName, d.typeName)
+	fmt.Fprintf(&b, "func %s(prefix string) %s {\n\treturn %s\n}", ctor(d.typeName), d.typeName, d.prefixedLiteral(""))
+
+	return b.String()
+}
+
+// prefixedLiteral writes this document's value with every path built on the constructor's prefix, rel being the
+// part of the path between that prefix and this document.
+//
+// A document nested inside an element is written out in place rather than through a constructor of its own: only
+// arrays of documents get constructors, so calling one for a plain nested document would name a function that was
+// never declared. An array of documents inside an element is built the way the root literal builds one, its wrapper
+// carrying its own path beside its element's constructor, since the field holds the wrapper and not the element.
+func (d *document) prefixedLiteral(rel string) string {
+	var b strings.Builder
+
+	fmt.Fprintf(&b, "%s{\n", d.typeName)
 
 	for _, f := range d.fields {
-		key := f.path[strings.LastIndex(f.path, ".")+1:]
+		key := rel + "." + f.path[strings.LastIndex(f.path, ".")+1:]
 
 		switch {
-		case f.kind == KindArray && f.child == nil:
-			fmt.Fprintf(&b, "\t\t%s: monq.ArrayPath{Path: monq.FieldPath(prefix + %q)},\n", f.goName, "."+key)
-		case f.child != nil:
-			fmt.Fprintf(&b, "\t\t%s: %s(prefix + %q),\n", f.goName, ctor(f.child.typeName), "."+key)
+		case f.kind == KindArray && f.child != nil:
+			fmt.Fprintf(
+				&b, "\t%s: %s{Path: monq.FieldPath(prefix + %q), %s: %s(prefix + %q)},\n",
+				f.goName, f.wrapper, key, f.child.typeName, ctor(f.child.typeName), key,
+			)
+		case f.kind == KindArray:
+			fmt.Fprintf(&b, "\t%s: monq.ArrayPath{Path: monq.FieldPath(prefix + %q)},\n", f.goName, key)
+		case f.kind == KindDocument && f.child != nil:
+			fmt.Fprintf(&b, "\t%s: %s,\n", f.goName, f.child.prefixedLiteral(key))
 		default:
-			fmt.Fprintf(&b, "\t\t%s: monq.FieldPath(prefix + %q),\n", f.goName, "."+key)
+			fmt.Fprintf(&b, "\t%s: monq.FieldPath(prefix + %q),\n", f.goName, key)
 		}
 	}
 
-	b.WriteString("\t}\n}")
+	b.WriteString("}")
 
 	return b.String()
 }

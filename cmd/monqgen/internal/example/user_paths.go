@@ -9,10 +9,62 @@ type _UserAddressPaths struct {
 	City   monq.FieldPath
 }
 
+type _UserItemsWarehouseAddressPaths struct {
+	Street monq.FieldPath
+	City   monq.FieldPath
+}
+
+type _UserItemsWarehousePaths struct {
+	Code    monq.FieldPath
+	Address _UserItemsWarehouseAddressPaths
+}
+
+type _UserItemsVariantsPaths struct {
+	Color monq.FieldPath
+	Stock monq.FieldPath
+}
+
+// newUserItemsVariantsPaths returns the paths of one element under prefix.
+func newUserItemsVariantsPaths(prefix string) _UserItemsVariantsPaths {
+	return _UserItemsVariantsPaths{
+		Color: monq.FieldPath(prefix + ".color"),
+		Stock: monq.FieldPath(prefix + ".stock"),
+	}
+}
+
+// _UserItemsVariantsPathsArray is the Variants array: its own path, the dotted paths of its elements, and the positional
+// forms for naming particular elements.
+type _UserItemsVariantsPathsArray struct {
+	Path monq.FieldPath
+	_UserItemsVariantsPaths
+}
+
+// At returns the paths of the element at index i.
+func (a _UserItemsVariantsPathsArray) At(i int) _UserItemsVariantsPaths {
+	return newUserItemsVariantsPaths(string(monq.ArrayPath{Path: a.Path}.At(i)))
+}
+
+// Positional returns the paths of the element a query matched.
+func (a _UserItemsVariantsPathsArray) Positional() _UserItemsVariantsPaths {
+	return newUserItemsVariantsPaths(string(monq.ArrayPath{Path: a.Path}.Positional()))
+}
+
+// All returns the paths of every element.
+func (a _UserItemsVariantsPathsArray) All() _UserItemsVariantsPaths {
+	return newUserItemsVariantsPaths(string(monq.ArrayPath{Path: a.Path}.All()))
+}
+
+// Filtered returns the paths of the elements an array filter picks out.
+func (a _UserItemsVariantsPathsArray) Filtered(identifier string) _UserItemsVariantsPaths {
+	return newUserItemsVariantsPaths(string(monq.ArrayPath{Path: a.Path}.Filtered(identifier)))
+}
+
 type _UserItemsPaths struct {
-	SKU      monq.FieldPath
-	Quantity monq.FieldPath
-	Price    monq.FieldPath
+	SKU       monq.FieldPath
+	Quantity  monq.FieldPath
+	Price     monq.FieldPath
+	Warehouse _UserItemsWarehousePaths
+	Variants  _UserItemsVariantsPathsArray
 }
 
 // newUserItemsPaths returns the paths of one element under prefix.
@@ -21,6 +73,14 @@ func newUserItemsPaths(prefix string) _UserItemsPaths {
 		SKU:      monq.FieldPath(prefix + ".sku"),
 		Quantity: monq.FieldPath(prefix + ".qty"),
 		Price:    monq.FieldPath(prefix + ".price"),
+		Warehouse: _UserItemsWarehousePaths{
+			Code: monq.FieldPath(prefix + ".warehouse.code"),
+			Address: _UserItemsWarehouseAddressPaths{
+				Street: monq.FieldPath(prefix + ".warehouse.address.street"),
+				City:   monq.FieldPath(prefix + ".warehouse.address.city"),
+			},
+		},
+		Variants: _UserItemsVariantsPathsArray{Path: monq.FieldPath(prefix + ".variants"), _UserItemsVariantsPaths: newUserItemsVariantsPaths(prefix + ".variants")},
 	}
 }
 

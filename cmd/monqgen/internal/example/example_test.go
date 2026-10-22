@@ -41,6 +41,21 @@ func TestGeneratedPaths(t *testing.T) {
 		{name: "every element", got: example.UserPaths.Items.All().SKU, want: "items.$[].sku"},
 		{name: "an array filter", got: example.UserPaths.Items.Filtered("cheap").Price, want: "items.$[cheap].price"},
 		{name: "a scalar array position", got: example.UserPaths.Tags.At(0), want: "tags.0"},
+		{name: "a document inside an element", got: example.UserPaths.Items.Warehouse.Code, want: "items.warehouse.code"},
+		{
+			name: "two documents deep inside an element", got: example.UserPaths.Items.Warehouse.Address.City,
+			want: "items.warehouse.address.city",
+		},
+		{
+			name: "a document inside the matched element", got: example.UserPaths.Items.Positional().Warehouse.Address.City,
+			want: "items.$.warehouse.address.city",
+		},
+		{name: "an array inside an element", got: example.UserPaths.Items.Variants.Path, want: "items.variants"},
+		{name: "an element of an array inside an element", got: example.UserPaths.Items.At(2).Variants.At(0).Color, want: "items.2.variants.0.color"},
+		{
+			name: "every element of an array inside a filtered element", got: example.UserPaths.Items.Filtered("cheap").Variants.All().Stock,
+			want: "items.$[cheap].variants.$[].stock",
+		},
 	}
 
 	for _, tt := range tests {

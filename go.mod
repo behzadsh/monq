@@ -3,7 +3,7 @@ module github.com/behzadsh/monq
 go 1.26.0
 
 require (
-	go.mongodb.org/mongo-driver/v2 v2.9.2
+	go.mongodb.org/mongo-driver/v2 v2.9.3
 	golang.org/x/tools v0.52.0
 )
 
